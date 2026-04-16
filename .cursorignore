@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/
+
+# Build output
+.next/
+out/
+dist/
+build/
+.astro/
+.svelte-kit/
+.turbo/
+.cache/
+
+# Env / secrets
+.env
+.env.*
+
+# Deploy
+.vercel/
+.netlify/
+
+# Logs
+*.log
+
+# Lockfiles (keep package.json readable, not the huge lockfile)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Binary / media assets that don't need to be read
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+*.mp4
+*.mov
+*.pdf
+*.woff
+*.woff2
+*.ttf
+*.otf
