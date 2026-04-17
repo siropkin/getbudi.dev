@@ -57,3 +57,7 @@ pnpm-debug.log*
 *.scratch.*
 *.tmp
 *.temp
+
+# Cached fonts for one-shot asset generation (see scripts/generate-assets.mjs)
+scripts/fonts/
+
