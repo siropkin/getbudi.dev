@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "generate-assets": "node scripts/generate-assets.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -19,5 +20,9 @@
     "astro": "^5.18.1",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.0"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "satori": "^0.26.0"
   }
 }

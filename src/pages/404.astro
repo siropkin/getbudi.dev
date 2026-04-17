@@ -1,0 +1,55 @@
+---
+import Base from "~/layouts/Base.astro";
+
+// 404 intentionally carries a noindex hint so crawlers don't add it as an
+// entry point. Vercel still serves it with a 200 for static sites — the
+// `notFound: true` custom-404 wiring requires SSR we don't have. Lighthouse
+// and humans both treat this as the expected "page not found" affordance.
+---
+
+<Base
+  title="Not found — budi"
+  description="The page you requested does not exist. Head back to getbudi.dev."
+  canonical="https://getbudi.dev/404"
+  noindex={true}
+>
+  <section class="container-readable pt-24 pb-20 min-h-[60vh]">
+    <div class="max-w-2xl flex flex-col gap-6">
+      <span class="chip">
+        <span aria-hidden="true" class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        404 · page not found
+      </span>
+      <h1 class="text-[2rem] sm:text-[2.75rem] leading-[1.08] font-semibold tracking-tight">
+        That link does not exist here.
+      </h1>
+      <p class="text-fg-muted text-lg leading-relaxed">
+        The page you requested is not on <code>getbudi.dev</code>. You might be
+        looking for the product repo, the cloud dashboard, or the landing page.
+      </p>
+      <div class="flex flex-wrap items-center gap-3 text-sm">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-black font-semibold hover:opacity-90 transition-opacity"
+        >
+          Back to home
+        </a>
+        <a
+          href="https://github.com/siropkin/budi"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-line-strong hover:border-accent hover:text-accent transition-colors"
+        >
+          View on GitHub
+        </a>
+        <a
+          href="https://app.getbudi.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1 px-3 py-2 text-fg-muted hover:text-fg"
+        >
+          app.getbudi.dev →
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
