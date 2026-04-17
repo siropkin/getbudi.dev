@@ -1,0 +1,150 @@
+name: Lighthouse
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI (Vercel preview)
+    runs-on: ubuntu-latest
+    # Skip draft PRs and PRs opened from forks: Vercel previews are not
+    # guaranteed and fork PRs cannot read repo secrets anyway.
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for Vercel preview
+        id: wait-preview
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 600
+          check_interval: 10
+          environment: Preview
+
+      - name: Lighthouse (desktop)
+        id: lhci-desktop
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: ${{ steps.wait-preview.outputs.url }}
+          configPath: ./lighthouserc.desktop.json
+          temporaryPublicStorage: true
+          uploadArtifacts: true
+
+      - name: Lighthouse (mobile)
+        id: lhci-mobile
+        if: always()
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: ${{ steps.wait-preview.outputs.url }}
+          configPath: ./lighthouserc.mobile.json
+          temporaryPublicStorage: true
+          uploadArtifacts: true
+
+      - name: Comment Lighthouse report links on PR
+        if: always() && steps.wait-preview.outputs.url != ''
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.wait-preview.outputs.url }}
+          DESKTOP_LINKS: ${{ steps.lhci-desktop.outputs.links }}
+          DESKTOP_MANIFEST: ${{ steps.lhci-desktop.outputs.manifest }}
+          MOBILE_LINKS: ${{ steps.lhci-mobile.outputs.links }}
+          MOBILE_MANIFEST: ${{ steps.lhci-mobile.outputs.manifest }}
+          DESKTOP_OUTCOME: ${{ steps.lhci-desktop.outcome }}
+          MOBILE_OUTCOME: ${{ steps.lhci-mobile.outcome }}
+        with:
+          script: |
+            const marker = "<!-- lighthouse-ci-report -->";
+
+            const parseLinks = (raw) => {
+              if (!raw) return [];
+              try {
+                const obj = JSON.parse(raw);
+                return Object.entries(obj).map(([url, report]) => ({ url, report }));
+              } catch {
+                return [];
+              }
+            };
+
+            const parseSummary = (raw) => {
+              if (!raw) return null;
+              try {
+                const arr = JSON.parse(raw);
+                const rep = Array.isArray(arr) ? arr.find((r) => r.isRepresentativeRun) ?? arr[0] : null;
+                if (!rep || !rep.summary) return null;
+                const s = rep.summary;
+                const fmt = (n) => (typeof n === "number" ? Math.round(n * 100) : "—");
+                return {
+                  performance: fmt(s.performance),
+                  accessibility: fmt(s.accessibility),
+                  bestPractices: fmt(s["best-practices"]),
+                  seo: fmt(s.seo),
+                };
+              } catch {
+                return null;
+              }
+            };
+
+            const renderRow = (name, outcome, scores, links) => {
+              const icon = outcome === "success" ? "✅" : outcome === "failure" ? "❌" : "⚪";
+              const s = scores ?? { performance: "—", accessibility: "—", bestPractices: "—", seo: "—" };
+              const reportLink = links[0]?.report ? `[report](${links[0].report})` : "—";
+              return `| ${icon} ${name} | ${s.performance} | ${s.accessibility} | ${s.bestPractices} | ${s.seo} | ${reportLink} |`;
+            };
+
+            const body = [
+              marker,
+              `### Lighthouse CI`,
+              ``,
+              `Preview: ${process.env.PREVIEW_URL}`,
+              ``,
+              `| Run | Performance | Accessibility | Best Practices | SEO | Report |`,
+              `| --- | ---: | ---: | ---: | ---: | --- |`,
+              renderRow(
+                "Desktop",
+                process.env.DESKTOP_OUTCOME,
+                parseSummary(process.env.DESKTOP_MANIFEST),
+                parseLinks(process.env.DESKTOP_LINKS),
+              ),
+              renderRow(
+                "Mobile",
+                process.env.MOBILE_OUTCOME,
+                parseSummary(process.env.MOBILE_MANIFEST),
+                parseLinks(process.env.MOBILE_LINKS),
+              ),
+              ``,
+              `Gate: median of 3 runs ≥ 0.95 on every category. Reports are hosted on Lighthouse CI temporary public storage.`,
+            ].join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.user?.type === "Bot" && c.body?.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
