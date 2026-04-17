@@ -18,12 +18,7 @@
  * (gitignored). The script is idempotent and safe to re-run.
  */
 import { Resvg } from "@resvg/resvg-js";
-import {
-  writeFileSync,
-  readFileSync,
-  existsSync,
-  mkdirSync,
-} from "node:fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -59,10 +54,7 @@ async function ensureFont(name) {
 }
 
 function esc(text) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 /**
@@ -76,10 +68,8 @@ function buildOGSvg() {
   const H = 630;
   const headline1 = "See where your AI coding money";
   const headline2 = "actually goes.";
-  const sub =
-    "Local-first cost tracker for Claude Code, Cursor, Codex, and Copilot.";
-  const sub2 =
-    "One proxy. Real attribution. Prompts never leave your machine.";
+  const sub = "Local-first cost tracker for Claude Code, Cursor, Codex, and Copilot.";
+  const sub2 = "One proxy. Real attribution. Prompts never leave your machine.";
   const install = "brew install siropkin/budi/budi && budi init";
 
   return `<?xml version="1.0" encoding="UTF-8"?>
