@@ -29,3 +29,6 @@ jobs:
 
       - name: Astro build
         run: npm run build
+
+      - name: Static build audit
+        run: npm run audit
