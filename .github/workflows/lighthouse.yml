@@ -1,0 +1,247 @@
+name: Lighthouse
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# Default GITHUB_TOKEN is read-only in this repo; the PR-comment step needs
+# pull-requests:write, and the preview-URL resolver needs deployments:read.
+permissions:
+  contents: read
+  pull-requests: write
+  deployments: read
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI (Vercel preview)
+    runs-on: ubuntu-latest
+    # Skip draft PRs and PRs opened from forks: Vercel previews are not
+    # guaranteed and fork PRs cannot read repo secrets anyway.
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      # Resolve the Vercel preview URL directly from GitHub's Deployments API
+      # instead of `wait-for-vercel-preview`, which polls the URL over HTTP and
+      # fails when Vercel Deployment Protection is enabled for previews (the
+      # URL returns 401 until auth is satisfied). Pulling from the deployment
+      # status works regardless of whether protection is on.
+      - name: Resolve Vercel preview URL
+        id: preview
+        uses: actions/github-script@v7
+        env:
+          VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        with:
+          script: |
+            const sha = context.payload.pull_request.head.sha;
+            const { owner, repo } = context.repo;
+            const maxAttempts = 60;
+            const intervalMs = 10_000;
+
+            const findVercelSuccess = async () => {
+              const { data: deployments } = await github.rest.repos.listDeployments({
+                owner,
+                repo,
+                sha,
+                per_page: 100,
+              });
+              for (const d of deployments) {
+                const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
+                  owner,
+                  repo,
+                  deployment_id: d.id,
+                  per_page: 100,
+                });
+                const ok = statuses.find((s) => s.state === "success");
+                if (!ok) continue;
+                const raw = ok.environment_url || ok.target_url;
+                if (!raw) continue;
+                let host;
+                try {
+                  host = new URL(raw).hostname;
+                } catch {
+                  continue;
+                }
+                if (!/\.vercel\.app$/.test(host)) continue;
+                return raw;
+              }
+              return null;
+            };
+
+            let displayUrl = null;
+            for (let i = 0; i < maxAttempts; i++) {
+              displayUrl = await findVercelSuccess();
+              if (displayUrl) break;
+              core.info(`No Vercel preview yet (attempt ${i + 1}/${maxAttempts}), retrying in ${intervalMs / 1000}s...`);
+              await new Promise((r) => setTimeout(r, intervalMs));
+            }
+            if (!displayUrl) {
+              core.setFailed("No successful Vercel preview deployment for this commit within the timeout.");
+              return;
+            }
+
+            const bypass = process.env.VERCEL_BYPASS_SECRET;
+            let auditUrl = displayUrl;
+            if (bypass) {
+              // Mask explicitly in case the secret appears in any composed URL
+              // that leaks into logs (Actions already masks the raw value, but
+              // belt + braces).
+              core.setSecret(bypass);
+              const u = new URL(displayUrl);
+              u.searchParams.set("x-vercel-protection-bypass", bypass);
+              u.searchParams.set("x-vercel-set-bypass-cookie", "samesitenone");
+              auditUrl = u.toString();
+              core.info("Applied Vercel Protection Bypass for Automation to audit URL.");
+            } else {
+              core.info("No VERCEL_AUTOMATION_BYPASS_SECRET set; auditing the preview URL directly.");
+            }
+
+            core.setOutput("display_url", displayUrl);
+            core.setOutput("audit_url", auditUrl);
+            core.setOutput("bypass_enabled", bypass ? "true" : "false");
+
+      # Do not use `uploadArtifacts: true` — both Lighthouse steps share the
+      # same default artifact name and the second upload 409s. The
+      # temporary-public-storage report URLs already surface in the PR comment
+      # below, which is what reviewers actually use.
+      - name: Lighthouse (desktop)
+        id: lhci-desktop
+        if: steps.preview.outputs.audit_url != ''
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: ${{ steps.preview.outputs.audit_url }}
+          configPath: ./lighthouserc.desktop.json
+          temporaryPublicStorage: true
+
+      - name: Lighthouse (mobile)
+        id: lhci-mobile
+        if: always() && steps.preview.outputs.audit_url != ''
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: ${{ steps.preview.outputs.audit_url }}
+          configPath: ./lighthouserc.mobile.json
+          temporaryPublicStorage: true
+
+      - name: Comment Lighthouse report links on PR
+        if: always() && steps.preview.outputs.display_url != ''
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.display_url }}
+          BYPASS_ENABLED: ${{ steps.preview.outputs.bypass_enabled }}
+          DESKTOP_LINKS: ${{ steps.lhci-desktop.outputs.links }}
+          DESKTOP_MANIFEST: ${{ steps.lhci-desktop.outputs.manifest }}
+          MOBILE_LINKS: ${{ steps.lhci-mobile.outputs.links }}
+          MOBILE_MANIFEST: ${{ steps.lhci-mobile.outputs.manifest }}
+          DESKTOP_OUTCOME: ${{ steps.lhci-desktop.outcome }}
+          MOBILE_OUTCOME: ${{ steps.lhci-mobile.outcome }}
+        with:
+          script: |
+            const marker = "<!-- lighthouse-ci-report -->";
+
+            const parseLinks = (raw) => {
+              if (!raw) return [];
+              try {
+                const obj = JSON.parse(raw);
+                return Object.entries(obj).map(([url, report]) => ({ url, report }));
+              } catch {
+                return [];
+              }
+            };
+
+            const parseSummary = (raw) => {
+              if (!raw) return null;
+              try {
+                const arr = JSON.parse(raw);
+                const rep = Array.isArray(arr)
+                  ? (arr.find((r) => r.isRepresentativeRun) ?? arr[0])
+                  : null;
+                if (!rep || !rep.summary) return null;
+                const s = rep.summary;
+                const fmt = (n) => (typeof n === "number" ? Math.round(n * 100) : "—");
+                return {
+                  performance: fmt(s.performance),
+                  accessibility: fmt(s.accessibility),
+                  bestPractices: fmt(s["best-practices"]),
+                  seo: fmt(s.seo),
+                };
+              } catch {
+                return null;
+              }
+            };
+
+            const renderRow = (name, outcome, scores, links) => {
+              const icon =
+                outcome === "success" ? "✅" : outcome === "failure" ? "❌" : "⚪";
+              const s =
+                scores ?? {
+                  performance: "—",
+                  accessibility: "—",
+                  bestPractices: "—",
+                  seo: "—",
+                };
+              const reportLink = links[0]?.report ? `[report](${links[0].report})` : "—";
+              return `| ${icon} ${name} | ${s.performance} | ${s.accessibility} | ${s.bestPractices} | ${s.seo} | ${reportLink} |`;
+            };
+
+            const bypassLine =
+              process.env.BYPASS_ENABLED === "true"
+                ? "Protection Bypass for Automation: **enabled**."
+                : "Protection Bypass for Automation: **not configured** — if Vercel Deployment Protection is on, Lighthouse is auditing the auth wall.";
+
+            const body = [
+              marker,
+              `### Lighthouse CI`,
+              ``,
+              `Preview: ${process.env.PREVIEW_URL}`,
+              ``,
+              `| Run | Performance | Accessibility | Best Practices | SEO | Report |`,
+              `| --- | ---: | ---: | ---: | ---: | --- |`,
+              renderRow(
+                "Desktop",
+                process.env.DESKTOP_OUTCOME,
+                parseSummary(process.env.DESKTOP_MANIFEST),
+                parseLinks(process.env.DESKTOP_LINKS),
+              ),
+              renderRow(
+                "Mobile",
+                process.env.MOBILE_OUTCOME,
+                parseSummary(process.env.MOBILE_MANIFEST),
+                parseLinks(process.env.MOBILE_LINKS),
+              ),
+              ``,
+              `Gate: median of 3 runs ≥ 0.95 on every category. Reports are hosted on Lighthouse CI temporary public storage.`,
+              ``,
+              bypassLine,
+            ].join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (c) => c.user?.type === "Bot" && c.body?.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
