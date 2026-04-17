@@ -115,6 +115,62 @@ const altInstalls = [
     code: "git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh",
   },
 ];
+
+// "Why not just use X?" — honest, not dismissive. Every row names the real
+// alternative, what it's good at, and where it stops. The Budi row is last
+// and visually distinct. Source: #3 scope §1.
+const alternatives = [
+  {
+    name: "Provider dashboards",
+    examples: "Anthropic Console · OpenAI usage · Cursor usage",
+    good: "Official, authoritative totals. Free.",
+    gap: "Single-provider. No repo, branch, or ticket attribution. No session health signal. Nothing cross-agent.",
+    kind: "alt" as const,
+  },
+  {
+    name: "Open-source CLI usage tools",
+    examples: "ccusage and similar",
+    good: "Local, lightweight, correct for the one agent they target.",
+    gap: "Usually single-agent. No proxy, so no live session health or inline flags. No team view if you ever need one.",
+    kind: "alt" as const,
+  },
+  {
+    name: "SaaS cost trackers that upload prompts",
+    examples: "Generic observability vendors that ingest LLM payloads",
+    good: "Central dashboard, often with deep analytics on the prompts themselves.",
+    gap: "Your prompts, code, and responses leave your machine. For most teams, that is a hard no for source code.",
+    kind: "alt" as const,
+  },
+  {
+    name: "Budi",
+    examples: "Local proxy · multi-agent · opt-in cloud",
+    good: "Multi-agent via one proxy. Repo/branch/ticket attribution. Live session health flags. Optional team dashboard with aggregates only.",
+    gap: "You run a small daemon. Not every agent is supported yet (Gemini deferred). v1 single-machine per user.",
+    kind: "budi" as const,
+  },
+];
+
+// 3-step "after you install" block, taken from the siropkin/budi README
+// first-run checklist (§ First run checklist). We intentionally surface the
+// three commands that prove setup worked, not the full 6-step list — that
+// lives in the README and we link out to it. Source: #3 scope §5.
+const firstRunSteps = [
+  {
+    n: "1",
+    cmd: "budi init",
+    body: "Starts the daemon (port 7878) and proxy (port 9878) and prompts you to pick agents and integrations. Defaults are safe; you can opt out per agent.",
+  },
+  {
+    n: "2",
+    cmd: "budi doctor",
+    body: "Verifies the daemon, proxy, autostart service, agent configuration, and that proxy env vars are active in your current shell.",
+  },
+  {
+    n: "3",
+    cmd: "budi stats",
+    body: "Prints your first cost + token breakdown. Non-zero output = tracking works. Try --projects, --branches, --models, or --tag ticket_id.",
+  },
+];
 ---
 
 <Base>
@@ -145,10 +201,17 @@ const altInstalls = [
         </p>
       </div>
 
+      {/*
+       * Per-archetype CTA row (R1.1 §1–2, implemented in #3):
+       *   - Individual developer  → brew install ... (above, hero) + "View on GitHub"
+       *   - Team lead / manager   → jumps to #teams block (cloud sign-up CTA)
+       *   - Tire-kicker / contributor → jumps to comparison section + footer repos
+       */}
       <div class="flex flex-wrap items-center gap-3 text-sm">
         <a
           href="https://github.com/siropkin/budi"
-          rel="noopener"
+          target="_blank"
+          rel="noopener noreferrer"
           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-line-strong hover:border-accent hover:text-accent transition-colors"
         >
           <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -156,8 +219,17 @@ const altInstalls = [
           </svg>
           View on GitHub
         </a>
-        <a href="#how" class="inline-flex items-center gap-1 px-2 py-2 text-fg-muted hover:text-fg">
-          What does the page show? ↓
+        <a
+          href="#teams"
+          class="inline-flex items-center gap-1 px-3 py-2 text-fg-muted hover:text-fg"
+        >
+          For teams →
+        </a>
+        <a
+          href="#compare"
+          class="inline-flex items-center gap-1 px-3 py-2 text-fg-muted hover:text-fg"
+        >
+          Why not just X? ↓
         </a>
       </div>
     </div>
@@ -250,6 +322,65 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     </div>
   </section>
 
+  {/* 3b. WHY NOT JUST USE X — honest comparison */}
+  <section id="compare" class="container-readable py-14 sm:py-20 border-t border-line/70">
+    <header class="max-w-2xl mb-10">
+      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Why not just use X?</p>
+      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+        The realistic alternatives, named honestly.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        Before you install anything new, the fair question is: what does the
+        obvious existing option already give you? Here is where Budi does and
+        does not help.
+      </p>
+    </header>
+
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {alternatives.map((alt) => (
+        <article
+          class:list={[
+            "card p-5 sm:p-6 flex flex-col gap-3",
+            alt.kind === "budi" ? "border-accent bg-accent-soft/30" : "",
+          ]}
+        >
+          <header class="flex flex-col gap-1">
+            <h3
+              class:list={[
+                "font-semibold tracking-tight",
+                alt.kind === "budi" ? "text-accent" : "text-fg",
+              ]}
+            >
+              {alt.name}
+            </h3>
+            <p class="text-xs text-fg-dim leading-snug">{alt.examples}</p>
+          </header>
+          <dl class="flex flex-col gap-2 text-sm">
+            <div>
+              <dt class="text-xs uppercase tracking-wider text-fg-dim mb-0.5">
+                Good at
+              </dt>
+              <dd class="text-fg-muted leading-relaxed">{alt.good}</dd>
+            </div>
+            <div>
+              <dt class="text-xs uppercase tracking-wider text-fg-dim mb-0.5">
+                {alt.kind === "budi" ? "Caveats" : "Stops at"}
+              </dt>
+              <dd class="text-fg-muted leading-relaxed">{alt.gap}</dd>
+            </div>
+          </dl>
+        </article>
+      ))}
+    </div>
+
+    <p class="text-xs text-fg-dim mt-4 max-w-2xl">
+      If one of the above already fits your workflow, use it. Budi exists for
+      the case where you are running <em>more than one</em> agent, care about
+      per-repo or per-ticket attribution, and are not willing to upload prompts
+      to a third party.
+    </p>
+  </section>
+
   {/* 4. LOCAL-FIRST, BY DESIGN */}
   <section id="local-first" class="container-readable py-14 sm:py-20 border-t border-line/70">
     <header class="max-w-2xl mb-10">
@@ -287,7 +418,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <a
           href="https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md"
           class="link-underline hover:text-fg"
-          rel="noopener"
+          target="_blank"
+          rel="noopener noreferrer"
         >ADR-0083</a> in the product repo.
       </p>
     </header>
@@ -311,7 +443,12 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <div class="card p-5 border-l-4 border-l-line-strong">
         <h3 class="font-semibold text-fg mb-2">How you turn it on</h3>
         <p class="text-sm text-fg-muted leading-relaxed">
-          Sign up at <a href="https://app.getbudi.dev" class="link-underline hover:text-fg">app.getbudi.dev</a>,
+          Sign up at <a
+            href="https://app.getbudi.dev"
+            class="link-underline hover:text-fg"
+            target="_blank"
+            rel="noopener noreferrer"
+          >app.getbudi.dev</a>,
           drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>,
           set <code class="text-xs">enabled = true</code>. Off by default.
         </p>
@@ -331,7 +468,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <a
           href="https://github.com/siropkin/budi/blob/main/docs/adr/0082-proxy-compatibility-matrix-and-gateway-contract.md"
           class="link-underline hover:text-fg"
-          rel="noopener"
+          target="_blank"
+          rel="noopener noreferrer"
         >ADR-0082</a>.
       </p>
     </header>
@@ -431,6 +569,52 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         ))}
       </div>
     </details>
+
+    {/*
+     * "After you install" — the conversion we actually care about. Installing
+     * is not adoption; a non-zero budi stats run is. Three commands, in order,
+     * mirror the siropkin/budi README first-run checklist.
+     */}
+    <div class="mt-12">
+      <header class="max-w-2xl mb-6">
+        <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">After you install</p>
+        <h3 class="text-xl sm:text-2xl font-semibold tracking-tight">
+          Three commands to prove it works.
+        </h3>
+        <p class="text-fg-muted mt-3 text-sm">
+          Five minutes end to end. If any step looks wrong, <code class="text-xs">budi doctor</code>
+          will say so out loud — it is the source of truth, not this page.
+        </p>
+      </header>
+
+      <ol class="grid gap-4 md:grid-cols-3" role="list">
+        {firstRunSteps.map((step) => (
+          <li class="card p-5 sm:p-6 flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+              <span
+                aria-hidden="true"
+                class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent font-mono text-sm font-semibold"
+              >
+                {step.n}
+              </span>
+              <code class="text-sm font-mono text-fg">{step.cmd}</code>
+            </div>
+            <p class="text-sm text-fg-muted leading-relaxed">{step.body}</p>
+          </li>
+        ))}
+      </ol>
+
+      <p class="text-xs text-fg-dim mt-4 max-w-2xl">
+        Full, canonical 6-step checklist (including historical import and
+        terminal-restart caveats) lives in the
+        <a
+          href="https://github.com/siropkin/budi#first-run-checklist-5-minutes"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link-underline hover:text-fg"
+        >siropkin/budi README</a>.
+      </p>
+    </div>
   </section>
 
   {/* 8. FOR TEAMS (opt-in cloud) */}
@@ -443,7 +627,12 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <p class="text-fg-muted mt-3">
         If a team lead now owns an "AI coding spend" line item, the cloud
         dashboard at
-        <a href="https://app.getbudi.dev" class="link-underline hover:text-fg">app.getbudi.dev</a>
+        <a
+          href="https://app.getbudi.dev"
+          class="link-underline hover:text-fg"
+          target="_blank"
+          rel="noopener noreferrer"
+        >app.getbudi.dev</a>
         gives them daily cost per user, repo, model, branch, and ticket. Without
         reading anyone's prompts, responses, or file paths.
       </p>
@@ -473,7 +662,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     <div class="mt-6 flex flex-wrap items-center gap-3 text-sm">
       <a
         href="https://app.getbudi.dev"
-        rel="noopener"
+        target="_blank"
+        rel="noopener noreferrer"
         class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-black font-semibold hover:opacity-90 transition-opacity"
       >
         Sign up at app.getbudi.dev
@@ -484,7 +674,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </a>
       <a
         href="https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md"
-        rel="noopener"
+        target="_blank"
+        rel="noopener noreferrer"
         class="inline-flex items-center gap-1 px-2 py-2 text-fg-muted hover:text-fg"
       >
         Read the privacy contract (ADR-0083) →
