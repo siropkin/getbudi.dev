@@ -12,8 +12,8 @@ accept = ["200..=299", "403", "429"]
 exclude_path = ["dist/404.html"]
 # ^ The 404 page intentionally links to things we want to check, but skipping
 #   it avoids scanning the same links twice.
-exclude = ["^/"]
-# ^ Skip root-relative URLs like "/", "/#privacy", "/favicon.svg".
-#   Internal anchor + asset integrity is verified by scripts/audit-build.mjs
-#   without a network round-trip; probing them here would either fail (no
-#   base URL) or double up on the audit.
+# Root-relative URLs like "/", "/#privacy", "/favicon.svg" are resolved
+# against `--root-dir` (set in the workflow to $GITHUB_WORKSPACE/dist) so
+# lychee treats them as offline filesystem checks. That keeps the network
+# probe scoped to genuine outbound http(s) links; internal anchor integrity
+# stays owned by scripts/audit-build.mjs (R2.2).
