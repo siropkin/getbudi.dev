@@ -32,7 +32,7 @@ src/
   components/
     CopyableCommand.astro    # one-click-copy install block (hero + compact)
     Diagram.astro            # inline SVG: agent → proxy → provider
-  pages/index.astro          # all 9 sections of the landing page
+  pages/index.astro          # landing page: hero → problem → features → compare → local-first → privacy → agents → install (+ after-install) → for teams
   styles/global.css          # Tailwind v4 import + @theme tokens + base layer
 public/
   favicon.svg, robots.txt    # static assets copied verbatim to the build
