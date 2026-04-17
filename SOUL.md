@@ -6,13 +6,13 @@ This repo is the public face, not the product. Keep it small, fast, and static-f
 
 ## Product boundaries
 
-| Domain | Repo | What lives there |
-|--------|------|-----------------|
-| `getbudi.dev` | **this repo** (`siropkin/getbudi.dev`) | Marketing site: hero, features, pricing, docs-lite, install instructions |
-| `app.getbudi.dev` | [`siropkin/budi-cloud`](https://github.com/siropkin/budi-cloud) | Authenticated cloud dashboard (Next.js + Supabase) |
-| Open-source CLI / daemon | [`siropkin/budi`](https://github.com/siropkin/budi) | Rust workspace: daemon, CLI, proxy, core business logic |
-| Cursor / VS Code extension | [`siropkin/budi-cursor`](https://github.com/siropkin/budi-cursor) | TypeScript VS Code extension |
-| Homebrew tap | [`siropkin/homebrew-budi`](https://github.com/siropkin/homebrew-budi) | `brew install siropkin/budi/budi` formula |
+| Domain                     | Repo                                                                  | What lives there                                                         |
+| -------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `getbudi.dev`              | **this repo** (`siropkin/getbudi.dev`)                                | Marketing site: hero, features, pricing, docs-lite, install instructions |
+| `app.getbudi.dev`          | [`siropkin/budi-cloud`](https://github.com/siropkin/budi-cloud)       | Authenticated cloud dashboard (Next.js + Supabase)                       |
+| Open-source CLI / daemon   | [`siropkin/budi`](https://github.com/siropkin/budi)                   | Rust workspace: daemon, CLI, proxy, core business logic                  |
+| Cursor / VS Code extension | [`siropkin/budi-cursor`](https://github.com/siropkin/budi-cursor)     | TypeScript VS Code extension                                             |
+| Homebrew tap               | [`siropkin/homebrew-budi`](https://github.com/siropkin/homebrew-budi) | `brew install siropkin/budi/budi` formula                                |
 
 Do **not** mix cloud dashboard code, product features, or anything that touches user data into this repo. This is a static marketing surface only.
 

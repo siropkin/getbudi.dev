@@ -8,32 +8,27 @@ const installCommand = "brew install siropkin/budi/budi && budi init";
 const features = [
   {
     title: "Multi-agent tracking",
-    body:
-      "One proxy in front of Claude Code, Cursor, Codex CLI, and Copilot CLI. Configured automatically by budi init — no per-agent keys to manage.",
+    body: "One proxy in front of Claude Code, Cursor, Codex CLI, and Copilot CLI. Configured automatically by budi init — no per-agent keys to manage.",
     foot: "Tier 1 + Tier 2 agents. Gemini deferred.",
   },
   {
     title: "Per repo, branch, and ticket",
-    body:
-      "Cost is attributed to the repo and branch you were on, with ticket IDs extracted from branch names. Filter by ticket prefix, model, project, or custom tag.",
+    body: "Cost is attributed to the repo and branch you were on, with ticket IDs extracted from branch names. Filter by ticket prefix, model, project, or custom tag.",
     foot: "budi stats --branches · --tag ticket_id",
   },
   {
     title: "Session health, not just counters",
-    body:
-      "Budi flags context bloat, cache degradation, cost acceleration, and retry loops while they happen, with provider-aware tips. \"You spent $X\" → \"you are about to spend $X for no reason.\"",
+    body: 'Budi flags context bloat, cache degradation, cost acceleration, and retry loops while they happen, with provider-aware tips. "You spent $X" → "you are about to spend $X for no reason."',
     foot: "🟡 budi · $12.50 session · /compact soon",
   },
   {
     title: "Live status line",
-    body:
-      "A live cost + health string in Claude Code and a status bar + side panel in Cursor. New sessions start green; tips appear only when something is off.",
+    body: "A live cost + health string in Claude Code and a status bar + side panel in Cursor. New sessions start green; tips appear only when something is off.",
     foot: "🟢 budi · $0.42 session · new session",
   },
   {
     title: "One-time historical import",
-    body:
-      "budi import backfills from Claude Code JSONL, Codex Desktop/CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You don't lose the months you already spent.",
+    body: "budi import backfills from Claude Code JSONL, Codex Desktop/CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You don't lose the months you already spent.",
     foot: "budi import",
   },
 ];
@@ -175,59 +170,65 @@ const firstRunSteps = [
 
 <Base>
   {/* 1. HERO */}
-  <section class="container-readable pt-16 sm:pt-24 pb-14 sm:pb-20">
-    <div class="flex flex-col items-start gap-6 sm:gap-8 max-w-3xl">
+  <section class="container-readable pt-16 pb-14 sm:pt-24 sm:pb-20">
+    <div class="flex max-w-3xl flex-col items-start gap-6 sm:gap-8">
       <span class="chip">
-        <span aria-hidden="true" class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        <span aria-hidden="true" class="bg-accent inline-block h-1.5 w-1.5 rounded-full"></span>
         Local-first · open source · MIT
       </span>
 
-      <h1 class="text-[2.25rem] sm:text-[3.25rem] leading-[1.05] font-semibold tracking-tight text-balance">
+      <h1
+        class="text-[2.25rem] leading-[1.05] font-semibold tracking-tight text-balance sm:text-[3.25rem]"
+      >
         See where your AI coding money
         <span class="text-accent">actually goes.</span>
       </h1>
 
-      <p class="text-lg sm:text-xl text-fg-muted leading-relaxed text-pretty">
-        Budi is a local-first cost tracker for AI coding agents. It runs a small
-        proxy on your machine between your agent and the LLM provider, and shows
-        you exactly where your tokens and money go — by repo, branch, ticket, and
-        model. Your prompts, code, and responses never leave your machine.
+      <p class="text-fg-muted text-lg leading-relaxed text-pretty sm:text-xl">
+        Budi is a local-first cost tracker for AI coding agents. It runs a small proxy on your
+        machine between your agent and the LLM provider, and shows you exactly where your tokens and
+        money go — by repo, branch, ticket, and model. Your prompts, code, and responses never leave
+        your machine.
       </p>
 
       <div class="w-full max-w-2xl">
         <CopyableCommand command={installCommand} variant="hero" />
-        <p class="text-xs text-fg-dim mt-2">
+        <p class="text-fg-dim mt-2 text-xs">
           One command. macOS / Linux / Windows binaries. No account needed.
         </p>
       </div>
 
-      {/*
-       * Per-archetype CTA row (R1.1 §1–2, implemented in #3):
-       *   - Individual developer  → brew install ... (above, hero) + "View on GitHub"
-       *   - Team lead / manager   → jumps to #teams block (cloud sign-up CTA)
-       *   - Tire-kicker / contributor → jumps to comparison section + footer repos
-       */}
+      {
+        /*
+         * Per-archetype CTA row (R1.1 §1–2, implemented in #3):
+         *   - Individual developer  → brew install ... (above, hero) + "View on GitHub"
+         *   - Team lead / manager   → jumps to #teams block (cloud sign-up CTA)
+         *   - Tire-kicker / contributor → jumps to comparison section + footer repos
+         */
+      }
       <div class="flex flex-wrap items-center gap-3 text-sm">
         <a
           href="https://github.com/siropkin/budi"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-line-strong hover:border-accent hover:text-accent transition-colors"
+          class="border-line-strong hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors"
         >
           <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"></path>
+            <path
+              d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"
+            ></path>
           </svg>
           View on GitHub
         </a>
         <a
           href="#teams"
-          class="inline-flex items-center gap-1 px-3 py-2 text-fg-muted hover:text-fg"
+          class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
         >
           For teams →
         </a>
         <a
           href="#compare"
-          class="inline-flex items-center gap-1 px-3 py-2 text-fg-muted hover:text-fg"
+          class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
         >
           Why not just X? ↓
         </a>
@@ -236,13 +237,16 @@ const firstRunSteps = [
 
     {/* Hero visual: a static, copy-paste-shaped budi stats sample. No video, no JS. */}
     <div class="card mt-12 overflow-hidden">
-      <div class="flex items-center gap-2 px-4 py-2.5 border-b border-line bg-surface-3 text-xs text-fg-dim">
+      <div
+        class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs"
+      >
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
         <span class="ml-3 font-mono">~ budi stats --projects</span>
       </div>
-      <pre class="m-0 px-4 sm:px-6 py-5 sm:py-6 text-[12.5px] sm:text-[13.5px] leading-[1.55] overflow-x-auto text-fg"><code>{`Today                                           7d        30d
+      <pre
+        class="text-fg m-0 overflow-x-auto px-4 py-5 text-[12.5px] leading-[1.55] sm:px-6 sm:py-6 sm:text-[13.5px]"><code>{`Today                                           7d        30d
 ─────────────────────────────────────────────────────────────────
 $ 4.92 session    🟢 healthy        $ 38.10    $ 162.44
 
@@ -269,136 +273,141 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 2. THE PROBLEM (real numbers) */}
-  <section id="how" class="container-readable py-14 sm:py-20 border-t border-line/70">
-    <header class="max-w-2xl mb-10">
-      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">The problem</p>
-      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">You are not imagining it.</h2>
+  <section id="how" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">The problem</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">You are not imagining it.</h2>
       <p class="text-fg-muted mt-3">
-        These are real numbers from a single month, one developer, multiple
-        agents and providers, and zero per-repo visibility from the upstream
-        dashboards. The provider bill arrived at the end of the month with a
-        single total and no answer to the obvious follow-up: <em>where</em>.
+        These are real numbers from a single month, one developer, multiple agents and providers,
+        and zero per-repo visibility from the upstream dashboards. The provider bill arrived at the
+        end of the month with a single total and no answer to the obvious follow-up: <em>where</em>.
       </p>
     </header>
 
     <div class="grid gap-4 sm:grid-cols-3">
-      {numbers.map((n) => (
-        <div class="card p-5 sm:p-6">
-          <div class="font-mono text-[1.7rem] sm:text-3xl font-semibold text-accent mb-2">{n.figure}</div>
-          <p class="text-sm text-fg-muted leading-relaxed">{n.body}</p>
-        </div>
-      ))}
+      {
+        numbers.map((n) => (
+          <div class="card p-5 sm:p-6">
+            <div class="text-accent mb-2 font-mono text-[1.7rem] font-semibold sm:text-3xl">
+              {n.figure}
+            </div>
+            <p class="text-fg-muted text-sm leading-relaxed">{n.body}</p>
+          </div>
+        ))
+      }
     </div>
 
-    <p class="text-xs text-fg-dim mt-4 max-w-2xl">
-      Anonymized example, drawn from the same kind of monthly bill that prompted
-      this project. Your numbers are probably smaller — or larger.
+    <p class="text-fg-dim mt-4 max-w-2xl text-xs">
+      Anonymized example, drawn from the same kind of monthly bill that prompted this project. Your
+      numbers are probably smaller — or larger.
     </p>
   </section>
 
   {/* 3. WHAT BUDI DOES */}
-  <section id="features" class="container-readable py-14 sm:py-20 border-t border-line/70">
-    <header class="max-w-2xl mb-10">
-      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">What Budi does</p>
-      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+  <section id="features" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What Budi does</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
         One proxy. Every agent. Real attribution.
       </h2>
       <p class="text-fg-muted mt-3">
-        Five things, on purpose. Budi is not an LLM gateway, a prompt router, or
-        a "cost optimization" consulting product.
+        Five things, on purpose. Budi is not an LLM gateway, a prompt router, or a "cost
+        optimization" consulting product.
       </p>
     </header>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {features.map((f) => (
-        <article class="card p-5 sm:p-6 flex flex-col gap-3">
-          <h3 class="font-semibold text-fg tracking-tight">{f.title}</h3>
-          <p class="text-sm text-fg-muted leading-relaxed">{f.body}</p>
-          <code class="mt-auto text-[12px] text-fg-dim bg-surface-3 border border-line/70 rounded-md px-2 py-1 self-start">
-            {f.foot}
-          </code>
-        </article>
-      ))}
+      {
+        features.map((f) => (
+          <article class="card flex flex-col gap-3 p-5 sm:p-6">
+            <h3 class="text-fg font-semibold tracking-tight">{f.title}</h3>
+            <p class="text-fg-muted text-sm leading-relaxed">{f.body}</p>
+            <code class="text-fg-dim bg-surface-3 border-line/70 mt-auto self-start rounded-md border px-2 py-1 text-[12px]">
+              {f.foot}
+            </code>
+          </article>
+        ))
+      }
     </div>
   </section>
 
   {/* 3b. WHY NOT JUST USE X — honest comparison */}
-  <section id="compare" class="container-readable py-14 sm:py-20 border-t border-line/70">
-    <header class="max-w-2xl mb-10">
-      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Why not just use X?</p>
-      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+  <section id="compare" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Why not just use X?</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
         The realistic alternatives, named honestly.
       </h2>
       <p class="text-fg-muted mt-3">
-        Before you install anything new, the fair question is: what does the
-        obvious existing option already give you? Here is where Budi does and
-        does not help.
+        Before you install anything new, the fair question is: what does the obvious existing option
+        already give you? Here is where Budi does and does not help.
       </p>
     </header>
 
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {alternatives.map((alt) => (
-        <article
-          class:list={[
-            "card p-5 sm:p-6 flex flex-col gap-3",
-            alt.kind === "budi" ? "border-accent bg-accent-soft/30" : "",
-          ]}
-        >
-          <header class="flex flex-col gap-1">
-            <h3
-              class:list={[
-                "font-semibold tracking-tight",
-                alt.kind === "budi" ? "text-accent" : "text-fg",
-              ]}
-            >
-              {alt.name}
-            </h3>
-            <p class="text-xs text-fg-dim leading-snug">{alt.examples}</p>
-          </header>
-          <dl class="flex flex-col gap-2 text-sm">
-            <div>
-              <dt class="text-xs uppercase tracking-wider text-fg-dim mb-0.5">
-                Good at
-              </dt>
-              <dd class="text-fg-muted leading-relaxed">{alt.good}</dd>
-            </div>
-            <div>
-              <dt class="text-xs uppercase tracking-wider text-fg-dim mb-0.5">
-                {alt.kind === "budi" ? "Caveats" : "Stops at"}
-              </dt>
-              <dd class="text-fg-muted leading-relaxed">{alt.gap}</dd>
-            </div>
-          </dl>
-        </article>
-      ))}
+      {
+        alternatives.map((alt) => (
+          <article
+            class:list={[
+              "card flex flex-col gap-3 p-5 sm:p-6",
+              alt.kind === "budi" ? "border-accent bg-accent-soft/30" : "",
+            ]}
+          >
+            <header class="flex flex-col gap-1">
+              <h3
+                class:list={[
+                  "font-semibold tracking-tight",
+                  alt.kind === "budi" ? "text-accent" : "text-fg",
+                ]}
+              >
+                {alt.name}
+              </h3>
+              <p class="text-fg-dim text-xs leading-snug">{alt.examples}</p>
+            </header>
+            <dl class="flex flex-col gap-2 text-sm">
+              <div>
+                <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Good at</dt>
+                <dd class="text-fg-muted leading-relaxed">{alt.good}</dd>
+              </div>
+              <div>
+                <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">
+                  {alt.kind === "budi" ? "Caveats" : "Stops at"}
+                </dt>
+                <dd class="text-fg-muted leading-relaxed">{alt.gap}</dd>
+              </div>
+            </dl>
+          </article>
+        ))
+      }
     </div>
 
-    <p class="text-xs text-fg-dim mt-4 max-w-2xl">
-      If one of the above already fits your workflow, use it. Budi exists for
-      the case where you are running <em>more than one</em> agent, care about
-      per-repo or per-ticket attribution, and are not willing to upload prompts
-      to a third party.
+    <p class="text-fg-dim mt-4 max-w-2xl text-xs">
+      If one of the above already fits your workflow, use it. Budi exists for the case where you are
+      running <em>more than one</em> agent, care about per-repo or per-ticket attribution, and are not
+      willing to upload prompts to a third party.
     </p>
   </section>
 
   {/* 4. LOCAL-FIRST, BY DESIGN */}
-  <section id="local-first" class="container-readable py-14 sm:py-20 border-t border-line/70">
-    <header class="max-w-2xl mb-10">
-      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Local-first, by design</p>
-      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+  <section id="local-first" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Local-first, by design</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
         Three questions, answered before you scroll past.
       </h2>
     </header>
 
-    <div class="grid lg:grid-cols-5 gap-6 lg:gap-10 items-start">
+    <div class="grid items-start gap-6 lg:grid-cols-5 lg:gap-10">
       <div class="lg:col-span-3">
-        <dl class="card divide-y divide-line">
-          {localCloudRows.map((row) => (
-            <div class="grid sm:grid-cols-[14rem_1fr] gap-2 sm:gap-6 px-5 sm:px-6 py-4">
-              <dt class="font-medium text-fg">{row.q}</dt>
-              <dd class="text-sm text-fg-muted leading-relaxed">{row.a}</dd>
-            </div>
-          ))}
+        <dl class="card divide-line divide-y">
+          {
+            localCloudRows.map((row) => (
+              <div class="grid gap-2 px-5 py-4 sm:grid-cols-[14rem_1fr] sm:gap-6 sm:px-6">
+                <dt class="text-fg font-medium">{row.q}</dt>
+                <dd class="text-fg-muted text-sm leading-relaxed">{row.a}</dd>
+              </div>
+            ))
+          }
         </dl>
       </div>
 
@@ -409,85 +418,82 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 5. PRIVACY CONTRACT */}
-  <section id="privacy" class="container-readable py-14 sm:py-20 border-t border-line/70">
-    <header class="max-w-2xl mb-8">
-      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Privacy contract</p>
-      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">Stated, not sold.</h2>
+  <section id="privacy" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-8 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Privacy contract</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Stated, not sold.</h2>
       <p class="text-fg-muted mt-3">
         Three bullets in plain English. The full, binding contract lives in
         <a
           href="https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md"
           class="link-underline hover:text-fg"
           target="_blank"
-          rel="noopener noreferrer"
-        >ADR-0083</a> in the product repo.
+          rel="noopener noreferrer">ADR-0083</a
+        > in the product repo.
       </p>
     </header>
 
     <div class="grid gap-4 md:grid-cols-3">
-      <div class="card p-5 border-l-4 border-l-accent">
-        <h3 class="font-semibold text-fg mb-2">Never leaves</h3>
-        <p class="text-sm text-fg-muted leading-relaxed">
-          Prompts, code, AI responses, file paths, email addresses, raw payloads,
-          and tag values. There is no "full upload" mode in the code.
+      <div class="card border-l-accent border-l-4 p-5">
+        <h3 class="text-fg mb-2 font-semibold">Never leaves</h3>
+        <p class="text-fg-muted text-sm leading-relaxed">
+          Prompts, code, AI responses, file paths, email addresses, raw payloads, and tag values.
+          There is no "full upload" mode in the code.
         </p>
       </div>
-      <div class="card p-5 border-l-4 border-l-warn">
-        <h3 class="font-semibold text-fg mb-2">Can optionally leave</h3>
-        <p class="text-sm text-fg-muted leading-relaxed">
-          Pre-aggregated daily numbers — tokens, cost, model name, hashed repo ID,
-          branch name, ticket ID. Push-only, HTTPS-only, daily granularity. 90-day
-          cloud retention in alpha.
+      <div class="card border-l-warn border-l-4 p-5">
+        <h3 class="text-fg mb-2 font-semibold">Can optionally leave</h3>
+        <p class="text-fg-muted text-sm leading-relaxed">
+          Pre-aggregated daily numbers — tokens, cost, model name, hashed repo ID, branch name,
+          ticket ID. Push-only, HTTPS-only, daily granularity. 90-day cloud retention in alpha.
         </p>
       </div>
-      <div class="card p-5 border-l-4 border-l-line-strong">
-        <h3 class="font-semibold text-fg mb-2">How you turn it on</h3>
-        <p class="text-sm text-fg-muted leading-relaxed">
+      <div class="card border-l-line-strong border-l-4 p-5">
+        <h3 class="text-fg mb-2 font-semibold">How you turn it on</h3>
+        <p class="text-fg-muted text-sm leading-relaxed">
           Sign up at <a
             href="https://app.getbudi.dev"
             class="link-underline hover:text-fg"
             target="_blank"
-            rel="noopener noreferrer"
-          >app.getbudi.dev</a>,
-          drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>,
-          set <code class="text-xs">enabled = true</code>. Off by default.
+            rel="noopener noreferrer">app.getbudi.dev</a
+          >, drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>, set <code
+            class="text-xs">enabled = true</code
+          >. Off by default.
         </p>
       </div>
     </div>
 
-    <p id="analytics" class="mt-8 text-sm text-fg-muted leading-relaxed scroll-mt-24">
+    <p id="analytics" class="text-fg-muted mt-8 scroll-mt-24 text-sm leading-relaxed">
       <strong class="text-fg font-medium">Analytics.</strong>
-      This marketing site (<code class="text-xs">getbudi.dev</code>) counts
-      anonymous page views via Vercel Web Analytics: cookieless, IP hashed
-      daily, no prompts, no code, no session replay, no cross-site tracking.
-      It only runs on this site — it is not part of the product and never sees
-      anything the <a href="#privacy" class="link-underline hover:text-fg">privacy
-      contract</a> above covers.
+      This marketing site (<code class="text-xs">getbudi.dev</code>) counts anonymous page views via
+      Vercel Web Analytics: cookieless, IP hashed daily, no prompts, no code, no session replay, no
+      cross-site tracking. It only runs on this site — it is not part of the product and never sees
+      anything the <a href="#privacy" class="link-underline hover:text-fg">privacy contract</a> above
+      covers.
     </p>
   </section>
 
   {/* 6. SUPPORTED AGENTS */}
-  <section id="agents" class="container-readable py-14 sm:py-20 border-t border-line/70">
-    <header class="max-w-2xl mb-8">
-      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Supported agents</p>
-      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">Tracked through one proxy.</h2>
+  <section id="agents" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-8 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Supported agents</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Tracked through one proxy.</h2>
       <p class="text-fg-muted mt-3">
-        Tier 1 agents use simple env vars with high confidence. Tier 2 agents
-        work but have onboarding caveats (GUI settings, proprietary env vars).
-        Full compatibility matrix lives in
+        Tier 1 agents use simple env vars with high confidence. Tier 2 agents work but have
+        onboarding caveats (GUI settings, proprietary env vars). Full compatibility matrix lives in
         <a
           href="https://github.com/siropkin/budi/blob/main/docs/adr/0082-proxy-compatibility-matrix-and-gateway-contract.md"
           class="link-underline hover:text-fg"
           target="_blank"
-          rel="noopener noreferrer"
-        >ADR-0082</a>.
+          rel="noopener noreferrer">ADR-0082</a
+        >.
       </p>
     </header>
 
     <div class="card overflow-x-auto">
       <table class="w-full text-sm">
-        <thead class="text-left text-fg-muted text-xs uppercase tracking-wider">
-          <tr class="border-b border-line">
+        <thead class="text-fg-muted text-left text-xs tracking-wider uppercase">
+          <tr class="border-line border-b">
             <th class="px-5 py-3 font-medium">Agent</th>
             <th class="px-5 py-3 font-medium">Tier</th>
             <th class="px-5 py-3 font-medium">Status</th>
@@ -495,48 +501,49 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
           </tr>
         </thead>
         <tbody>
-          {agents.map((agent, idx) => (
-            <tr class:list={[idx !== agents.length - 1 ? "border-b border-line/70" : ""]}>
-              <td class="px-5 py-3 font-medium text-fg">{agent.name}</td>
-              <td class="px-5 py-3 font-mono text-fg-muted">{agent.tier}</td>
-              <td class="px-5 py-3">
-                <span
-                  class:list={[
-                    "inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full",
-                    agent.status === "Supported"
-                      ? "bg-accent-soft text-accent"
-                      : "bg-surface-3 text-fg-muted",
-                  ]}
-                >
+          {
+            agents.map((agent, idx) => (
+              <tr class:list={[idx !== agents.length - 1 ? "border-line/70 border-b" : ""]}>
+                <td class="text-fg px-5 py-3 font-medium">{agent.name}</td>
+                <td class="text-fg-muted px-5 py-3 font-mono">{agent.tier}</td>
+                <td class="px-5 py-3">
                   <span
-                    aria-hidden="true"
                     class:list={[
-                      "h-1.5 w-1.5 rounded-full",
-                      agent.status === "Supported" ? "bg-accent" : "bg-fg-dim",
+                      "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs",
+                      agent.status === "Supported"
+                        ? "bg-accent-soft text-accent"
+                        : "bg-surface-3 text-fg-muted",
                     ]}
-                  ></span>
-                  {agent.status}
-                </span>
-              </td>
-              <td class="px-5 py-3 text-fg-muted">{agent.how}</td>
-            </tr>
-          ))}
+                  >
+                    <span
+                      aria-hidden="true"
+                      class:list={[
+                        "h-1.5 w-1.5 rounded-full",
+                        agent.status === "Supported" ? "bg-accent" : "bg-fg-dim",
+                      ]}
+                    />
+                    {agent.status}
+                  </span>
+                </td>
+                <td class="text-fg-muted px-5 py-3">{agent.how}</td>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
     </div>
   </section>
 
   {/* 7. INSTALL */}
-  <section id="install" class="container-readable py-14 sm:py-20 border-t border-line/70">
-    <header class="max-w-2xl mb-8">
-      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Install</p>
-      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+  <section id="install" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-8 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Install</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
         One command. Then <code class="text-accent">budi init</code>.
       </h2>
       <p class="text-fg-muted mt-3">
-        <code>budi init</code> starts the daemon (port 7878) and proxy (port
-        9878), and prompts you to choose which agents to track. Defaults are
-        safe — you can opt out per agent.
+        <code>budi init</code> starts the daemon (port 7878) and proxy (port 9878), and prompts you to
+        choose which agents to track. Defaults are safe — you can opt out per agent.
       </p>
     </header>
 
@@ -544,16 +551,18 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <CopyableCommand command={installCommand} variant="hero" />
     </div>
 
-    <div class="mt-4 max-w-3xl text-sm text-fg-muted">
+    <div class="text-fg-muted mt-4 max-w-3xl text-sm">
       <strong class="text-fg">One install on PATH.</strong>
       Don't mix Homebrew with <code class="text-xs">~/.local/bin</code> (or
-      <code class="text-xs">%LOCALAPPDATA%\budi\bin</code> on Windows): you can
-      end up with different binaries and confusing restarts.
+      <code class="text-xs">%LOCALAPPDATA%\budi\bin</code> on Windows): you can end up with different
+      binaries and confusing restarts.
       <code class="text-xs">budi doctor</code> warns you when it sees duplicates.
     </div>
 
-    <details class="mt-8 group">
-      <summary class="cursor-pointer list-none inline-flex items-center gap-2 text-sm text-fg-muted hover:text-fg transition-colors">
+    <details class="group mt-8">
+      <summary
+        class="text-fg-muted hover:text-fg inline-flex cursor-pointer list-none items-center gap-2 text-sm transition-colors"
+      >
         <svg
           aria-hidden="true"
           width="14"
@@ -571,24 +580,28 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         Other install methods
       </summary>
       <div class="mt-4 grid gap-3">
-        {altInstalls.map((alt) => (
-          <div>
-            <div class="text-xs uppercase tracking-wider text-fg-dim mb-1.5">{alt.label}</div>
-            <CopyableCommand command={alt.code} variant="compact" />
-          </div>
-        ))}
+        {
+          altInstalls.map((alt) => (
+            <div>
+              <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">{alt.label}</div>
+              <CopyableCommand command={alt.code} variant="compact" />
+            </div>
+          ))
+        }
       </div>
     </details>
 
-    {/*
-     * "After you install" — the conversion we actually care about. Installing
-     * is not adoption; a non-zero budi stats run is. Three commands, in order,
-     * mirror the siropkin/budi README first-run checklist.
-     */}
+    {
+      /*
+       * "After you install" — the conversion we actually care about. Installing
+       * is not adoption; a non-zero budi stats run is. Three commands, in order,
+       * mirror the siropkin/budi README first-run checklist.
+       */
+    }
     <div class="mt-12">
-      <header class="max-w-2xl mb-6">
-        <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">After you install</p>
-        <h3 class="text-xl sm:text-2xl font-semibold tracking-tight">
+      <header class="mb-6 max-w-2xl">
+        <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">After you install</p>
+        <h3 class="text-xl font-semibold tracking-tight sm:text-2xl">
           Three commands to prove it works.
         </h3>
         <p class="text-fg-muted mt-3 text-sm">
@@ -598,60 +611,61 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </header>
 
       <ol class="grid gap-4 md:grid-cols-3" role="list">
-        {firstRunSteps.map((step) => (
-          <li class="card p-5 sm:p-6 flex flex-col gap-3">
-            <div class="flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent font-mono text-sm font-semibold"
-              >
-                {step.n}
-              </span>
-              <code class="text-sm font-mono text-fg">{step.cmd}</code>
-            </div>
-            <p class="text-sm text-fg-muted leading-relaxed">{step.body}</p>
-          </li>
-        ))}
+        {
+          firstRunSteps.map((step) => (
+            <li class="card flex flex-col gap-3 p-5 sm:p-6">
+              <div class="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
+                >
+                  {step.n}
+                </span>
+                <code class="text-fg font-mono text-sm">{step.cmd}</code>
+              </div>
+              <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
+            </li>
+          ))
+        }
       </ol>
 
-      <p class="text-xs text-fg-dim mt-4 max-w-2xl">
-        Full, canonical 6-step checklist (including historical import and
-        terminal-restart caveats) lives in the
+      <p class="text-fg-dim mt-4 max-w-2xl text-xs">
+        Full, canonical 6-step checklist (including historical import and terminal-restart caveats)
+        lives in the
         <a
           href="https://github.com/siropkin/budi#first-run-checklist-5-minutes"
           target="_blank"
           rel="noopener noreferrer"
-          class="link-underline hover:text-fg"
-        >siropkin/budi README</a>.
+          class="link-underline hover:text-fg">siropkin/budi README</a
+        >.
       </p>
     </div>
   </section>
 
   {/* 8. FOR TEAMS (opt-in cloud) */}
-  <section id="teams" class="container-readable py-14 sm:py-20 border-t border-line/70">
-    <header class="max-w-2xl mb-8">
-      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">For teams (opt-in)</p>
-      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+  <section id="teams" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-8 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">For teams (opt-in)</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
         One dashboard for the team. No prompts, no code, no surprises.
       </h2>
       <p class="text-fg-muted mt-3">
-        If a team lead now owns an "AI coding spend" line item, the cloud
-        dashboard at
+        If a team lead now owns an "AI coding spend" line item, the cloud dashboard at
         <a
           href="https://app.getbudi.dev"
           class="link-underline hover:text-fg"
           target="_blank"
-          rel="noopener noreferrer"
-        >app.getbudi.dev</a>
-        gives them daily cost per user, repo, model, branch, and ticket. Without
-        reading anyone's prompts, responses, or file paths.
+          rel="noopener noreferrer">app.getbudi.dev</a
+        >
+        gives them daily cost per user, repo, model, branch, and ticket. Without reading anyone's prompts,
+        responses, or file paths.
       </p>
     </header>
 
     <div class="grid gap-4 md:grid-cols-2">
       <div class="card p-5 sm:p-6">
-        <h3 class="font-semibold text-fg mb-2">What the manager sees</h3>
-        <ul class="text-sm text-fg-muted space-y-1.5 list-disc pl-5">
+        <h3 class="text-fg mb-2 font-semibold">What the manager sees</h3>
+        <ul class="text-fg-muted list-disc space-y-1.5 pl-5 text-sm">
           <li>Daily cost per user, repo, model, branch, ticket</li>
           <li>Trend lines across the last 7 / 30 / 90 days</li>
           <li>Session summaries: duration, model mix, health flags</li>
@@ -659,8 +673,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         </ul>
       </div>
       <div class="card p-5 sm:p-6">
-        <h3 class="font-semibold text-fg mb-2">What the cloud never sees</h3>
-        <ul class="text-sm text-fg-muted space-y-1.5 list-disc pl-5">
+        <h3 class="text-fg mb-2 font-semibold">What the cloud never sees</h3>
+        <ul class="text-fg-muted list-disc space-y-1.5 pl-5 text-sm">
           <li>Prompts and AI responses</li>
           <li>Source code or file contents</li>
           <li>File paths and email addresses</li>
@@ -674,10 +688,20 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         href="https://app.getbudi.dev"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-black font-semibold hover:opacity-90 transition-opacity"
+        class="bg-accent inline-flex items-center gap-2 rounded-lg px-4 py-2 font-semibold text-black transition-opacity hover:opacity-90"
       >
         Sign up at app.getbudi.dev
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <svg
+          aria-hidden="true"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line x1="7" y1="17" x2="17" y2="7"></line>
           <polyline points="7 7 17 7 17 17"></polyline>
         </svg>
@@ -686,7 +710,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         href="https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-1 px-2 py-2 text-fg-muted hover:text-fg"
+        class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-2 py-2"
       >
         Read the privacy contract (ADR-0083) →
       </a>

@@ -78,13 +78,19 @@ const jsonLd = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="budi — see where your AI coding money actually goes. Install with brew install siropkin/budi/budi && budi init." />
+    <meta
+      property="og:image:alt"
+      content="budi — see where your AI coding money actually goes. Install with brew install siropkin/budi/budi && budi init."
+    />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
-    <meta name="twitter:image:alt" content="budi — local-first cost tracker for AI coding agents." />
+    <meta
+      name="twitter:image:alt"
+      content="budi — local-first cost tracker for AI coding agents."
+    />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
@@ -98,22 +104,22 @@ const jsonLd = {
   <body class="antialiased">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-accent focus:px-3 focus:py-2 focus:text-black"
+      class="focus:bg-accent sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:px-3 focus:py-2 focus:text-black"
     >
       Skip to content
     </a>
 
-    <header class="border-b border-line/70 backdrop-blur-sm">
+    <header class="border-line/70 border-b backdrop-blur-sm">
       <div class="container-readable flex items-center justify-between py-4">
         <a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
           <span
             aria-hidden="true"
-            class="inline-block h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_10px_var(--color-accent)]"
+            class="bg-accent inline-block h-2.5 w-2.5 rounded-full shadow-[0_0_10px_var(--color-accent)]"
           ></span>
           <span class="text-[1.05rem]">budi</span>
-          <span class="text-xs text-fg-dim font-normal">/ getbudi.dev</span>
+          <span class="text-fg-dim text-xs font-normal">/ getbudi.dev</span>
         </a>
-        <nav class="flex items-center gap-5 text-sm text-fg-muted">
+        <nav class="text-fg-muted flex items-center gap-5 text-sm">
           <a href="/#install" class="hover:text-fg">Install</a>
           <a href="/#compare" class="hover:text-fg hidden sm:inline">Compare</a>
           <a href="/#privacy" class="hover:text-fg hidden sm:inline">Privacy</a>
@@ -124,16 +130,10 @@ const jsonLd = {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <svg
-              aria-hidden="true"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"
-              />
+              ></path>
             </svg>
             <span class="hidden sm:inline">GitHub</span>
           </a>
@@ -147,62 +147,127 @@ const jsonLd = {
 
     <Analytics />
 
-    <footer class="border-t border-line/70 mt-24">
-      <div class="container-readable py-10 text-sm text-fg-muted">
+    <footer class="border-line/70 mt-24 border-t">
+      <div class="container-readable text-fg-muted py-10 text-sm">
         <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div class="flex items-center gap-2 text-fg font-semibold mb-2">
-              <span aria-hidden="true" class="inline-block h-2 w-2 rounded-full bg-accent"></span>
+            <div class="text-fg mb-2 flex items-center gap-2 font-semibold">
+              <span aria-hidden="true" class="bg-accent inline-block h-2 w-2 rounded-full"></span>
               budi
             </div>
-            <p>
-              Local-first cost analytics for AI coding agents. MIT-licensed, open
-              source.
-            </p>
+            <p>Local-first cost analytics for AI coding agents. MIT-licensed, open source.</p>
           </div>
           <div>
-            <h4 class="text-fg font-medium mb-2">Source</h4>
+            <h4 class="text-fg mb-2 font-medium">Source</h4>
             <ul class="space-y-1.5">
-              <li><a href="https://github.com/siropkin/budi" target="_blank" rel="noopener noreferrer" class="hover:text-fg">budi (core)</a></li>
-              <li><a href="https://github.com/siropkin/budi-cloud" target="_blank" rel="noopener noreferrer" class="hover:text-fg">budi-cloud</a></li>
-              <li><a href="https://github.com/siropkin/budi-cursor" target="_blank" rel="noopener noreferrer" class="hover:text-fg">budi-cursor</a></li>
-              <li><a href="https://github.com/siropkin/homebrew-budi" target="_blank" rel="noopener noreferrer" class="hover:text-fg">homebrew-budi</a></li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/budi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">budi (core)</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/budi-cloud"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">budi-cloud</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/budi-cursor"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">budi-cursor</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/homebrew-budi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">homebrew-budi</a
+                >
+              </li>
             </ul>
           </div>
           <div>
-            <h4 class="text-fg font-medium mb-2">Reference</h4>
+            <h4 class="text-fg mb-2 font-medium">Reference</h4>
             <ul class="space-y-1.5">
-              <li><a href="https://github.com/siropkin/budi#readme" target="_blank" rel="noopener noreferrer" class="hover:text-fg">README</a></li>
-              <li><a href="https://github.com/siropkin/budi/releases" target="_blank" rel="noopener noreferrer" class="hover:text-fg">Changelog (Releases)</a></li>
-              <li><a href="https://github.com/siropkin/budi/tree/main/docs/adr" target="_blank" rel="noopener noreferrer" class="hover:text-fg">ADRs</a></li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/budi#readme"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">README</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/budi/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">Changelog (Releases)</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/budi/tree/main/docs/adr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">ADRs</a
+                >
+              </li>
             </ul>
           </div>
           <div>
-            <h4 class="text-fg font-medium mb-2">Project</h4>
+            <h4 class="text-fg mb-2 font-medium">Project</h4>
             <ul class="space-y-1.5">
-              <li><a href="https://github.com/siropkin/budi/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="hover:text-fg">License (MIT)</a></li>
-              <li><a href="https://app.getbudi.dev" target="_blank" rel="noopener noreferrer" class="hover:text-fg">app.getbudi.dev</a></li>
-              <li><a href="https://github.com/siropkin/budi/issues" target="_blank" rel="noopener noreferrer" class="hover:text-fg">Issues</a></li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/budi/blob/main/LICENSE"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">License (MIT)</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://app.getbudi.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">app.getbudi.dev</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/siropkin/budi/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-fg">Issues</a
+                >
+              </li>
             </ul>
           </div>
         </div>
         <div
-          class="mt-10 pt-6 border-t border-line/70 flex flex-col sm:flex-row justify-between gap-3 text-xs text-fg-dim"
+          class="border-line/70 text-fg-dim mt-10 flex flex-col justify-between gap-3 border-t pt-6 text-xs sm:flex-row"
         >
           <span>© {new Date().getFullYear()} budi contributors. Public alpha.</span>
           <span>
             Built static.{" "}
-            <a
-              href="/#analytics"
-              class="link-underline hover:text-fg"
-            >Privacy-friendly analytics via Vercel</a>.
-            Source on{" "}
+            <a href="/#analytics" class="link-underline hover:text-fg"
+              >Privacy-friendly analytics via Vercel</a
+            >. Source on{" "}
             <a
               href="https://github.com/siropkin/getbudi.dev"
               target="_blank"
               rel="noopener noreferrer"
-              class="link-underline hover:text-fg"
-            >GitHub</a>.
+              class="link-underline hover:text-fg">GitHub</a
+            >.
           </span>
         </div>
       </div>
