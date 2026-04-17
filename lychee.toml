@@ -1,0 +1,19 @@
+# External links only — internal anchors and root-relative assets are covered
+# by the R2.2 audit (scripts/audit-build.mjs), so skip them here.
+include_verbatim = false
+max_redirects = 5
+max_retries = 2
+timeout = 20
+# Respect the hosts that serve rate-limited HEADs by retrying as GET.
+method = "get"
+accept = ["200..=299", "403", "429"]
+# 403 is tolerated because GitHub sometimes 403s HEAD for unauth requests.
+# 429 is tolerated transiently; real 429s surface via retries.
+exclude_path = ["dist/404.html"]
+# ^ The 404 page intentionally links to things we want to check, but skipping
+#   it avoids scanning the same links twice.
+# Root-relative URLs like "/", "/#privacy", "/favicon.svg" are resolved
+# against `--root-dir` (set in the workflow to $GITHUB_WORKSPACE/dist) so
+# lychee treats them as offline filesystem checks. That keeps the network
+# probe scoped to genuine outbound http(s) links; internal anchor integrity
+# stays owned by scripts/audit-build.mjs (R2.2).
