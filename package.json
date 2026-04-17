@@ -1,0 +1,23 @@
+{
+  "name": "getbudi-dev",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Marketing landing page for budi — local-first cost analytics for AI coding agents.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/sitemap": "^3.7.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "astro": "^5.18.1",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.0"
+  }
+}

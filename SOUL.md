@@ -16,25 +16,41 @@ This repo is the public face, not the product. Keep it small, fast, and static-f
 
 Do **not** mix cloud dashboard code, product features, or anything that touches user data into this repo. This is a static marketing surface only.
 
-## Stack (TBD)
+## Stack
 
-Stack is not yet chosen. Pick one of the following and fill in the Build section below:
+Chosen in [#2](https://github.com/siropkin/getbudi.dev/issues/2): **Astro 5 + Tailwind CSS v4**, fully static output.
 
-- **Astro** — preferred for a marketing site (static-first, easy to keep fast)
-- **Next.js** — matches `budi-cloud` if reuse of components is desired
-- **Plain HTML + Tailwind** — if the site stays small
+- Astro is static-first: the only JS that ships is what a component explicitly opts into (here, a small clipboard handler on `CopyableCommand`). This matches the "a marketing site that takes 4 seconds to render is not a good ad" rule below.
+- Tailwind v4 is configured CSS-first in `src/styles/global.css` via `@theme` — no `tailwind.config.js`, no PostCSS pipeline. Theme tokens (`--color-*`, `--font-*`) auto-generate matching utilities like `bg-surface-2`, `text-fg-muted`, `border-accent`. Avoid arbitrary `[--var]` syntax in templates — in v4 it does not wrap in `var()` and silently breaks.
+- No React/Vue/Svelte runtime on the critical path. If a section ever needs interactivity beyond trivial vanilla JS, add a single island rather than a whole framework.
 
-When a stack is picked, update this file with concrete build / dev commands.
+## Project layout
+
+```
+src/
+  layouts/Base.astro         # <html>, head, header, footer, skip link
+  components/
+    CopyableCommand.astro    # one-click-copy install block (hero + compact)
+    Diagram.astro            # inline SVG: agent → proxy → provider
+  pages/index.astro          # all 9 sections of the landing page
+  styles/global.css          # Tailwind v4 import + @theme tokens + base layer
+public/
+  favicon.svg, robots.txt    # static assets copied verbatim to the build
+astro.config.mjs             # sitemap + tailwindcss vite plugin
+vercel.json                  # static output, security + cache headers
+```
 
 ## Build & dev
 
 ```bash
-# TODO: fill in once stack is chosen. Examples:
-# npm install
-# npm run dev       # local dev server
-# npm run build     # static build output
-# npm run preview   # serve built output locally
+npm install
+npm run dev       # local dev server at http://localhost:4321
+npm run build     # static build output to dist/
+npm run preview   # serve dist/ locally
+npm run check     # astro check (TS + template diagnostics)
 ```
+
+Node 20.3+ (Astro 5 minimum). CI and Vercel both use the `npm run build` target.
 
 ## Content principles
 
@@ -56,7 +72,7 @@ The site should read the way the Reddit posts read — first-person, specific, h
 
 ## Deploy
 
-Deployment target: Vercel or Cloudflare Pages (TBD). Domain `getbudi.dev` is owned and DNS is separate from `app.getbudi.dev` (which serves `budi-cloud`).
+Deployment target: **Vercel**, auto-deploy from `main` (per [ADR-0087 §3](https://github.com/siropkin/budi/blob/main/docs/adr/0087-cloud-infrastructure-and-deployment.md)). `vercel.json` pins `framework: "astro"`, output dir `dist`, and sets security + cache headers. Domain `getbudi.dev` is separate from `app.getbudi.dev` (which serves `budi-cloud`) — do not share edge config, cookies, or analytics scopes between them.
 
 ## Dev notes
 

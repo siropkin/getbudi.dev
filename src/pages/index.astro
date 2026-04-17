@@ -1,0 +1,494 @@
+---
+import Base from "~/layouts/Base.astro";
+import CopyableCommand from "~/components/CopyableCommand.astro";
+import Diagram from "~/components/Diagram.astro";
+
+const installCommand = "brew install siropkin/budi/budi && budi init";
+
+const features = [
+  {
+    title: "Multi-agent tracking",
+    body:
+      "One proxy in front of Claude Code, Cursor, Codex CLI, and Copilot CLI. Configured automatically by budi init — no per-agent keys to manage.",
+    foot: "Tier 1 + Tier 2 agents. Gemini deferred.",
+  },
+  {
+    title: "Per repo, branch, and ticket",
+    body:
+      "Cost is attributed to the repo and branch you were on, with ticket IDs extracted from branch names. Filter by ticket prefix, model, project, or custom tag.",
+    foot: "budi stats --branches · --tag ticket_id",
+  },
+  {
+    title: "Session health, not just counters",
+    body:
+      "Budi flags context bloat, cache degradation, cost acceleration, and retry loops while they happen, with provider-aware tips. \"You spent $X\" → \"you are about to spend $X for no reason.\"",
+    foot: "🟡 budi · $12.50 session · /compact soon",
+  },
+  {
+    title: "Live status line",
+    body:
+      "A live cost + health string in Claude Code and a status bar + side panel in Cursor. New sessions start green; tips appear only when something is off.",
+    foot: "🟢 budi · $0.42 session · new session",
+  },
+  {
+    title: "One-time historical import",
+    body:
+      "budi import backfills from Claude Code JSONL, Codex Desktop/CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You don't lose the months you already spent.",
+    foot: "budi import",
+  },
+];
+
+const numbers = [
+  {
+    figure: "$6,154",
+    body: "in a single month on AI coding agents — across one developer, multiple subscriptions and pay-as-you-go bills.",
+  },
+  {
+    figure: "136K",
+    body: "messages over that month. The provider dashboards showed a total. They did not show which repo, branch, or ticket.",
+  },
+  {
+    figure: "5,508",
+    body: "Haiku calls that nobody asked for. Cheap individually, real money in aggregate. Invisible until something started counting.",
+  },
+];
+
+const localCloudRows = [
+  {
+    q: "Where does Budi run?",
+    a: "On your machine. A small Rust daemon (~6 MB) plus a local proxy on 127.0.0.1:9878.",
+  },
+  {
+    q: "What leaves my machine?",
+    a: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails.",
+  },
+  {
+    q: "Why would I turn cloud on?",
+    a: "You want your team lead to see one dashboard for the whole team. Otherwise, leave it off.",
+  },
+];
+
+const agents = [
+  {
+    name: "Claude Code",
+    tier: "Tier 1",
+    status: "Supported",
+    how: "Auto-configured by budi init (shell profile env block).",
+  },
+  {
+    name: "Codex CLI",
+    tier: "Tier 1",
+    status: "Supported",
+    how: "Auto-configured by budi init (shell profile env block + Codex Desktop config patch).",
+  },
+  {
+    name: "Cursor",
+    tier: "Tier 2",
+    status: "Supported",
+    how: "Auto-configured by budi init (Cursor settings.json patch).",
+  },
+  {
+    name: "Copilot CLI",
+    tier: "Tier 2",
+    status: "Supported",
+    how: "Auto-configured by budi init (shell profile env block).",
+  },
+  {
+    name: "Gemini CLI",
+    tier: "Tier 3",
+    status: "Deferred",
+    how: "Different API format; not supported in v1 proxy.",
+  },
+];
+
+const altInstalls = [
+  {
+    label: "Shell script (macOS / Linux, glibc)",
+    code: "curl -fsSL https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.sh | bash",
+  },
+  {
+    label: "PowerShell (Windows 10+)",
+    code: "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex",
+  },
+  {
+    label: "From source (Rust toolchain)",
+    code: "git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh",
+  },
+];
+---
+
+<Base>
+  {/* 1. HERO */}
+  <section class="container-readable pt-16 sm:pt-24 pb-14 sm:pb-20">
+    <div class="flex flex-col items-start gap-6 sm:gap-8 max-w-3xl">
+      <span class="chip">
+        <span aria-hidden="true" class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+        Local-first · open source · MIT
+      </span>
+
+      <h1 class="text-[2.25rem] sm:text-[3.25rem] leading-[1.05] font-semibold tracking-tight text-balance">
+        See where your AI coding money
+        <span class="text-accent">actually goes.</span>
+      </h1>
+
+      <p class="text-lg sm:text-xl text-fg-muted leading-relaxed text-pretty">
+        Budi is a local-first cost tracker for AI coding agents. It runs a small
+        proxy on your machine between your agent and the LLM provider, and shows
+        you exactly where your tokens and money go — by repo, branch, ticket, and
+        model. Your prompts, code, and responses never leave your machine.
+      </p>
+
+      <div class="w-full max-w-2xl">
+        <CopyableCommand command={installCommand} variant="hero" />
+        <p class="text-xs text-fg-dim mt-2">
+          One command. macOS / Linux / Windows binaries. No account needed.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 text-sm">
+        <a
+          href="https://github.com/siropkin/budi"
+          rel="noopener"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-line-strong hover:border-accent hover:text-accent transition-colors"
+        >
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"></path>
+          </svg>
+          View on GitHub
+        </a>
+        <a href="#how" class="inline-flex items-center gap-1 px-2 py-2 text-fg-muted hover:text-fg">
+          What does the page show? ↓
+        </a>
+      </div>
+    </div>
+
+    {/* Hero visual: a static, copy-paste-shaped budi stats sample. No video, no JS. */}
+    <div class="card mt-12 overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-2.5 border-b border-line bg-surface-3 text-xs text-fg-dim">
+        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+        <span class="ml-3 font-mono">~ budi stats --projects</span>
+      </div>
+      <pre class="m-0 px-4 sm:px-6 py-5 sm:py-6 text-[12.5px] sm:text-[13.5px] leading-[1.55] overflow-x-auto text-fg"><code>{`Today                                           7d        30d
+─────────────────────────────────────────────────────────────────
+$ 4.92 session    🟢 healthy        $ 38.10    $ 162.44
+
+Top repos (last 7d)                          cost      msgs
+─────────────────────────────────────────────────────────────────
+siropkin/budi                              $ 18.40    21,402
+acme/web                                   $ 11.05     9,118
+acme/infra                                 $  6.32     2,845
+personal/notes                             $  2.33       661
+
+Top models (last 7d)                         cost     share
+─────────────────────────────────────────────────────────────────
+claude-3.5-sonnet                          $ 22.18    58.2 %
+gpt-5-codex                                $  9.41    24.7 %
+claude-3.5-haiku                           $  4.02    10.6 %
+gpt-4.1-mini                               $  2.49     6.5 %
+
+Branch hot list                              cost    ticket
+─────────────────────────────────────────────────────────────────
+budi/feat/cloud-ingest                     $  6.91    BUD-214
+acme/web/fix/checkout-retry                $  4.38    WEB-1180
+acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
+    </div>
+  </section>
+
+  {/* 2. THE PROBLEM (real numbers) */}
+  <section id="how" class="container-readable py-14 sm:py-20 border-t border-line/70">
+    <header class="max-w-2xl mb-10">
+      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">The problem</p>
+      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">You are not imagining it.</h2>
+      <p class="text-fg-muted mt-3">
+        These are real numbers from a single month, one developer, multiple
+        agents and providers, and zero per-repo visibility from the upstream
+        dashboards. The provider bill arrived at the end of the month with a
+        single total and no answer to the obvious follow-up: <em>where</em>.
+      </p>
+    </header>
+
+    <div class="grid gap-4 sm:grid-cols-3">
+      {numbers.map((n) => (
+        <div class="card p-5 sm:p-6">
+          <div class="font-mono text-[1.7rem] sm:text-3xl font-semibold text-accent mb-2">{n.figure}</div>
+          <p class="text-sm text-fg-muted leading-relaxed">{n.body}</p>
+        </div>
+      ))}
+    </div>
+
+    <p class="text-xs text-fg-dim mt-4 max-w-2xl">
+      Anonymized example, drawn from the same kind of monthly bill that prompted
+      this project. Your numbers are probably smaller — or larger.
+    </p>
+  </section>
+
+  {/* 3. WHAT BUDI DOES */}
+  <section id="features" class="container-readable py-14 sm:py-20 border-t border-line/70">
+    <header class="max-w-2xl mb-10">
+      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">What Budi does</p>
+      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+        One proxy. Every agent. Real attribution.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        Five things, on purpose. Budi is not an LLM gateway, a prompt router, or
+        a "cost optimization" consulting product.
+      </p>
+    </header>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {features.map((f) => (
+        <article class="card p-5 sm:p-6 flex flex-col gap-3">
+          <h3 class="font-semibold text-fg tracking-tight">{f.title}</h3>
+          <p class="text-sm text-fg-muted leading-relaxed">{f.body}</p>
+          <code class="mt-auto text-[12px] text-fg-dim bg-surface-3 border border-line/70 rounded-md px-2 py-1 self-start">
+            {f.foot}
+          </code>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {/* 4. LOCAL-FIRST, BY DESIGN */}
+  <section id="local-first" class="container-readable py-14 sm:py-20 border-t border-line/70">
+    <header class="max-w-2xl mb-10">
+      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Local-first, by design</p>
+      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+        Three questions, answered before you scroll past.
+      </h2>
+    </header>
+
+    <div class="grid lg:grid-cols-5 gap-6 lg:gap-10 items-start">
+      <div class="lg:col-span-3">
+        <dl class="card divide-y divide-line">
+          {localCloudRows.map((row) => (
+            <div class="grid sm:grid-cols-[14rem_1fr] gap-2 sm:gap-6 px-5 sm:px-6 py-4">
+              <dt class="font-medium text-fg">{row.q}</dt>
+              <dd class="text-sm text-fg-muted leading-relaxed">{row.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <div class="lg:col-span-2">
+        <Diagram />
+      </div>
+    </div>
+  </section>
+
+  {/* 5. PRIVACY CONTRACT */}
+  <section id="privacy" class="container-readable py-14 sm:py-20 border-t border-line/70">
+    <header class="max-w-2xl mb-8">
+      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Privacy contract</p>
+      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">Stated, not sold.</h2>
+      <p class="text-fg-muted mt-3">
+        Three bullets in plain English. The full, binding contract lives in
+        <a
+          href="https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md"
+          class="link-underline hover:text-fg"
+          rel="noopener"
+        >ADR-0083</a> in the product repo.
+      </p>
+    </header>
+
+    <div class="grid gap-4 md:grid-cols-3">
+      <div class="card p-5 border-l-4 border-l-accent">
+        <h3 class="font-semibold text-fg mb-2">Never leaves</h3>
+        <p class="text-sm text-fg-muted leading-relaxed">
+          Prompts, code, AI responses, file paths, email addresses, raw payloads,
+          and tag values. There is no "full upload" mode in the code.
+        </p>
+      </div>
+      <div class="card p-5 border-l-4 border-l-warn">
+        <h3 class="font-semibold text-fg mb-2">Can optionally leave</h3>
+        <p class="text-sm text-fg-muted leading-relaxed">
+          Pre-aggregated daily numbers — tokens, cost, model name, hashed repo ID,
+          branch name, ticket ID. Push-only, HTTPS-only, daily granularity. 90-day
+          cloud retention in alpha.
+        </p>
+      </div>
+      <div class="card p-5 border-l-4 border-l-line-strong">
+        <h3 class="font-semibold text-fg mb-2">How you turn it on</h3>
+        <p class="text-sm text-fg-muted leading-relaxed">
+          Sign up at <a href="https://app.getbudi.dev" class="link-underline hover:text-fg">app.getbudi.dev</a>,
+          drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>,
+          set <code class="text-xs">enabled = true</code>. Off by default.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* 6. SUPPORTED AGENTS */}
+  <section id="agents" class="container-readable py-14 sm:py-20 border-t border-line/70">
+    <header class="max-w-2xl mb-8">
+      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Supported agents</p>
+      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">Tracked through one proxy.</h2>
+      <p class="text-fg-muted mt-3">
+        Tier 1 agents use simple env vars with high confidence. Tier 2 agents
+        work but have onboarding caveats (GUI settings, proprietary env vars).
+        Full compatibility matrix lives in
+        <a
+          href="https://github.com/siropkin/budi/blob/main/docs/adr/0082-proxy-compatibility-matrix-and-gateway-contract.md"
+          class="link-underline hover:text-fg"
+          rel="noopener"
+        >ADR-0082</a>.
+      </p>
+    </header>
+
+    <div class="card overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="text-left text-fg-muted text-xs uppercase tracking-wider">
+          <tr class="border-b border-line">
+            <th class="px-5 py-3 font-medium">Agent</th>
+            <th class="px-5 py-3 font-medium">Tier</th>
+            <th class="px-5 py-3 font-medium">Status</th>
+            <th class="px-5 py-3 font-medium">How</th>
+          </tr>
+        </thead>
+        <tbody>
+          {agents.map((agent, idx) => (
+            <tr class:list={[idx !== agents.length - 1 ? "border-b border-line/70" : ""]}>
+              <td class="px-5 py-3 font-medium text-fg">{agent.name}</td>
+              <td class="px-5 py-3 font-mono text-fg-muted">{agent.tier}</td>
+              <td class="px-5 py-3">
+                <span
+                  class:list={[
+                    "inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full",
+                    agent.status === "Supported"
+                      ? "bg-accent-soft text-accent"
+                      : "bg-surface-3 text-fg-muted",
+                  ]}
+                >
+                  <span
+                    aria-hidden="true"
+                    class:list={[
+                      "h-1.5 w-1.5 rounded-full",
+                      agent.status === "Supported" ? "bg-accent" : "bg-fg-dim",
+                    ]}
+                  ></span>
+                  {agent.status}
+                </span>
+              </td>
+              <td class="px-5 py-3 text-fg-muted">{agent.how}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {/* 7. INSTALL */}
+  <section id="install" class="container-readable py-14 sm:py-20 border-t border-line/70">
+    <header class="max-w-2xl mb-8">
+      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">Install</p>
+      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+        One command. Then <code class="text-accent">budi init</code>.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        <code>budi init</code> starts the daemon (port 7878) and proxy (port
+        9878), and prompts you to choose which agents to track. Defaults are
+        safe — you can opt out per agent.
+      </p>
+    </header>
+
+    <div class="max-w-2xl">
+      <CopyableCommand command={installCommand} variant="hero" />
+    </div>
+
+    <div class="mt-4 max-w-3xl text-sm text-fg-muted">
+      <strong class="text-fg">One install on PATH.</strong>
+      Don't mix Homebrew with <code class="text-xs">~/.local/bin</code> (or
+      <code class="text-xs">%LOCALAPPDATA%\budi\bin</code> on Windows): you can
+      end up with different binaries and confusing restarts.
+      <code class="text-xs">budi doctor</code> warns you when it sees duplicates.
+    </div>
+
+    <details class="mt-8 group">
+      <summary class="cursor-pointer list-none inline-flex items-center gap-2 text-sm text-fg-muted hover:text-fg transition-colors">
+        <svg
+          aria-hidden="true"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform group-open:rotate-90"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+        Other install methods
+      </summary>
+      <div class="mt-4 grid gap-3">
+        {altInstalls.map((alt) => (
+          <div>
+            <div class="text-xs uppercase tracking-wider text-fg-dim mb-1.5">{alt.label}</div>
+            <CopyableCommand command={alt.code} variant="compact" />
+          </div>
+        ))}
+      </div>
+    </details>
+  </section>
+
+  {/* 8. FOR TEAMS (opt-in cloud) */}
+  <section id="teams" class="container-readable py-14 sm:py-20 border-t border-line/70">
+    <header class="max-w-2xl mb-8">
+      <p class="text-xs uppercase tracking-[0.18em] text-fg-dim mb-2">For teams (opt-in)</p>
+      <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight">
+        One dashboard for the team. No prompts, no code, no surprises.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        If a team lead now owns an "AI coding spend" line item, the cloud
+        dashboard at
+        <a href="https://app.getbudi.dev" class="link-underline hover:text-fg">app.getbudi.dev</a>
+        gives them daily cost per user, repo, model, branch, and ticket. Without
+        reading anyone's prompts, responses, or file paths.
+      </p>
+    </header>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      <div class="card p-5 sm:p-6">
+        <h3 class="font-semibold text-fg mb-2">What the manager sees</h3>
+        <ul class="text-sm text-fg-muted space-y-1.5 list-disc pl-5">
+          <li>Daily cost per user, repo, model, branch, ticket</li>
+          <li>Trend lines across the last 7 / 30 / 90 days</li>
+          <li>Session summaries: duration, model mix, health flags</li>
+          <li>Manager / member roles for small teams (1–20 devs)</li>
+        </ul>
+      </div>
+      <div class="card p-5 sm:p-6">
+        <h3 class="font-semibold text-fg mb-2">What the cloud never sees</h3>
+        <ul class="text-sm text-fg-muted space-y-1.5 list-disc pl-5">
+          <li>Prompts and AI responses</li>
+          <li>Source code or file contents</li>
+          <li>File paths and email addresses</li>
+          <li>Raw payloads or tag values</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3 text-sm">
+      <a
+        href="https://app.getbudi.dev"
+        rel="noopener"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-black font-semibold hover:opacity-90 transition-opacity"
+      >
+        Sign up at app.getbudi.dev
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="7" y1="17" x2="17" y2="7"></line>
+          <polyline points="7 7 17 7 17 17"></polyline>
+        </svg>
+      </a>
+      <a
+        href="https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md"
+        rel="noopener"
+        class="inline-flex items-center gap-1 px-2 py-2 text-fg-muted hover:text-fg"
+      >
+        Read the privacy contract (ADR-0083) →
+      </a>
+    </div>
+  </section>
+</Base>
