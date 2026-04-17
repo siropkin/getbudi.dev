@@ -1,5 +1,6 @@
 ---
 import "~/styles/global.css";
+import Analytics from "@vercel/analytics/astro";
 
 interface Props {
   title?: string;
@@ -144,6 +145,8 @@ const jsonLd = {
       <slot />
     </main>
 
+    <Analytics />
+
     <footer class="border-t border-line/70 mt-24">
       <div class="container-readable py-10 text-sm text-fg-muted">
         <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -188,7 +191,7 @@ const jsonLd = {
         >
           <span>© {new Date().getFullYear()} budi contributors. Public alpha.</span>
           <span>
-            Built static. No tracking pixels. Source on{" "}
+            Built static. Privacy-friendly analytics via Vercel. Source on{" "}
             <a
               href="https://github.com/siropkin/getbudi.dev"
               target="_blank"
