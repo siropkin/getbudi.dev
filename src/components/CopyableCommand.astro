@@ -1,0 +1,92 @@
+---
+interface Props {
+  command: string;
+  ariaLabel?: string;
+  variant?: "hero" | "compact";
+}
+
+const { command, ariaLabel = "Copy install command", variant = "hero" } = Astro.props;
+const isHero = variant === "hero";
+---
+
+<div
+  class:list={[
+    "copyable group relative flex items-stretch w-full overflow-hidden",
+    "rounded-xl border border-line bg-surface-2",
+    "shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_8px_30px_-12px_rgba(0,0,0,0.5)]",
+    isHero ? "text-base" : "text-sm",
+  ]}
+  data-command={command}
+>
+  <span
+    aria-hidden="true"
+    class:list={[
+      "select-none border-r border-line/70",
+      "px-3 sm:px-4 flex items-center text-accent font-mono",
+      isHero ? "py-3.5" : "py-2.5",
+    ]}
+  >
+    $
+  </span>
+  <pre
+    class:list={[
+      "flex-1 m-0 overflow-x-auto whitespace-pre py-3.5 px-3 sm:px-4 font-mono",
+      "text-fg",
+      isHero ? "text-[0.95rem] sm:text-base" : "text-sm",
+    ]}
+  ><code>{command}</code></pre>
+  <button
+    type="button"
+    aria-label={ariaLabel}
+    class:list={[
+      "copyable-btn shrink-0 px-3 sm:px-4 border-l border-line/70",
+      "text-xs uppercase tracking-wider font-semibold",
+      "text-fg-muted hover:text-accent hover:bg-accent-soft",
+      "transition-colors flex items-center gap-1.5",
+    ]}
+  >
+    <svg
+      aria-hidden="true"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+    <span class="copyable-label">Copy</span>
+  </button>
+</div>
+
+<script>
+  const blocks = document.querySelectorAll<HTMLElement>(".copyable");
+  for (const block of blocks) {
+    const button = block.querySelector<HTMLButtonElement>(".copyable-btn");
+    const label = block.querySelector<HTMLElement>(".copyable-label");
+    const command = block.dataset.command ?? "";
+    if (!button || !label) continue;
+
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(command);
+        const original = label.textContent;
+        label.textContent = "Copied";
+        button.classList.add("text-accent");
+        setTimeout(() => {
+          label.textContent = original ?? "Copy";
+          button.classList.remove("text-accent");
+        }, 1600);
+      } catch {
+        label.textContent = "Press ⌘C";
+        setTimeout(() => {
+          label.textContent = "Copy";
+        }, 2000);
+      }
+    });
+  }
+</script>
