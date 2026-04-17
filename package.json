@@ -7,10 +7,11 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "astro build && npm run audit",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
+    "audit": "node scripts/audit-build.mjs dist",
     "generate-assets": "node scripts/generate-assets.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
+    "node-html-parser": "^7.1.0",
     "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
