@@ -1,4 +1,5 @@
 {
+  "//": "SEO is deliberately NOT asserted here. Every Vercel preview deployment is served with x-robots-tag: noindex, which Lighthouse weights at ~30% of the SEO category, so every preview scores ~0.66 regardless of real SEO quality. Static SEO invariants (canonical, og, twitter, JSON-LD, sitemap, robots.txt, icons) are already enforced on every PR by scripts/audit-build.mjs (R2.2). SEO scores are still collected and surfaced in the PR comment for visibility.",
   "ci": {
     "collect": {
       "numberOfRuns": 3,
@@ -10,8 +11,7 @@
       "assertions": {
         "categories:performance": ["error", { "minScore": 0.95, "aggregationMethod": "median" }],
         "categories:accessibility": ["error", { "minScore": 0.95, "aggregationMethod": "median" }],
-        "categories:best-practices": ["error", { "minScore": 0.95, "aggregationMethod": "median" }],
-        "categories:seo": ["error", { "minScore": 0.95, "aggregationMethod": "median" }]
+        "categories:best-practices": ["error", { "minScore": 0.95, "aggregationMethod": "median" }]
       }
     },
     "upload": {
