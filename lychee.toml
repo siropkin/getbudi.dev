@@ -1,4 +1,5 @@
-# External links only — internal anchors are covered by the R2.2 audit.
+# External links only — internal anchors and root-relative assets are covered
+# by the R2.2 audit (scripts/audit-build.mjs), so skip them here.
 include_verbatim = false
 max_redirects = 5
 max_retries = 2
@@ -11,3 +12,8 @@ accept = ["200..=299", "403", "429"]
 exclude_path = ["dist/404.html"]
 # ^ The 404 page intentionally links to things we want to check, but skipping
 #   it avoids scanning the same links twice.
+exclude = ["^/"]
+# ^ Skip root-relative URLs like "/", "/#privacy", "/favicon.svg".
+#   Internal anchor + asset integrity is verified by scripts/audit-build.mjs
+#   without a network round-trip; probing them here would either fail (no
+#   base URL) or double up on the audit.
