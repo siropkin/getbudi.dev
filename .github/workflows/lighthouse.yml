@@ -103,6 +103,10 @@ jobs:
             core.setOutput("audit_url", auditUrl);
             core.setOutput("bypass_enabled", bypass ? "true" : "false");
 
+      # Do not use `uploadArtifacts: true` — both Lighthouse steps share the
+      # same default artifact name and the second upload 409s. The
+      # temporary-public-storage report URLs already surface in the PR comment
+      # below, which is what reviewers actually use.
       - name: Lighthouse (desktop)
         id: lhci-desktop
         if: steps.preview.outputs.audit_url != ''
@@ -111,7 +115,6 @@ jobs:
           urls: ${{ steps.preview.outputs.audit_url }}
           configPath: ./lighthouserc.desktop.json
           temporaryPublicStorage: true
-          uploadArtifacts: true
 
       - name: Lighthouse (mobile)
         id: lhci-mobile
@@ -121,7 +124,6 @@ jobs:
           urls: ${{ steps.preview.outputs.audit_url }}
           configPath: ./lighthouserc.mobile.json
           temporaryPublicStorage: true
-          uploadArtifacts: true
 
       - name: Comment Lighthouse report links on PR
         if: always() && steps.preview.outputs.display_url != ''
