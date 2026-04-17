@@ -1,0 +1,13 @@
+# External links only — internal anchors are covered by the R2.2 audit.
+include_verbatim = false
+max_redirects = 5
+max_retries = 2
+timeout = 20
+# Respect the hosts that serve rate-limited HEADs by retrying as GET.
+method = "get"
+accept = ["200..=299", "403", "429"]
+# 403 is tolerated because GitHub sometimes 403s HEAD for unauth requests.
+# 429 is tolerated transiently; real 429s surface via retries.
+exclude_path = ["dist/404.html"]
+# ^ The 404 page intentionally links to things we want to check, but skipping
+#   it avoids scanning the same links twice.
