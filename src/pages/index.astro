@@ -13,18 +13,18 @@ const features = [
   },
   {
     title: "Per repo, branch, and ticket",
-    body: "Cost is attributed to the repo and branch you were on, with ticket IDs extracted from branch names. Filter by ticket prefix, model, project, or custom tag.",
-    foot: "budi stats --branches · --tag ticket_id",
+    body: "Cost is attributed to the repo and branch you were on, with ticket IDs lifted out of branch names and promoted to first-class CLI dimensions. Filter by ticket, activity, file, model, or custom tag.",
+    foot: "budi stats --branches · --tickets · --files",
   },
   {
-    title: "Session health, not just counters",
-    body: 'Budi flags context bloat, cache degradation, cost acceleration, and retry loops while they happen, with provider-aware tips. "You spent $X" → "you are about to spend $X for no reason."',
-    foot: "🟡 budi · $12.50 session · /compact soon",
+    title: "Quiet by default",
+    body: "The statusline and Cursor status bar are intentionally cost-only and provider-scoped. Session health, context bloat, cache drops, and retry loops are available as opt-in coach / full presets — not a wall of emoji by default.",
+    foot: '~/.config/budi/statusline.toml → preset = "coach"',
   },
   {
-    title: "Live status line",
-    body: "A live cost + health string in Claude Code and a status bar + side panel in Cursor. New sessions start green; tips appear only when something is off.",
-    foot: "🟢 budi · $0.42 session · new session",
+    title: "Live status line (rolling 1d / 7d / 30d)",
+    body: "A rolling cost string in Claude Code and a matching single status bar item in Cursor. Each surface is scoped to its own provider — the Claude Code line shows Claude Code spend only, the Cursor line shows Cursor spend only. Click through to the cloud dashboard.",
+    foot: "🟢 budi · $1.24 1d · $8.50 7d · $32.10 30d",
   },
   {
     title: "One-time historical import",
@@ -153,17 +153,17 @@ const firstRunSteps = [
   {
     n: "1",
     cmd: "budi init",
-    body: "Starts the daemon (port 7878) and proxy (port 9878) and prompts you to pick agents and integrations. Defaults are safe; you can opt out per agent.",
+    body: "Starts the daemon (port 7878) and proxy (port 9878) and prompts you to pick agents and integrations. Defaults are safe; you can opt out per agent. Restart your terminal after this so shell-profile proxy env vars take effect for CLI agents.",
   },
   {
     n: "2",
     cmd: "budi doctor",
-    body: "Verifies the daemon, proxy, autostart service, agent configuration, and that proxy env vars are active in your current shell.",
+    body: "Canonical end-to-end verifier: daemon, proxy, autostart service, agent configuration, database, and whether proxy env vars are active in your current shell. Also reports attribution health for sessions, branches, tickets, and activities.",
   },
   {
     n: "3",
-    cmd: "budi stats",
-    body: "Prints your first cost + token breakdown. Non-zero output = tracking works. Try --projects, --branches, --models, or --tag ticket_id.",
+    cmd: "budi status",
+    body: "Today-cost snapshot: daemon/proxy state and today's spend. If nothing has been recorded yet, it prints a friendly nudge to open your agent instead of an all-zero summary. For the full breakdown, use budi stats --projects / --branches / --tickets / --activities / --files.",
   },
 ];
 ---
@@ -329,6 +329,19 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         ))
       }
     </div>
+
+    <p class="text-fg-dim mt-6 max-w-2xl text-xs">
+      The Claude Code statusline, the Cursor status bar, and the cloud dashboard's provider-scoped
+      tiles all consume the same
+      <a
+        href="https://github.com/siropkin/budi/blob/main/docs/statusline-contract.md"
+        class="link-underline hover:text-fg"
+        target="_blank"
+        rel="noopener noreferrer">shared provider-scoped status contract</a
+      > — rolling <code class="text-xs">1d</code> / <code class="text-xs">7d</code> /
+      <code class="text-xs">30d</code> windows, one <code class="text-xs">provider</code> filter, no blended
+      totals.
+    </p>
   </section>
 
   {/* 3b. WHY NOT JUST USE X — honest comparison */}
@@ -458,7 +471,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
             rel="noopener noreferrer">app.getbudi.dev</a
           >, drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>, set <code
             class="text-xs">enabled = true</code
-          >. Off by default.
+          >, then restart the daemon. <code class="text-xs">budi cloud status</code> and
+          <code class="text-xs">budi cloud sync</code> confirm and push from the CLI. Off by default.
         </p>
       </div>
     </div>
@@ -559,6 +573,53 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <code class="text-xs">budi doctor</code> warns you when it sees duplicates.
     </div>
 
+    {/* R2.4 — Cursor marketplace as a first-class acquisition path (#314 / budi-cursor #6) */}
+    <div class="card mt-8 flex flex-col gap-3 p-5 sm:flex-row sm:items-start sm:gap-6 sm:p-6">
+      <div class="flex-1">
+        <h3 class="text-fg font-semibold tracking-tight">Install via the Cursor marketplace</h3>
+        <p class="text-fg-muted mt-1.5 text-sm leading-relaxed">
+          Discovered Budi inside Cursor? Install the
+          <a
+            href="https://marketplace.visualstudio.com/items?itemName=siropkin.budi"
+            class="link-underline hover:text-fg"
+            target="_blank"
+            rel="noopener noreferrer">budi extension</a
+          > from the marketplace and its welcome view will guide you through installing the daemon in
+          an integrated terminal, then hand you off to <code class="text-xs">budi init</code>. The
+          extension surfaces a gray dot (<span
+            aria-hidden="true"
+            class="inline-block h-2 w-2 rounded-full bg-[#9aa3b2]"></span>
+          <code class="text-xs">budi · setup</code>) while the daemon is not installed yet, then
+          switches to the same green/yellow/red health dots as the Claude Code statusline once
+          everything is wired.
+        </p>
+      </div>
+      <div class="sm:self-center">
+        <a
+          href="https://marketplace.visualstudio.com/items?itemName=siropkin.budi"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="border-line-strong hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
+        >
+          Open in marketplace
+          <svg
+            aria-hidden="true"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+
     <details class="group mt-8">
       <summary
         class="text-fg-muted hover:text-fg inline-flex cursor-pointer list-none items-center gap-2 text-sm transition-colors"
@@ -630,8 +691,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </ol>
 
       <p class="text-fg-dim mt-4 max-w-2xl text-xs">
-        Full, canonical 6-step checklist (including historical import and terminal-restart caveats)
-        lives in the
+        Full canonical 5-step first-run checklist (including the explicit "restart your terminal"
+        step and optional <code class="text-xs">budi import</code> backfill) lives in the
         <a
           href="https://github.com/siropkin/budi#first-run-checklist-5-minutes"
           target="_blank"
@@ -667,7 +728,14 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <h3 class="text-fg mb-2 font-semibold">What the manager sees</h3>
         <ul class="text-fg-muted list-disc space-y-1.5 pl-5 text-sm">
           <li>Daily cost per user, repo, model, branch, ticket</li>
-          <li>Trend lines across the last 7 / 30 / 90 days</li>
+          <li>
+            Rolling <code class="text-xs">1d</code> / <code class="text-xs">7d</code> /
+            <code class="text-xs">30d</code> windows — the same contract the local statusline uses
+          </li>
+          <li>
+            Sync-freshness badge on every page (<em>Linked — waiting for first sync</em>,
+            <em>Synced Xm ago</em>, or <em>Stalled — last synced Xh ago</em>)
+          </li>
           <li>Session summaries: duration, model mix, health flags</li>
           <li>Manager / member roles for small teams (1–20 devs)</li>
         </ul>
@@ -714,6 +782,31 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       >
         Read the privacy contract (ADR-0083) →
       </a>
+    </div>
+
+    {/* R2.1 / #225 — discoverable cloud-ops commands matching the CLI */}
+    <div class="mt-8 grid gap-4 md:grid-cols-2">
+      <div class="card p-5 sm:p-6">
+        <h3 class="text-fg mb-2 font-semibold">
+          <code class="text-sm">budi cloud status</code>
+        </h3>
+        <p class="text-fg-muted mb-3 text-sm leading-relaxed">
+          Reports whether sync is enabled, when it last succeeded, and how many records are queued
+          locally. Useful right after you drop your API key in so you can see the link go healthy.
+        </p>
+        <CopyableCommand command="budi cloud status" variant="compact" />
+      </div>
+      <div class="card p-5 sm:p-6">
+        <h3 class="text-fg mb-2 font-semibold">
+          <code class="text-sm">budi cloud sync</code>
+        </h3>
+        <p class="text-fg-muted mb-3 text-sm leading-relaxed">
+          Pushes queued local rollups and session summaries to the cloud on demand, instead of
+          waiting for the background worker interval. Reports records upserted, watermark, and
+          endpoint.
+        </p>
+        <CopyableCommand command="budi cloud sync" variant="compact" />
+      </div>
     </div>
   </section>
 </Base>
