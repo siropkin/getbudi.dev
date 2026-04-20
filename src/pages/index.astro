@@ -7,9 +7,9 @@ const installCommand = "brew install siropkin/budi/budi && budi init";
 
 const features = [
   {
-    title: "Multi-agent tracking",
-    body: "One proxy in front of Claude Code, Cursor, Codex CLI, and Copilot CLI. Configured automatically by budi init — no per-agent keys to manage.",
-    foot: "Tier 1 + Tier 2 agents. Gemini deferred.",
+    title: "Multi-agent tracking, no interception",
+    body: "Claude Code, Codex CLI, Copilot CLI, and Cursor — all attributed by the same daemon. Budi reads the transcript files those tools already write to disk, so there is nothing in your network path and nothing to mis-route.",
+    foot: "ADR-0089 · JSONL tailing as sole live path",
   },
   {
     title: "Per repo, branch, and ticket",
@@ -51,7 +51,7 @@ const numbers = [
 const localCloudRows = [
   {
     q: "Where does Budi run?",
-    a: "On your machine. A small Rust daemon (~6 MB) plus a local proxy on 127.0.0.1:9878.",
+    a: "On your machine. A small Rust daemon (~6 MB) on port 7878 that watches the transcript files your AI agents already write locally. Nothing sits in your network path.",
   },
   {
     q: "What leaves my machine?",
@@ -68,31 +68,31 @@ const agents = [
     name: "Claude Code",
     tier: "Tier 1",
     status: "Supported",
-    how: "Auto-configured by budi init (shell profile env block).",
+    how: "Live tailing of ~/.claude/projects JSONL transcripts. Zero config — Claude Code already writes them.",
   },
   {
     name: "Codex CLI",
     tier: "Tier 1",
     status: "Supported",
-    how: "Auto-configured by budi init (shell profile env block + Codex Desktop config patch).",
-  },
-  {
-    name: "Cursor",
-    tier: "Tier 2",
-    status: "Supported",
-    how: "Auto-configured by budi init (Cursor settings.json patch).",
+    how: "Live tailing of ~/.codex/sessions JSONL transcripts. Zero config — Codex already writes them.",
   },
   {
     name: "Copilot CLI",
     tier: "Tier 2",
     status: "Supported",
-    how: "Auto-configured by budi init (shell profile env block).",
+    how: "Live tailing of ~/.copilot/session-state JSONL transcripts. Zero config — Copilot already writes them.",
+  },
+  {
+    name: "Cursor",
+    tier: "Tier 2",
+    status: "Supported",
+    how: "Live transcript tailing plus Cursor Usage API cost reconciliation (cost may lag the live row by up to ~10 min while the Usage API catches up).",
   },
   {
     name: "Gemini CLI",
     tier: "Tier 3",
     status: "Deferred",
-    how: "Different API format; not supported in v1 proxy.",
+    how: "Different transcript format; not yet wired into the tailer.",
   },
 ];
 
@@ -113,7 +113,7 @@ const altInstalls = [
 
 // "Why not just use X?" — honest, not dismissive. Every row names the real
 // alternative, what it's good at, and where it stops. The Budi row is last
-// and visually distinct. Source: #3 scope §1.
+// and visually distinct.
 const alternatives = [
   {
     name: "Provider dashboards",
@@ -126,7 +126,7 @@ const alternatives = [
     name: "Open-source CLI usage tools",
     examples: "ccusage and similar",
     good: "Local, lightweight, correct for the one agent they target.",
-    gap: "Usually single-agent. No proxy, so no live session health or inline flags. No team view if you ever need one.",
+    gap: "Usually single-agent. No team view. No cross-agent rollups, no branch/ticket attribution.",
     kind: "alt" as const,
   },
   {
@@ -138,32 +138,53 @@ const alternatives = [
   },
   {
     name: "Budi",
-    examples: "Local proxy · multi-agent · opt-in cloud",
-    good: "Multi-agent via one proxy. Repo/branch/ticket attribution. Live session health flags. Optional team dashboard with aggregates only.",
-    gap: "You run a small daemon. Not every agent is supported yet (Gemini deferred). v1 single-machine per user.",
+    examples: "Local daemon · transcript tailing · multi-agent · opt-in cloud",
+    good: "Multi-agent via local transcript tailing — nothing in your network path. Repo/branch/ticket attribution. Live session health flags. Optional team dashboard with aggregates only.",
+    gap: "You run a small daemon. Live row updates lag the wire by seconds (vs the millisecond proxy in 8.1) so very fast tools may briefly read $0 before the row settles. Not every agent is supported yet (Gemini deferred).",
     kind: "budi" as const,
   },
 ];
 
 // 3-step "after you install" block, taken from the siropkin/budi README
-// first-run checklist (§ First run checklist). We intentionally surface the
-// three commands that prove setup worked, not the full 6-step list — that
-// lives in the README and we link out to it. Source: #3 scope §5.
+// first-run checklist (§ First run checklist). We surface the three commands
+// that prove setup worked, not the full 6-step list — that lives in the
+// README and we link out to it.
 const firstRunSteps = [
   {
     n: "1",
     cmd: "budi init",
-    body: "Starts the daemon (port 7878) and proxy (port 9878) and prompts you to pick agents and integrations. Defaults are safe; you can opt out per agent. Restart your terminal after this so shell-profile proxy env vars take effect for CLI agents.",
+    body: "Starts the daemon (port 7878), installs the platform-native autostart service, and prints any agents detected on your machine. Does not touch your shell profile, Cursor settings, or Codex config — your tools keep working exactly as they do today.",
   },
   {
     n: "2",
     cmd: "budi doctor",
-    body: "Canonical end-to-end verifier: daemon, proxy, autostart service, agent configuration, database, and whether proxy env vars are active in your current shell. Also reports attribution health for sessions, branches, tickets, and activities.",
+    body: "Canonical end-to-end verifier: daemon, tailer readiness, schema, transcript visibility, and any leftover 8.0/8.1 proxy residue. Also reports attribution health for sessions, branches, tickets, and activities.",
   },
   {
     n: "3",
     cmd: "budi status",
-    body: "Today-cost snapshot: daemon/proxy state and today's spend. If nothing has been recorded yet, it prints a friendly nudge to open your agent instead of an all-zero summary. For the full breakdown, use budi stats --projects / --branches / --tickets / --activities / --files.",
+    body: "Today-cost snapshot: daemon state and today's spend. If nothing has been recorded yet, it prints a friendly nudge to open your agent instead of an all-zero summary. For the full breakdown, use budi stats --projects / --branches / --tickets / --activities / --files.",
+  },
+];
+
+// Upgrade-from-8.1 surfaces (#330 in siropkin/budi). 8.2 removes the proxy
+// entirely (ADR-0089) and exposes a consent-first cleanup command for the
+// shell/editor blocks that 8.0/8.1 wrote to disk.
+const upgradeSteps = [
+  {
+    n: "1",
+    cmd: "brew upgrade budi   # or rerun the install command above",
+    body: "Updates the budi binary and budi-daemon. The daemon now boots in tailer-only mode — there is no proxy port, no ANTHROPIC_BASE_URL injection, no shell-profile mutation.",
+  },
+  {
+    n: "2",
+    cmd: "budi init --cleanup",
+    body: "Reviews and removes the managed Budi blocks that 8.0/8.1 wrote into your shell profile (~/.zshrc / ~/.bashrc), Cursor settings.json, and ~/.codex/config.toml. Every removal is shown to you first and requires explicit consent — nothing is stripped silently.",
+  },
+  {
+    n: "3",
+    cmd: "budi doctor",
+    body: "Confirms the tailer is healthy, transcripts are visible, and no proxy-era residue remains. budi doctor is the single source of truth for whether the upgrade is finished — if it says All checks passed, you are done.",
   },
 ];
 ---
@@ -185,10 +206,10 @@ const firstRunSteps = [
       </h1>
 
       <p class="text-fg-muted text-lg leading-relaxed text-pretty sm:text-xl">
-        Budi is a local-first cost tracker for AI coding agents. It runs a small proxy on your
-        machine between your agent and the LLM provider, and shows you exactly where your tokens and
-        money go — by repo, branch, ticket, and model. Your prompts, code, and responses never leave
-        your machine.
+        Budi is a local-first cost tracker for AI coding agents. A small Rust daemon on your machine
+        reads the transcripts your agents already write to disk and shows you exactly where your
+        tokens and money go — by repo, branch, ticket, and model. Nothing sits in your network path.
+        Your prompts, code, and responses never leave your machine.
       </p>
 
       <div class="w-full max-w-2xl">
@@ -200,7 +221,7 @@ const firstRunSteps = [
 
       {
         /*
-         * Per-archetype CTA row (R1.1 §1–2, implemented in #3):
+         * Per-archetype CTA row:
          *   - Individual developer  → brew install ... (above, hero) + "View on GitHub"
          *   - Team lead / manager   → jumps to #teams block (cloud sign-up CTA)
          *   - Tire-kicker / contributor → jumps to comparison section + footer repos
@@ -308,11 +329,12 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     <header class="mb-10 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What Budi does</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        One proxy. Every agent. Real attribution.
+        Invisible by default. Real attribution.
       </h2>
       <p class="text-fg-muted mt-3">
         Five things, on purpose. Budi is not an LLM gateway, a prompt router, or a "cost
-        optimization" consulting product.
+        optimization" consulting product. Since 8.2 it is also no longer in your network path — Budi
+        reads the transcripts your agents already write locally and stays out of the way.
       </p>
     </header>
 
@@ -491,15 +513,18 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   <section id="agents" class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Supported agents</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Tracked through one proxy.</h2>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+        Tracked by tailing the transcripts your agents already write.
+      </h2>
       <p class="text-fg-muted mt-3">
-        Tier 1 agents use simple env vars with high confidence. Tier 2 agents work but have
-        onboarding caveats (GUI settings, proprietary env vars). Full compatibility matrix lives in
+        Tier 1 agents tail their JSONL transcripts directly. Tier 2 agents work the same way; Cursor
+        additionally reconciles cost via the Cursor Usage API, which has a known short lag. Full
+        rationale lives in
         <a
-          href="https://github.com/siropkin/budi/blob/main/docs/adr/0082-proxy-compatibility-matrix-and-gateway-contract.md"
+          href="https://github.com/siropkin/budi/blob/main/docs/adr/0089-reverse-proxy-first-jsonl-tailing-as-sole-live-path.md"
           class="link-underline hover:text-fg"
           target="_blank"
-          rel="noopener noreferrer">ADR-0082</a
+          rel="noopener noreferrer">ADR-0089</a
         >.
       </p>
     </header>
@@ -556,8 +581,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         One command. Then <code class="text-accent">budi init</code>.
       </h2>
       <p class="text-fg-muted mt-3">
-        <code>budi init</code> starts the daemon (port 7878) and proxy (port 9878), and prompts you to
-        choose which agents to track. Defaults are safe — you can opt out per agent.
+        <code>budi init</code> starts the daemon on port 7878, installs the platform-native autostart
+        service, and prints any agents detected on your machine. It does <em>not</em> patch your shell
+        profile, Cursor settings, or Codex config. Your tools keep working exactly as they do today.
       </p>
     </header>
 
@@ -573,7 +599,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <code class="text-xs">budi doctor</code> warns you when it sees duplicates.
     </div>
 
-    {/* R2.4 — Cursor marketplace as a first-class acquisition path (#314 / budi-cursor #6) */}
+    {/* Cursor marketplace as a first-class acquisition path */}
     <div class="card mt-8 flex flex-col gap-3 p-5 sm:flex-row sm:items-start sm:gap-6 sm:p-6">
       <div class="flex-1">
         <h3 class="text-fg font-semibold tracking-tight">Install via the Cursor marketplace</h3>
@@ -691,8 +717,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </ol>
 
       <p class="text-fg-dim mt-4 max-w-2xl text-xs">
-        Full canonical 5-step first-run checklist (including the explicit "restart your terminal"
-        step and optional <code class="text-xs">budi import</code> backfill) lives in the
+        Full canonical 5-step first-run checklist (including the optional <code class="text-xs"
+          >budi import</code
+        > backfill) lives in the
         <a
           href="https://github.com/siropkin/budi#first-run-checklist-5-minutes"
           target="_blank"
@@ -701,6 +728,65 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         >.
       </p>
     </div>
+  </section>
+
+  {/* 7b. UPGRADING FROM 8.1 — proxy removal + budi init --cleanup */}
+  <section id="upgrade" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-6 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Upgrading from 8.1</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+        The proxy is gone. <code class="text-accent">budi init --cleanup</code> tidies up.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        Budi 8.2 removes the local proxy entirely (governed by
+        <a
+          href="https://github.com/siropkin/budi/blob/main/docs/adr/0089-reverse-proxy-first-jsonl-tailing-as-sole-live-path.md"
+          class="link-underline hover:text-fg"
+          target="_blank"
+          rel="noopener noreferrer">ADR-0089</a
+        >). The 8.0 / 8.1 daemon wrote managed proxy config blocks into your shell profile, Cursor
+        <code class="text-xs">settings.json</code>, and <code class="text-xs"
+          >~/.codex/config.toml</code
+        >. After upgrading, those blocks no longer do anything — the new
+        <code class="text-xs">budi init --cleanup</code> command shows you each one and asks for explicit
+        consent before removing it. Existing analytics from your 8.0 / 8.1 proxy traffic stay intact.
+      </p>
+    </header>
+
+    <ol class="grid gap-4 md:grid-cols-3" role="list">
+      {
+        upgradeSteps.map((step) => (
+          <li class="card flex flex-col gap-3 p-5 sm:p-6">
+            <div class="flex items-center gap-3">
+              <span
+                aria-hidden="true"
+                class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
+              >
+                {step.n}
+              </span>
+              <code class="text-fg font-mono text-xs">{step.cmd}</code>
+            </div>
+            <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="text-fg-dim mt-4 max-w-2xl text-xs">
+      Tracking ticket:
+      <a
+        href="https://github.com/siropkin/budi/issues/330"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-underline hover:text-fg">siropkin/budi#330</a
+      >. Full upgrade notes live in the
+      <a
+        href="https://github.com/siropkin/budi/releases/tag/v8.2.0"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-underline hover:text-fg">v8.2.0 release notes</a
+      >.
+    </p>
   </section>
 
   {/* 8. FOR TEAMS (opt-in cloud) */}
@@ -784,7 +870,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </a>
     </div>
 
-    {/* R2.1 / #225 — discoverable cloud-ops commands matching the CLI */}
+    {/* Discoverable cloud-ops commands matching the CLI */}
     <div class="mt-8 grid gap-4 md:grid-cols-2">
       <div class="card p-5 sm:p-6">
         <h3 class="text-fg mb-2 font-semibold">

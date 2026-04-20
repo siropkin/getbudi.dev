@@ -1,16 +1,19 @@
 ---
-// Plain-SVG diagram for the local-first data flow. Inlined for zero JS,
-// minimal request count, and good print/dark-mode contrast.
+// Plain-SVG diagram for the local-first data flow as of Budi 8.2 (ADR-0089).
+// Budi is no longer in your network path — your agent talks directly to the
+// LLM provider, and the daemon tails the transcript files the agent already
+// writes locally. Inlined for zero JS, minimal request count, and good
+// print/dark-mode contrast.
 ---
 
 <figure
   class="card overflow-hidden p-4 sm:p-6"
-  aria-label="Diagram: your AI agent talks to a local proxy on 127.0.0.1, which forwards to the LLM provider. An optional, opt-in dotted arrow sends pre-aggregated daily numbers to app.getbudi.dev."
+  aria-label="Diagram: your AI agent talks directly to the LLM provider. The agent writes a transcript file to disk on your machine. A small Rust daemon tails that transcript locally. An optional, opt-in dotted arrow sends pre-aggregated daily numbers to app.getbudi.dev."
 >
   <svg
     role="img"
     aria-hidden="true"
-    viewBox="0 0 720 220"
+    viewBox="0 0 720 280"
     xmlns="http://www.w3.org/2000/svg"
     class="h-auto w-full"
   >
@@ -33,68 +36,94 @@
       font-size="13"
       fill="#e6e8ec"
     >
-      <!-- Agent -->
+      {/* Agent (top-left) */}
       <g>
-        <rect x="20" y="55" width="160" height="90" rx="12" fill="#11141a" stroke="#313846"></rect>
-        <text x="100" y="90" text-anchor="middle" font-size="14" font-weight="600">your agent</text>
-        <text x="100" y="112" text-anchor="middle" fill="#9aa3b2" font-size="11"
+        <rect x="20" y="30" width="180" height="90" rx="12" fill="#11141a" stroke="#313846"></rect>
+        <text x="110" y="62" text-anchor="middle" font-size="14" font-weight="600">your agent</text>
+        <text x="110" y="84" text-anchor="middle" fill="#9aa3b2" font-size="11"
           >claude · cursor</text
         >
-        <text x="100" y="128" text-anchor="middle" fill="#9aa3b2" font-size="11"
+        <text x="110" y="100" text-anchor="middle" fill="#9aa3b2" font-size="11"
           >codex · copilot</text
         >
       </g>
 
-      <!-- Local proxy -->
+      {/* LLM provider (top-right) — direct, Budi is NOT in this path */}
       <g>
-        <rect x="265" y="40" width="190" height="120" rx="14" fill="#0f1f17" stroke="#22c55e"
+        <rect x="520" y="30" width="180" height="90" rx="12" fill="#11141a" stroke="#313846"></rect>
+        <text x="610" y="62" text-anchor="middle" font-size="14" font-weight="600"
+          >LLM provider</text
+        >
+        <text x="610" y="84" text-anchor="middle" fill="#9aa3b2" font-size="11"
+          >anthropic · openai</text
+        >
+        <text x="610" y="100" text-anchor="middle" fill="#9aa3b2" font-size="11">github</text>
+      </g>
+
+      {/* Direct arrow agent → provider (no Budi in the middle) */}
+      <g stroke="#9aa3b2" stroke-width="1.6" fill="none" color="#9aa3b2">
+        <line x1="200" y1="75" x2="518" y2="75" marker-end="url(#arrowhead)"></line>
+      </g>
+      <text x="360" y="60" text-anchor="middle" fill="#9aa3b2" font-size="11">
+        direct — Budi is not in the network path
+      </text>
+
+      {/* Transcript on disk (bottom-left under agent) */}
+      <g>
+        <rect x="20" y="160" width="180" height="80" rx="10" fill="#11141a" stroke="#313846"></rect>
+        <text x="110" y="190" text-anchor="middle" font-size="13" font-weight="600"
+          >transcript on disk</text
+        >
+        <text x="110" y="210" text-anchor="middle" fill="#9aa3b2" font-size="11"
+          >~/.claude/projects</text
+        >
+        <text x="110" y="226" text-anchor="middle" fill="#9aa3b2" font-size="11"
+          >~/.codex/sessions · …</text
+        >
+      </g>
+
+      {/* Agent writes transcript */}
+      <g stroke="#9aa3b2" stroke-width="1.6" fill="none" color="#9aa3b2">
+        <line x1="110" y1="120" x2="110" y2="158" marker-end="url(#arrowhead)"></line>
+      </g>
+
+      {/* Budi daemon (bottom-middle) */}
+      <g>
+        <rect x="265" y="155" width="190" height="95" rx="14" fill="#0f1f17" stroke="#22c55e"
         ></rect>
-        <text x="360" y="72" text-anchor="middle" font-size="14" font-weight="700" fill="#22c55e"
-          >budi proxy</text
+        <text x="360" y="185" text-anchor="middle" font-size="14" font-weight="700" fill="#22c55e"
+          >budi-daemon</text
         >
-        <text x="360" y="94" text-anchor="middle" fill="#cbd5e1" font-size="11">127.0.0.1:9878</text
+        <text x="360" y="207" text-anchor="middle" fill="#cbd5e1" font-size="11">tails JSONL</text>
+        <text x="360" y="223" text-anchor="middle" fill="#9aa3b2" font-size="11"
+          >~6 MB Rust · port 7878</text
         >
-        <text x="360" y="116" text-anchor="middle" fill="#9aa3b2" font-size="11"
-          >~6 MB Rust daemon</text
-        >
-        <text x="360" y="138" text-anchor="middle" fill="#9aa3b2" font-size="11"
+        <text x="360" y="239" text-anchor="middle" fill="#9aa3b2" font-size="11"
           >on your machine</text
         >
       </g>
 
-      <!-- Provider -->
-      <g>
-        <rect x="540" y="55" width="160" height="90" rx="12" fill="#11141a" stroke="#313846"></rect>
-        <text x="620" y="90" text-anchor="middle" font-size="14" font-weight="600"
-          >LLM provider</text
-        >
-        <text x="620" y="112" text-anchor="middle" fill="#9aa3b2" font-size="11"
-          >anthropic · openai</text
-        >
-        <text x="620" y="128" text-anchor="middle" fill="#9aa3b2" font-size="11">github</text>
+      {/* Tail arrow: transcript → daemon */}
+      <g stroke="#22c55e" stroke-width="1.6" fill="none" color="#22c55e">
+        <line x1="200" y1="200" x2="262" y2="200" marker-end="url(#arrowhead)"></line>
       </g>
 
-      <!-- Arrows agent <-> proxy -->
-      <g stroke="#9aa3b2" stroke-width="1.6" fill="none" color="#9aa3b2">
-        <line x1="180" y1="100" x2="262" y2="100" marker-end="url(#arrowhead)"></line>
-      </g>
-      <!-- Arrow proxy -> provider -->
-      <g stroke="#9aa3b2" stroke-width="1.6" fill="none" color="#9aa3b2">
-        <line x1="455" y1="100" x2="538" y2="100" marker-end="url(#arrowhead)"></line>
-      </g>
-
-      <!-- Optional cloud arrow -->
+      {/* Optional cloud arrow (daemon → cloud), bottom-right */}
       <g stroke="#22c55e" stroke-width="1.6" stroke-dasharray="5 5" fill="none" color="#22c55e">
-        <path d="M 360 160 C 360 195, 600 195, 620 195" marker-end="url(#arrowhead)"></path>
+        <path d="M 455 215 C 540 215, 600 215, 620 215" marker-end="url(#arrowhead)"></path>
       </g>
-      <text x="490" y="212" text-anchor="middle" fill="#22c55e" font-size="11">
-        opt-in: aggregates only → app.getbudi.dev
+      <text x="540" y="245" text-anchor="middle" fill="#22c55e" font-size="11">
+        opt-in: aggregates only
+      </text>
+      <text x="540" y="259" text-anchor="middle" fill="#22c55e" font-size="11">
+        → app.getbudi.dev
       </text>
     </g>
   </svg>
   <figcaption class="sr-only">
-    Your agent sends requests to a local proxy on 127.0.0.1:9878. The proxy forwards them to the
-    upstream LLM provider. Optionally, the proxy can sync only pre-aggregated daily numbers to
-    app.getbudi.dev.
+    Your agent talks directly to the upstream LLM provider — Budi is not in the network path. The
+    agent writes a transcript JSONL file to disk locally (for example, to ~/.claude/projects or
+    ~/.codex/sessions). The budi-daemon process tails that transcript on your machine on port 7878.
+    Optionally, the daemon can sync only pre-aggregated daily numbers to app.getbudi.dev.
   </figcaption>
 </figure>
