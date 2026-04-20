@@ -18,8 +18,8 @@ const features = [
   },
   {
     title: "Quiet by default",
-    body: "The statusline and Cursor status bar are intentionally cost-only and provider-scoped. Session health, context bloat, cache drops, and retry loops are available as opt-in coach / full presets — not a wall of emoji by default.",
-    foot: '~/.config/budi/statusline.toml → preset = "coach"',
+    body: "The statusline and Cursor status bar are intentionally cost-only and provider-scoped. Session health vitals — context growth, cache reuse, cost acceleration, retry loops — are available as opt-in coach / full presets, or on demand via budi vitals. Not a wall of emoji by default.",
+    foot: 'budi vitals · ~/.config/budi/statusline.toml → preset = "coach"',
   },
   {
     title: "Live status line (rolling 1d / 7d / 30d)",
@@ -119,7 +119,7 @@ const alternatives = [
     name: "Provider dashboards",
     examples: "Anthropic Console · OpenAI usage · Cursor usage",
     good: "Official, authoritative totals. Free.",
-    gap: "Single-provider. No repo, branch, or ticket attribution. No session health signal. Nothing cross-agent.",
+    gap: "Single-provider. No repo, branch, or ticket attribution. No session health vitals signal. Nothing cross-agent.",
     kind: "alt" as const,
   },
   {
@@ -139,7 +139,7 @@ const alternatives = [
   {
     name: "Budi",
     examples: "Local daemon · transcript tailing · multi-agent · opt-in cloud",
-    good: "Multi-agent via local transcript tailing — nothing in your network path. Repo/branch/ticket attribution. Live session health flags. Optional team dashboard with aggregates only.",
+    good: "Multi-agent via local transcript tailing — nothing in your network path. Repo/branch/ticket attribution. Live session health vitals (budi vitals). Optional team dashboard with aggregates only.",
     gap: "You run a small daemon. Live row updates lag the wire by seconds (vs the millisecond proxy in 8.1) so very fast tools may briefly read $0 before the row settles. Not every agent is supported yet (Gemini deferred).",
     kind: "budi" as const,
   },
@@ -693,7 +693,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         </h3>
         <p class="text-fg-muted mt-3 text-sm">
           Five minutes end to end. If any step looks wrong, <code class="text-xs">budi doctor</code>
-          will say so out loud — it is the source of truth, not this page.
+          will say so out loud — it is the source of truth, not this page. For a per-session health read
+          (context growth, cache reuse, cost acceleration, retry loops), run
+          <code class="text-xs">budi vitals</code>.
         </p>
       </header>
 
@@ -822,7 +824,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
             Sync-freshness badge on every page (<em>Linked — waiting for first sync</em>,
             <em>Synced Xm ago</em>, or <em>Stalled — last synced Xh ago</em>)
           </li>
-          <li>Session summaries: duration, model mix, health flags</li>
+          <li>Session summaries: duration, model mix, health vitals</li>
           <li>Manager / member roles for small teams (1–20 devs)</li>
         </ul>
       </div>
