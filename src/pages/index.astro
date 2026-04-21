@@ -3,7 +3,8 @@ import Base from "~/layouts/Base.astro";
 import CopyableCommand from "~/components/CopyableCommand.astro";
 import Diagram from "~/components/Diagram.astro";
 
-const installCommand = "brew install siropkin/budi/budi && budi init";
+const installCommand =
+  "brew install siropkin/budi/budi && budi init && budi integrations install";
 
 const features = [
   {
@@ -578,12 +579,18 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Install</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        One command. Then <code class="text-accent">budi init</code>.
+        One paste. <code class="text-accent">budi init</code>, then
+        <code class="text-accent">budi integrations install</code>.
       </h2>
       <p class="text-fg-muted mt-3">
         <code>budi init</code> starts the daemon on port 7878, installs the platform-native autostart
-        service, and prints any agents detected on your machine. It does <em>not</em> patch your shell
-        profile, Cursor settings, or Codex config. Your tools keep working exactly as they do today.
+        service, and prints any agents detected on your machine. <code>budi integrations install</code>
+        then wires the Claude Code statusline into <code class="text-xs">~/.claude/settings.json</code>
+        and, if Cursor is detected, offers to install the Cursor extension. Neither step patches your
+        shell profile or Codex config — your tools keep working exactly as they do today. <strong
+          class="text-fg">Restart Claude Code after <code class="text-xs">budi integrations install</code
+          ></strong
+        > so it picks up the new <code class="text-xs">statusLine</code> command.
       </p>
     </header>
 
@@ -617,7 +624,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
             class="inline-block h-2 w-2 rounded-full bg-[#9aa3b2]"></span>
           <code class="text-xs">budi · setup</code>) while the daemon is not installed yet, then
           switches to the same green/yellow/red health dots as the Claude Code statusline once
-          everything is wired.
+          everything is wired. If you already have the CLI, run <code class="text-xs"
+            >budi integrations install --with cursor-extension</code
+          > to wire the extension without visiting the marketplace.
         </p>
       </div>
       <div class="sm:self-center">
