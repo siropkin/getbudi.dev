@@ -9,7 +9,7 @@ const features = [
   {
     title: "Multi-agent tracking, no interception",
     body: "Claude Code, Codex CLI, Copilot CLI, and Cursor — all attributed by the same daemon. Budi reads the transcript files those tools already write to disk, so there is nothing in your network path and nothing to mis-route.",
-    foot: "ADR-0089 · JSONL tailing as sole live path",
+    foot: "Reads transcripts from disk — no network interception",
   },
   {
     title: "Per repo, branch, and ticket",
@@ -354,15 +354,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
 
     <p class="text-fg-dim mt-6 max-w-2xl text-xs">
       The Claude Code statusline, the Cursor status bar, and the cloud dashboard's provider-scoped
-      tiles all consume the same
-      <a
-        href="https://github.com/siropkin/budi/blob/main/docs/statusline-contract.md"
-        class="link-underline hover:text-fg"
-        target="_blank"
-        rel="noopener noreferrer">shared provider-scoped status contract</a
-      > — rolling <code class="text-xs">1d</code> / <code class="text-xs">7d</code> /
-      <code class="text-xs">30d</code> windows, one <code class="text-xs">provider</code> filter, no blended
-      totals.
+      tiles all speak the same shape: rolling <code class="text-xs">1d</code> /
+      <code class="text-xs">7d</code> / <code class="text-xs">30d</code> windows, one
+      <code class="text-xs">provider</code> filter, no blended totals.
     </p>
   </section>
 
@@ -458,13 +452,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Privacy contract</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Stated, not sold.</h2>
       <p class="text-fg-muted mt-3">
-        Three bullets in plain English. The full, binding contract lives in
-        <a
-          href="https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md"
-          class="link-underline hover:text-fg"
-          target="_blank"
-          rel="noopener noreferrer">ADR-0083</a
-        > in the product repo.
+        Three bullets in plain English. What leaves your machine, what doesn't, and how you turn
+        sync on.
       </p>
     </header>
 
@@ -518,14 +507,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </h2>
       <p class="text-fg-muted mt-3">
         Tier 1 agents tail their JSONL transcripts directly. Tier 2 agents work the same way; Cursor
-        additionally reconciles cost via the Cursor Usage API, which has a known short lag. Full
-        rationale lives in
-        <a
-          href="https://github.com/siropkin/budi/blob/main/docs/adr/0089-reverse-proxy-first-jsonl-tailing-as-sole-live-path.md"
-          class="link-underline hover:text-fg"
-          target="_blank"
-          rel="noopener noreferrer">ADR-0089</a
-        >.
+        additionally reconciles cost via the Cursor Usage API, which has a known short lag. No
+        proxy, no network interception — just the transcript files your agents already write to
+        disk.
       </p>
     </header>
 
@@ -752,18 +736,13 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         The proxy is gone. <code class="text-accent">budi init --cleanup</code> tidies up.
       </h2>
       <p class="text-fg-muted mt-3">
-        Budi 8.2 removes the local proxy entirely (governed by
-        <a
-          href="https://github.com/siropkin/budi/blob/main/docs/adr/0089-reverse-proxy-first-jsonl-tailing-as-sole-live-path.md"
-          class="link-underline hover:text-fg"
-          target="_blank"
-          rel="noopener noreferrer">ADR-0089</a
-        >). The 8.0 / 8.1 daemon wrote managed proxy config blocks into your shell profile, Cursor
-        <code class="text-xs">settings.json</code>, and <code class="text-xs"
-          >~/.codex/config.toml</code
-        >. After upgrading, those blocks no longer do anything — the new
-        <code class="text-xs">budi init --cleanup</code> command shows you each one and asks for explicit
-        consent before removing it. Existing analytics from your 8.0 / 8.1 proxy traffic stay intact.
+        Budi 8.2 removes the local proxy entirely — the daemon now tails transcripts only and is no
+        longer in your network path. The 8.0 / 8.1 daemon wrote managed proxy config blocks into
+        your shell profile, Cursor <code class="text-xs">settings.json</code>, and
+        <code class="text-xs">~/.codex/config.toml</code>. After upgrading, those blocks no longer
+        do anything — the new <code class="text-xs">budi init --cleanup</code> command shows you each
+        one and asks for explicit consent before removing it. Existing analytics from your 8.0 / 8.1
+        proxy traffic stay intact.
       </p>
     </header>
 
@@ -875,12 +854,10 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         </svg>
       </a>
       <a
-        href="https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md"
-        target="_blank"
-        rel="noopener noreferrer"
+        href="#privacy"
         class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-2 py-2"
       >
-        Read the privacy contract (ADR-0083) →
+        Read the privacy contract →
       </a>
     </div>
 
