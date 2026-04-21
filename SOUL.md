@@ -28,24 +28,28 @@ Chosen in [#2](https://github.com/siropkin/getbudi.dev/issues/2): **Astro 5 + Ta
 
 ```
 src/
-  layouts/Base.astro         # <html>, head, header, footer, skip link, OG/Twitter meta, JSON-LD, icons
+  layouts/Base.astro         # <html>, head, header, footer, skip link, OG/Twitter meta, JSON-LD, icons, Vercel Web Analytics
   components/
     CopyableCommand.astro    # one-click-copy install block (hero + compact)
-    Diagram.astro            # inline SVG: agent → proxy → provider
+    Diagram.astro            # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript
   pages/
-    index.astro              # landing page: hero → problem → features → compare → local-first → privacy → agents → install (+ after-install) → for teams
+    index.astro              # landing page: hero → problem → features → compare → local-first → privacy → agents → install (+ after-install) → upgrade-from-8.1 → teams
     404.astro                # static "not found" page, noindex, linked back to /
   styles/global.css          # Tailwind v4 import + @theme tokens + base layer
 public/
   favicon.svg                # SVG favicon, source of truth for icon generation
-  apple-touch-icon.png       # 180×180 (generated from favicon.svg, see scripts/)
+  apple-touch-icon.png       # 180×180 (generated from favicon.svg)
   icon-192.png, icon-512.png # PWA-size icons (generated from favicon.svg)
   og.png                     # 1200×630 social preview (generated, see scripts/)
   robots.txt                 # allow-all + sitemap pointer
 scripts/
   generate-assets.mjs        # one-shot PNG/OG generator (resvg + cached fonts)
-astro.config.mjs             # sitemap (404 filtered) + tailwindcss vite plugin
-vercel.json                  # static output, security, HTML short-TTL, long-lived /_astro + image caches
+  audit-build.mjs            # post-build SEO / anchor / icon audit, runs after every `astro build`
+  fonts/                     # bundled Inter + JetBrains Mono TTFs used by the OG generator
+astro.config.mjs             # sitemap (404 filtered) + tailwindcss vite plugin + static output
+vercel.json                  # static output, security headers, HTML short-TTL, long-lived /_astro + image caches
+lychee.toml                  # external-link health-check config (CI only)
+lighthouserc.{desktop,mobile}.json  # Lighthouse CI budgets enforced against Vercel preview deploys
 ```
 
 ## Build & dev
@@ -53,13 +57,16 @@ vercel.json                  # static output, security, HTML short-TTL, long-liv
 ```bash
 npm install
 npm run dev              # local dev server at http://localhost:4321
-npm run build            # static build output to dist/
+npm run build            # static build to dist/, then runs scripts/audit-build.mjs
 npm run preview          # serve dist/ locally
 npm run check            # astro check (TS + template diagnostics)
+npm run format           # prettier --write .
+npm run format:check     # prettier --check . (what CI runs)
+npm run audit            # re-run the post-build audit against an existing dist/
 npm run generate-assets  # regenerate public/og.png + icon PNGs (see scripts/generate-assets.mjs)
 ```
 
-Node 20.3+ (Astro 5 minimum). CI and Vercel both use the `npm run build` target.
+Node 20.3+ (Astro 5 minimum). CI and Vercel both use the `npm run build` target, so the audit step gates every deploy.
 
 ## Content principles
 
@@ -71,17 +78,25 @@ The site should read the way the Reddit posts read — first-person, specific, h
 - **Install**: the primary CTA is always `brew install siropkin/budi/budi && budi init`. Install is one command. Say so.
 - **No dark patterns**: no cookie walls beyond what's strictly required, no email-gated downloads, no "request a demo" when a binary is one command away.
 
-## Pages (planned)
+## Pages
 
-- `/` — hero, 3-5 core features, install command, a live sample of `budi stats` output, link to GitHub
-- `/docs` — lightweight quickstart; deep docs stay in the main repo's README and ADRs
-- `/privacy` — the privacy contract from [ADR-0083](https://github.com/siropkin/budi/blob/main/docs/adr/0083-cloud-ingest-identity-and-privacy-contract.md), written in plain English
-- `/pricing` — only if there's a paid tier; until then, omit
-- `/changelog` — mirror of the main repo's `CHANGELOG.md` or a link to GitHub releases
+Intentionally a single marketing page plus a 404 — deep docs, changelog, and pricing stay out of this repo.
+
+- `/` — hero, the cost-problem numbers, features, honest compare table, local-first FAQ + diagram, privacy contract, supported-agents table, install (with after-install checklist), upgrade-from-8.1 block, for-teams block.
+- `/404` — static "not found", `noindex`, linked back to `/`. Excluded from `sitemap-index.xml` by `astro.config.mjs`.
+
+Deep reference links out to `siropkin/budi` (README, releases) or `app.getbudi.dev`. No `/docs`, `/pricing`, or `/changelog` page is planned — adding one re-opens the docs-drift problem we deliberately avoid by keeping a single surface.
 
 ## Deploy
 
 Deployment target: **Vercel**, auto-deploy from `main` (per [ADR-0087 §3](https://github.com/siropkin/budi/blob/main/docs/adr/0087-cloud-infrastructure-and-deployment.md)). `vercel.json` pins `framework: "astro"`, output dir `dist`, and sets security + cache headers. Domain `getbudi.dev` is separate from `app.getbudi.dev` (which serves `budi-cloud`) — do not share edge config, cookies, or analytics scopes between them.
+
+## CI
+
+Two GitHub Actions workflows in `.github/workflows/` gate every PR:
+
+- `ci.yml` — on every PR and push to `main`: `npm run format:check`, `astro check`, `astro build` (which chains into `scripts/audit-build.mjs`), then a second job runs [lychee](https://lychee.cli.rs/) against the built `dist/` using `lychee.toml` to flag broken outbound links. Internal anchor + SEO + image invariants are the audit script's job; lychee is for external URLs only.
+- `lighthouse.yml` — on non-draft PRs from the same repo only (fork PRs skip because they can't read the Vercel bypass secret). Resolves the Vercel preview URL from the Deployments API, runs Lighthouse CI desktop + mobile against it using `lighthouserc.{desktop,mobile}.json`, and upserts a single sticky PR comment with the scores. The gate is median-of-3 ≥ 0.95 on every category.
 
 ## SEO and social
 
@@ -89,9 +104,11 @@ Deployment target: **Vercel**, auto-deploy from `main` (per [ADR-0087 §3](https
 - `Base.astro` ships the full OG/Twitter card set, canonical URL, theme-color, and a JSON-LD `SoftwareApplication` block. The `noindex` prop on `Base.astro` is the seam for per-page robots hints (used by `404.astro`).
 - The sitemap is generated by `@astrojs/sitemap` with the 404 page explicitly filtered out. `robots.txt` is allow-all and points at `/sitemap-index.xml`.
 
-## Analytics (deferred)
+## Analytics
 
-No analytics in v1. The privacy pitch (ADR-0083 §5/§7) is the product, so the site cannot ship Google Analytics, session replay, fingerprinting, or any script that sets third-party cookies. When a privacy-respecting option is added (Plausible or self-hosted Umami), wire it in `Base.astro`, disclose the collection in the footer, and keep it off preview/staging deploys.
+Vercel Web Analytics is wired in `Base.astro` via `@vercel/analytics/astro` and counts anonymous page views only: cookieless, IP hashed daily, no prompts, no code, no session replay, no cross-site tracking. The `#analytics` anchor on `/` (inside the privacy section) discloses this in plain English and is linked from the footer.
+
+The privacy pitch (ADR-0083 §5/§7) is the product, so anything stricter than the above stays off this repo forever: no Google Analytics, no session replay, no fingerprinting, no script that sets third-party cookies. Swapping to a different privacy-respecting backend (Plausible, self-hosted Umami) is a drop-in replacement for the `<Analytics />` component — keep the footer disclosure in sync if that happens.
 
 ## Dev notes
 
