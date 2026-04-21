@@ -96,6 +96,6 @@ No analytics in v1. The privacy pitch (ADR-0083 §5/§7) is the product, so the 
 ## Dev notes
 
 - This repo should **not** import from `budi-cloud` or `budi`. Any shared assets (logo, brand colors) should live here and be copied to other repos rather than imported — these sites ship independently.
-- If any content on the site references a feature, link to the ADR or the code in the main repo rather than restating the behavior here. Docs drift is the enemy.
+- Visitor-facing copy does **not** link into `siropkin/budi`'s ADR tree or `docs/` files. Contributors still reason in ADRs, but the public site reads as plain English: restate the behavior in visitor-friendly terms and keep it aligned with the current product. Docs drift is still the enemy — just solved by rewording the one surface that shipped, not by pointing marketing visitors at a decision record.
 - Images should be optimized (WebP/AVIF where possible) and served with cache-friendly headers.
 - Keep the page JS-light. A marketing site that takes 4 seconds to render is not a good ad for a tool that brags about being fast.
