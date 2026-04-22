@@ -33,7 +33,7 @@ src/
     CopyableCommand.astro    # one-click-copy install block (hero + compact)
     Diagram.astro            # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript
   pages/
-    index.astro              # landing page: hero → problem → features → compare → local-first → privacy → agents → install (+ after-install) → upgrade-from-8.1 → teams
+    index.astro              # landing page: hero → problem → features → screenshots → compare → local-first → privacy → agents → install (+ 5-step after-install + upgrade-from-8.0/8.1 disclosure) → teams
     404.astro                # static "not found" page, noindex, linked back to /
   styles/global.css          # Tailwind v4 import + @theme tokens + base layer
 public/
@@ -82,7 +82,7 @@ The site should read the way the Reddit posts read — first-person, specific, h
 
 Intentionally a single marketing page plus a 404 — deep docs, changelog, and pricing stay out of this repo.
 
-- `/` — hero, the cost-problem numbers, features, honest compare table, local-first FAQ + diagram, privacy contract, supported-agents table, install (with after-install checklist), upgrade-from-8.1 block, for-teams block.
+- `/` — hero, the cost-problem numbers, features, terminal-fidelity product screenshots (statusline, vitals, stats breakdown), honest compare table, local-first FAQ + diagram, privacy contract, supported-agents table, install (with 5-step after-install checklist inline + upgrade-from-8.0/8.1 disclosure), for-teams block.
 - `/404` — static "not found", `noindex`, linked back to `/`. Excluded from `sitemap-index.xml` by `astro.config.mjs`.
 
 Deep reference links out to `siropkin/budi` (README, releases) or `app.getbudi.dev`. No `/docs`, `/pricing`, or `/changelog` page is planned — adding one re-opens the docs-drift problem we deliberately avoid by keeping a single surface.
