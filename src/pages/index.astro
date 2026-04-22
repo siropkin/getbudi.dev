@@ -5,6 +5,14 @@ import Diagram from "~/components/Diagram.astro";
 
 const installCommand = "brew install siropkin/budi/budi && budi init && budi integrations install";
 
+// The currently shipping budi release. Shown next to every install-command
+// block so fresh users can tell what version they're getting before they
+// paste the one-liner. Bump on release — the canonical value is the latest
+// `siropkin/budi` tag. The Cursor extension is versioned independently in
+// the `siropkin/budi-cursor` repo; see the marketplace block below.
+const LATEST_BUDI_VERSION = "v8.2.1";
+const LATEST_CURSOR_EXTENSION_VERSION = "v1.3.x";
+
 const features = [
   {
     title: "Multi-agent tracking, no interception",
@@ -28,8 +36,8 @@ const features = [
   },
   {
     title: "One-time historical import",
-    body: "budi import backfills from Claude Code JSONL, Codex Desktop/CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You don't lose the months you already spent.",
-    foot: "budi import",
+    body: "budi db import backfills from Claude Code JSONL, Codex Desktop/CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You don't lose the months you already spent.",
+    foot: "budi db import",
   },
 ];
 
@@ -140,30 +148,85 @@ const alternatives = [
     name: "Budi",
     examples: "Local daemon · transcript tailing · multi-agent · opt-in cloud",
     good: "Multi-agent via local transcript tailing — nothing in your network path. Repo/branch/ticket attribution. Live session health vitals (budi vitals). Optional team dashboard with aggregates only.",
-    gap: "You run a small daemon. Live row updates lag the wire by seconds (vs the millisecond proxy in 8.1) so very fast tools may briefly read $0 before the row settles. Not every agent is supported yet (Gemini deferred).",
+    gap: "You run a small daemon. Live row updates lag the wire by seconds (vs the millisecond proxy in 8.1) so very fast tools may briefly read $0 before the row settles. Cursor-attributed cost can additionally lag by up to ~10 minutes while the Cursor Usage API catches up. Not every agent is supported yet (Gemini deferred).",
     kind: "budi" as const,
   },
 ];
 
-// 3-step "after you install" block, taken from the siropkin/budi README
-// first-run checklist (§ First run checklist). We surface the three commands
-// that prove setup worked, not the full 6-step list — that lives in the
-// README and we link out to it.
+// Full 5-step "after you install" block. Mirrors the canonical first-run
+// checklist in the siropkin/budi README (§ First run checklist) so a fresh
+// user can finish setup without leaving the site. Step 5 is marked optional
+// to keep the critical path short; the upgrade-from-8.0/8.1 flow lives in
+// a separate disclosure below the Install section.
 const firstRunSteps = [
   {
     n: "1",
     cmd: "budi init",
-    body: "Starts the daemon (port 7878), installs the platform-native autostart service, and prints any agents detected on your machine. Does not touch your shell profile, Cursor settings, or Codex config — your tools keep working exactly as they do today.",
+    body: "Starts the daemon (port 7878), installs the platform-native autostart service, wires the Claude Code statusline and (if detected) the Cursor extension, and prints any agents detected on your machine. Does not touch your shell profile, Cursor settings, or Codex config — your tools keep working exactly as they do today.",
   },
   {
     n: "2",
-    cmd: "budi doctor",
-    body: "Canonical end-to-end verifier: daemon, tailer readiness, schema, transcript visibility, and any leftover 8.0/8.1 proxy residue. Also reports attribution health for sessions, branches, tickets, and activities.",
+    cmd: "# open your agent and send a prompt",
+    body: "Open Claude Code, Codex CLI, Copilot CLI, or Cursor as usual and send any prompt. Budi tails the local transcript / session files your agent already writes to disk — there is nothing extra to configure.",
   },
   {
     n: "3",
+    cmd: "budi doctor",
+    body: 'Canonical end-to-end verifier: daemon, tailer readiness, schema, transcript visibility, and any leftover 8.0/8.1 proxy residue. Also reports attribution health for sessions, branches, tickets, and activities. When the report top line reads "All checks passed." you are done.',
+  },
+  {
+    n: "4",
     cmd: "budi status",
     body: "Today-cost snapshot: daemon state and today's spend. If nothing has been recorded yet, it prints a friendly nudge to open your agent instead of an all-zero summary. For the full breakdown, use budi stats --projects / --branches / --tickets / --activities / --files.",
+  },
+  {
+    n: "5",
+    cmd: "budi db import   # optional",
+    body: "Optional one-time backfill from Claude Code JSONL transcripts, Codex Desktop / CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You do not lose the months you already spent. Skip this step if you only want live tracking going forward.",
+  },
+];
+
+// "Screenshots" are rendered as terminal-fidelity text blocks, not PNGs.
+// This matches the product: budi is a CLI / statusline tool, and the
+// authentic artifact a user will see is terminal output. Keeping the
+// surface as styled <pre> blocks also stays inside the site's static /
+// JS-light budget and the "no animated GIF / video" discipline (SOUL.md).
+const productShots = [
+  {
+    caption:
+      "Claude Code statusline — rolling 1d / 7d / 30d Claude-only spend with a green health dot. The line updates every ~10 s and stays quiet by default.",
+    hint: "claude code session · statusline preset = default",
+    body: `🟢 budi · $ 1.24 1d   $ 8.50 7d   $ 32.10 30d   claude-code
+ ╭───────────────────────────────────────────────────────────
+ │ > help me wire the feature flag
+ │`,
+  },
+  {
+    caption:
+      "budi vitals — session health in plain English: context growth, cache reuse, cost acceleration, retry loops. No wall of emoji, no dashboard required.",
+    hint: "~ budi vitals",
+    body: `Session Health: 🟢 GREEN  (session healthy)
+─────────────────────────────────────────────────────────────
+Context growth     →  18.2 %/hr        (within normal band)
+Cache reuse        →  72.8 %           (good — >60 % target)
+Cost acceleration  →  +$ 0.81 / 10 min (stable)
+Retry loops        →  0                (no retries)
+
+Session:  2h 14m · claude-3.5-sonnet · 46 msgs · $ 4.92`,
+  },
+  {
+    caption:
+      "budi stats --tickets — per-ticket attribution across the last 7 days, reconciled to the cent. Tickets are lifted from branch names (BUD-214 → siropkin/budi/feat/cloud-ingest).",
+    hint: "~ budi stats --tickets -p 7d",
+    body: `Ticket         cost       msgs    top repo
+─────────────────────────────────────────────────────────────
+BUD-214       $ 11.62    7,104    siropkin/budi
+WEB-1180      $  6.04    3,218    acme/web
+WEB-1199      $  4.88    2,641    acme/web
+INFRA-88      $  3.21    1,402    acme/infra
+(untagged)    $  2.40      812    personal/notes
+─────────────────────────────────────────────────────────────
+Total (7d)    $ 28.15   15,177    reconciles to budi stats`,
   },
 ];
 
@@ -214,8 +277,11 @@ const upgradeSteps = [
 
       <div class="w-full max-w-2xl">
         <CopyableCommand command={installCommand} variant="hero" />
-        <p class="text-fg-dim mt-2 text-xs">
-          One command. macOS / Linux / Windows binaries. No account needed.
+        <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+          <span>
+            Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.
+          </span>
+          <span>One command. macOS / Linux / Windows binaries. No account needed.</span>
         </p>
       </div>
 
@@ -299,9 +365,13 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">The problem</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">You are not imagining it.</h2>
       <p class="text-fg-muted mt-3">
-        These are real numbers from a single month, one developer, multiple agents and providers,
-        and zero per-repo visibility from the upstream dashboards. The provider bill arrived at the
-        end of the month with a single total and no answer to the obvious follow-up: <em>where</em>.
+        Active solo developers using AI coding agents typically see <strong class="text-fg"
+          >$120 – $800 / month</strong
+        > across providers. A heavy month — multiple agents, Opus-class models, and no idle days — can
+        run an order of magnitude higher. The numbers below are from one such month: one developer, multiple
+        agents and providers, and zero per-repo visibility from the upstream dashboards. The provider
+        bill arrived at the end of the month with a single total and no answer to the obvious follow-up:
+        <em>where</em>.
       </p>
     </header>
 
@@ -319,8 +389,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     </div>
 
     <p class="text-fg-dim mt-4 max-w-2xl text-xs">
-      Anonymized example, drawn from the same kind of monthly bill that prompted this project. Your
-      numbers are probably smaller — or larger.
+      Anonymized example, drawn from the same kind of monthly bill that prompted this project — this
+      is what a heavy month looks like. Your numbers are probably smaller — but until something
+      counts them by repo, branch, and ticket, you will not actually know.
     </p>
   </section>
 
@@ -358,6 +429,42 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <code class="text-xs">7d</code> / <code class="text-xs">30d</code> windows, one
       <code class="text-xs">provider</code> filter, no blended totals.
     </p>
+  </section>
+
+  {/* 3a. WHAT IT LOOKS LIKE — terminal-fidelity shots of the real surfaces */}
+  <section id="screenshots" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What it looks like</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+        Three surfaces, one contract.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        The statusline, <code class="text-xs">budi vitals</code>, and
+        <code class="text-xs">budi stats</code> all render the same rolling window and the same attribution.
+        These are the real surfaces, rendered the way your terminal will render them.
+      </p>
+    </header>
+
+    <div class="grid gap-4 lg:grid-cols-3">
+      {
+        productShots.map((shot) => (
+          <figure class="card flex flex-col overflow-hidden">
+            <div class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs">
+              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+              <span class="ml-3 font-mono">{shot.hint}</span>
+            </div>
+            <pre class="text-fg m-0 flex-1 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[12.5px]">
+              <code>{shot.body}</code>
+            </pre>
+            <figcaption class="text-fg-muted border-line/70 border-t px-4 py-3 text-xs leading-relaxed">
+              {shot.caption}
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
   </section>
 
   {/* 3b. WHY NOT JUST USE X — honest comparison */}
@@ -583,6 +690,15 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
 
     <div class="max-w-2xl">
       <CopyableCommand command={installCommand} variant="hero" />
+      <p class="text-fg-dim mt-2 text-xs">
+        Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>. Latest
+        release on <a
+          href="https://github.com/siropkin/budi/releases"
+          class="link-underline hover:text-fg"
+          target="_blank"
+          rel="noopener noreferrer">GitHub</a
+        >.
+      </p>
     </div>
 
     <div class="text-fg-muted mt-4 max-w-3xl text-sm">
@@ -596,7 +712,14 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     {/* Cursor marketplace as a first-class acquisition path */}
     <div class="card mt-8 flex flex-col gap-3 p-5 sm:flex-row sm:items-start sm:gap-6 sm:p-6">
       <div class="flex-1">
-        <h3 class="text-fg font-semibold tracking-tight">Install via the Cursor marketplace</h3>
+        <h3
+          class="text-fg flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-tight"
+        >
+          <span>Install via the Cursor marketplace</span>
+          <code class="text-fg-dim text-[11px] font-normal">
+            {LATEST_CURSOR_EXTENSION_VERSION}
+          </code>
+        </h3>
         <p class="text-fg-muted mt-1.5 text-sm leading-relaxed">
           Discovered Budi inside Cursor? Install the
           <a
@@ -614,6 +737,17 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
           everything is wired. If you already have the CLI, run <code class="text-xs"
             >budi integrations install --with cursor-extension</code
           > to wire the extension without visiting the marketplace.
+        </p>
+        <p class="text-fg-dim mt-3 text-xs leading-relaxed">
+          The marketplace extension is versioned independently of the CLI (see
+          <a
+            href="https://github.com/siropkin/budi-cursor"
+            class="link-underline hover:text-fg"
+            target="_blank"
+            rel="noopener noreferrer">siropkin/budi-cursor</a
+          >). <strong class="text-fg-muted"
+            >Earlier 1.0.x builds referenced the retired 8.0 / 8.1 proxy</strong
+          > — make sure you are on the current release from the marketplace.
         </p>
       </div>
       <div class="sm:self-center">
@@ -676,26 +810,29 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
 
     {
       /*
-       * "After you install" — the conversion we actually care about. Installing
-       * is not adoption; a non-zero budi stats run is. Three commands, in order,
-       * mirror the siropkin/budi README first-run checklist.
+       * "After you install" — the canonical 5-step first-run checklist
+       * mirrored inline from siropkin/budi README (§ First run checklist).
+       * A fresh user finishes setup without leaving the site; the README
+       * remains the upstream source of truth but is no longer a required
+       * stop on the critical path.
        */
     }
     <div class="mt-12">
       <header class="mb-6 max-w-2xl">
         <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">After you install</p>
         <h3 class="text-xl font-semibold tracking-tight sm:text-2xl">
-          Three commands to prove it works.
+          Five steps to prove it works.
         </h3>
         <p class="text-fg-muted mt-3 text-sm">
-          Five minutes end to end. If any step looks wrong, <code class="text-xs">budi doctor</code>
-          will say so out loud — it is the source of truth, not this page. For a per-session health read
-          (context growth, cache reuse, cost acceleration, retry loops), run
+          About five minutes end to end. If any step looks wrong, <code class="text-xs"
+            >budi doctor</code
+          > will say so out loud — it is the source of truth, not this page. For a per-session health
+          read (context growth, cache reuse, cost acceleration, retry loops), run
           <code class="text-xs">budi vitals</code>.
         </p>
       </header>
 
-      <ol class="grid gap-4 md:grid-cols-3" role="list">
+      <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
         {
           firstRunSteps.map((step) => (
             <li class="card flex flex-col gap-3 p-5 sm:p-6">
@@ -713,73 +850,87 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
           ))
         }
       </ol>
-
-      <p class="text-fg-dim mt-4 max-w-2xl text-xs">
-        Full canonical 5-step first-run checklist (including the optional <code class="text-xs"
-          >budi import</code
-        > backfill) lives in the
-        <a
-          href="https://github.com/siropkin/budi#first-run-checklist-5-minutes"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="link-underline hover:text-fg">siropkin/budi README</a
-        >.
-      </p>
     </div>
-  </section>
 
-  {/* 7b. UPGRADING FROM 8.1 — proxy removal + budi init --cleanup */}
-  <section id="upgrade" class="container-readable border-line/70 border-t py-14 sm:py-20">
-    <header class="mb-6 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Upgrading from 8.1</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        The proxy is gone. <code class="text-accent">budi init --cleanup</code> tidies up.
-      </h2>
-      <p class="text-fg-muted mt-3">
-        Budi 8.2 removes the local proxy entirely — the daemon now tails transcripts only and is no
-        longer in your network path. The 8.0 / 8.1 daemon wrote managed proxy config blocks into
-        your shell profile, Cursor <code class="text-xs">settings.json</code>, and
-        <code class="text-xs">~/.codex/config.toml</code>. After upgrading, those blocks no longer
-        do anything — the new <code class="text-xs">budi init --cleanup</code> command shows you each
-        one and asks for explicit consent before removing it. Existing analytics from your 8.0 / 8.1 proxy
-        traffic stay intact.
-      </p>
-    </header>
+    {
+      /*
+       * Upgrade-from-8.0/8.1 flow, collapsed behind a disclosure so fresh
+       * users on clean machines don't see it. The block used to live as a
+       * full top-level section (#upgrade) which made Budi look like it had
+       * a hard migration even on first install. See siropkin/budi#444.
+       */
+    }
+    <details id="upgrade" class="group mt-10 scroll-mt-24">
+      <summary
+        class="text-fg-muted hover:text-fg inline-flex cursor-pointer list-none items-center gap-2 text-sm transition-colors"
+      >
+        <svg
+          aria-hidden="true"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform group-open:rotate-90"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+        <span
+          >Upgrading from 8.0 / 8.1? Proxy removal + <code class="text-xs">budi init --cleanup</code
+          ></span
+        >
+      </summary>
 
-    <ol class="grid gap-4 md:grid-cols-3" role="list">
-      {
-        upgradeSteps.map((step) => (
-          <li class="card flex flex-col gap-3 p-5 sm:p-6">
-            <div class="flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
-              >
-                {step.n}
-              </span>
-              <code class="text-fg font-mono text-xs">{step.cmd}</code>
-            </div>
-            <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
-          </li>
-        ))
-      }
-    </ol>
+      <div class="mt-6">
+        <p class="text-fg-muted max-w-2xl text-sm leading-relaxed">
+          Budi 8.2 removes the local proxy entirely — the daemon now tails transcripts only and is
+          no longer in your network path. The 8.0 / 8.1 daemon wrote managed proxy config blocks
+          into your shell profile, Cursor <code class="text-xs">settings.json</code>, and
+          <code class="text-xs">~/.codex/config.toml</code>. After upgrading, those blocks no longer
+          do anything — <code class="text-xs">budi init --cleanup</code> shows you each one and asks for
+          explicit consent before removing it. Existing analytics from your 8.0 / 8.1 proxy traffic stay
+          intact.
+        </p>
 
-    <p class="text-fg-dim mt-4 max-w-2xl text-xs">
-      Tracking ticket:
-      <a
-        href="https://github.com/siropkin/budi/issues/330"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="link-underline hover:text-fg">siropkin/budi#330</a
-      >. Full upgrade notes live in the
-      <a
-        href="https://github.com/siropkin/budi/releases/tag/v8.2.0"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="link-underline hover:text-fg">v8.2.0 release notes</a
-      >.
-    </p>
+        <ol class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+          {
+            upgradeSteps.map((step) => (
+              <li class="card flex flex-col gap-3 p-5 sm:p-6">
+                <div class="flex items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
+                  >
+                    {step.n}
+                  </span>
+                  <code class="text-fg font-mono text-xs">{step.cmd}</code>
+                </div>
+                <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+
+        <p class="text-fg-dim mt-4 max-w-2xl text-xs">
+          Tracking ticket:
+          <a
+            href="https://github.com/siropkin/budi/issues/330"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underline hover:text-fg">siropkin/budi#330</a
+          >. Full upgrade notes live in the
+          <a
+            href="https://github.com/siropkin/budi/releases/tag/v8.2.0"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link-underline hover:text-fg">v8.2.0 release notes</a
+          >.
+        </p>
+      </div>
+    </details>
   </section>
 
   {/* 8. FOR TEAMS (opt-in cloud) */}
