@@ -6,13 +6,13 @@ This repo is the public face, not the product. Keep it small, fast, and static-f
 
 ## Product boundaries
 
-| Domain                     | Repo                                                                  | What lives there                                                         |
-| -------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `getbudi.dev`              | **this repo** (`siropkin/getbudi.dev`)                                | Marketing site: hero, features, pricing, docs-lite, install instructions |
-| `app.getbudi.dev`          | [`siropkin/budi-cloud`](https://github.com/siropkin/budi-cloud)       | Authenticated cloud dashboard (Next.js + Supabase)                       |
-| Open-source CLI / daemon   | [`siropkin/budi`](https://github.com/siropkin/budi)                   | Rust workspace: daemon, CLI, proxy, core business logic                  |
-| Cursor / VS Code extension | [`siropkin/budi-cursor`](https://github.com/siropkin/budi-cursor)     | TypeScript VS Code extension                                             |
-| Homebrew tap               | [`siropkin/homebrew-budi`](https://github.com/siropkin/homebrew-budi) | `brew install siropkin/budi/budi` formula                                |
+| Domain                     | Repo                                                                  | What lives there                                                                  |
+| -------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `getbudi.dev`              | **this repo** (`siropkin/getbudi.dev`)                                | Marketing site: hero, features, local-first story, install flow, opt-in cloud CTA |
+| `app.getbudi.dev`          | [`siropkin/budi-cloud`](https://github.com/siropkin/budi-cloud)       | Authenticated cloud dashboard (Next.js + Supabase)                                |
+| Open-source CLI / daemon   | [`siropkin/budi`](https://github.com/siropkin/budi)                   | Rust workspace: transcript-tailing daemon, CLI, core business logic               |
+| Cursor / VS Code extension | [`siropkin/budi-cursor`](https://github.com/siropkin/budi-cursor)     | TypeScript VS Code extension                                                      |
+| Homebrew tap               | [`siropkin/homebrew-budi`](https://github.com/siropkin/homebrew-budi) | `brew install siropkin/budi/budi` formula                                         |
 
 Do **not** mix cloud dashboard code, product features, or anything that touches user data into this repo. This is a static marketing surface only.
 
@@ -45,7 +45,7 @@ public/
 scripts/
   generate-assets.mjs        # one-shot PNG/OG generator (resvg + cached fonts)
   audit-build.mjs            # post-build SEO / anchor / icon audit, runs after every `astro build`
-  fonts/                     # bundled Inter + JetBrains Mono TTFs used by the OG generator
+  fonts/                     # downloaded on first run and cached here (gitignored); Inter + JetBrains Mono TTFs used by the OG generator
 astro.config.mjs             # sitemap (404 filtered) + tailwindcss vite plugin + static output
 vercel.json                  # static output, security headers, HTML short-TTL, long-lived /_astro + image caches
 lychee.toml                  # external-link health-check config (CI only)
@@ -96,7 +96,7 @@ Deployment target: **Vercel**, auto-deploy from `main` (per [ADR-0087 §3](https
 Two GitHub Actions workflows in `.github/workflows/` gate every PR:
 
 - `ci.yml` — on every PR and push to `main`: `npm run format:check`, `astro check`, `astro build` (which chains into `scripts/audit-build.mjs`), then a second job runs [lychee](https://lychee.cli.rs/) against the built `dist/` using `lychee.toml` to flag broken outbound links. Internal anchor + SEO + image invariants are the audit script's job; lychee is for external URLs only.
-- `lighthouse.yml` — on non-draft PRs from the same repo only (fork PRs skip because they can't read the Vercel bypass secret). Resolves the Vercel preview URL from the Deployments API, runs Lighthouse CI desktop + mobile against it using `lighthouserc.{desktop,mobile}.json`, and upserts a single sticky PR comment with the scores. The gate is median-of-3 ≥ 0.95 on every category.
+- `lighthouse.yml` — on non-draft PRs from the same repo only (fork PRs skip because they can't read the Vercel bypass secret). Resolves the Vercel preview URL from the Deployments API, runs Lighthouse CI desktop + mobile against it using `lighthouserc.{desktop,mobile}.json`, and upserts a single sticky PR comment with the scores. The gate is median-of-3 ≥ 0.95 on performance, accessibility, and best-practices. SEO is collected and surfaced in the comment but intentionally not asserted — Vercel preview deploys ship `x-robots-tag: noindex`, which caps the SEO score below the gate regardless of real SEO quality. Static SEO invariants are enforced by `scripts/audit-build.mjs` on every PR instead.
 
 ## SEO and social
 
