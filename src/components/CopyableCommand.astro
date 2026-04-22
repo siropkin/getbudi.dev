@@ -1,11 +1,10 @@
 ---
 interface Props {
   command: string;
-  ariaLabel?: string;
   variant?: "hero" | "compact";
 }
 
-const { command, ariaLabel = "Copy install command", variant = "hero" } = Astro.props;
+const { command, variant = "hero" } = Astro.props;
 const isHero = variant === "hero";
 ---
 
@@ -36,7 +35,7 @@ const isHero = variant === "hero";
     ]}><code>{command}</code></pre>
   <button
     type="button"
-    aria-label={ariaLabel}
+    aria-label="Copy install command"
     class:list={[
       "copyable-btn border-line/70 shrink-0 border-l px-3 sm:px-4",
       "text-xs font-semibold tracking-wider uppercase",
