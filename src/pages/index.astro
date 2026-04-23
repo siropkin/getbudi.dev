@@ -275,7 +275,7 @@ const upgradeSteps = [
         Your prompts, code, and responses never leave your machine.
       </p>
 
-      <div class="w-full max-w-2xl">
+      <div class="w-full">
         <CopyableCommand command={installCommand} variant="hero" />
         <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
           <span>
@@ -624,8 +624,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <table class="w-full text-sm">
         <thead class="text-fg-muted text-left text-xs tracking-wider uppercase">
           <tr class="border-line border-b">
-            <th class="px-5 py-3 font-medium">Agent</th>
-            <th class="px-5 py-3 font-medium">Tier</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Agent</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Tier</th>
             <th class="px-5 py-3 font-medium">Status</th>
             <th class="px-5 py-3 font-medium">How</th>
           </tr>
@@ -634,8 +634,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
           {
             agents.map((agent, idx) => (
               <tr class:list={[idx !== agents.length - 1 ? "border-line/70 border-b" : ""]}>
-                <td class="text-fg px-5 py-3 font-medium">{agent.name}</td>
-                <td class="text-fg-muted px-5 py-3 font-mono">{agent.tier}</td>
+                <td class="text-fg px-5 py-3 font-medium whitespace-nowrap">{agent.name}</td>
+                <td class="text-fg-muted px-5 py-3 font-mono whitespace-nowrap">{agent.tier}</td>
                 <td class="px-5 py-3">
                   <span
                     class:list={[
@@ -688,18 +688,16 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </p>
     </header>
 
-    <div class="max-w-2xl">
-      <CopyableCommand command={installCommand} variant="hero" />
-      <p class="text-fg-dim mt-2 text-xs">
-        Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>. Latest
-        release on <a
-          href="https://github.com/siropkin/budi/releases"
-          class="link-underline hover:text-fg"
-          target="_blank"
-          rel="noopener noreferrer">GitHub</a
-        >.
-      </p>
-    </div>
+    <CopyableCommand command={installCommand} variant="hero" />
+    <p class="text-fg-dim mt-2 text-xs">
+      Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>. Latest release
+      on <a
+        href="https://github.com/siropkin/budi/releases"
+        class="link-underline hover:text-fg"
+        target="_blank"
+        rel="noopener noreferrer">GitHub</a
+      >.
+    </p>
 
     <div class="text-fg-muted mt-4 max-w-3xl text-sm">
       <strong class="text-fg">One install on PATH.</strong>
