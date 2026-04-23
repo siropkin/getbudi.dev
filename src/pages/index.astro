@@ -279,52 +279,50 @@ const upgradeSteps = [
         tokens and money go — by repo, branch, ticket, and model. Nothing sits in your network path.
         Your prompts, code, and responses never leave your machine.
       </p>
+    </div>
 
-      <div class="w-full">
-        <CopyableCommand command={installCommand} variant="hero" />
-        <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-          <span>
-            Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.
-          </span>
-          <span>One command. macOS / Linux / Windows binaries. No account needed.</span>
-        </p>
-      </div>
+    {/* Install block spans the full section width — same style as #install. */}
+    <div class="mt-6 sm:mt-8">
+      <CopyableCommand command={installCommand} variant="hero" />
+      <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+        <span>
+          Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.
+        </span>
+        <span>One command. macOS / Linux / Windows binaries. No account needed.</span>
+      </p>
+    </div>
 
-      {
-        /*
-         * Per-archetype CTA row:
-         *   - Individual developer  → brew install ... (above, hero) + "View on GitHub"
-         *   - Team lead / manager   → jumps to #teams block (cloud sign-up CTA)
-         *   - Tire-kicker / contributor → jumps to comparison section + footer repos
-         */
-      }
-      <div class="flex flex-wrap items-center gap-3 text-sm">
-        <a
-          href="https://github.com/siropkin/budi"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="border-line-strong hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors"
-        >
-          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"
-            ></path>
-          </svg>
-          View on GitHub
-        </a>
-        <a
-          href="#teams"
-          class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
-        >
-          For teams →
-        </a>
-        <a
-          href="#compare"
-          class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
-        >
-          Why not just X? ↓
-        </a>
-      </div>
+    {
+      /*
+       * Per-archetype CTA row:
+       *   - Individual developer  → brew install ... (above, hero) + "View on GitHub"
+       *   - Team lead / manager   → jumps to #teams block (cloud sign-up CTA)
+       *   - Tire-kicker / contributor → jumps to comparison section + footer repos
+       */
+    }
+    <div class="mt-6 flex max-w-3xl flex-wrap items-center gap-3 text-sm sm:mt-8">
+      <a
+        href="https://github.com/siropkin/budi"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="border-line-strong hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors"
+      >
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"
+          ></path>
+        </svg>
+        View on GitHub
+      </a>
+      <a href="#teams" class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2">
+        For teams →
+      </a>
+      <a
+        href="#compare"
+        class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
+      >
+        Why not just X? ↓
+      </a>
     </div>
 
     {/* Hero visual: a static, copy-paste-shaped budi stats sample. No video, no JS. */}
