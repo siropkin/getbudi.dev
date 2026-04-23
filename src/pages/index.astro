@@ -10,7 +10,7 @@ const installCommand = "brew install siropkin/budi/budi && budi init && budi int
 // paste the one-liner. Bump on release — the canonical value is the latest
 // `siropkin/budi` tag. The Cursor extension is versioned independently in
 // the `siropkin/budi-cursor` repo; see the marketplace block below.
-const LATEST_BUDI_VERSION = "v8.2.1";
+const LATEST_BUDI_VERSION = "v8.3.0";
 const LATEST_CURSOR_EXTENSION_VERSION = "v1.3.x";
 
 const features = [
@@ -38,6 +38,11 @@ const features = [
     title: "One-time historical import",
     body: "budi db import backfills from Claude Code JSONL, Codex Desktop/CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You don't lose the months you already spent.",
     foot: "budi db import",
+  },
+  {
+    title: "Pricing you can audit",
+    body: "Every cost row tags its source. Model prices flow through a single pricing::lookup against the LiteLLM manifest — one place to reconcile when a provider changes a rate, no per-agent drift. Old rows are never silently backdated: history stays at the price that was in effect when the row was recorded.",
+    foot: "budi pricing status · pricing_source = litellm",
   },
 ];
 
@@ -826,7 +831,10 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
             >budi doctor</code
           > will say so out loud — it is the source of truth, not this page. For a per-session health
           read (context growth, cache reuse, cost acceleration, retry loops), run
-          <code class="text-xs">budi vitals</code>.
+          <code class="text-xs">budi vitals</code>. For the active pricing manifest — which model
+          prices the tailer is using and where they came from — run <code class="text-xs"
+            >budi pricing status</code
+          >. Those three are the canonical local-read commands.
         </p>
       </header>
 
