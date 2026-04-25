@@ -45,35 +45,17 @@ const tabs = [
           class="os-install-tab text-fg-muted hover:text-fg inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
         >
           {tab.os === "macos" && (
-            <svg
-              aria-hidden="true"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M16.365 1.43c0 1.14-.49 2.27-1.272 3.087-.83.86-2.214 1.524-3.336 1.421-.143-1.135.435-2.32 1.187-3.094.86-.882 2.34-1.535 3.42-1.414zM20.5 17.341c-.546 1.244-.808 1.797-1.512 2.897-.984 1.534-2.37 3.448-4.087 3.466-1.527.014-1.918-.978-3.99-.966-2.073.012-2.503.984-4.034.978-1.717-.006-3.03-1.747-4.013-3.281C.117 16.018-.18 11.118 1.586 8.51 2.85 6.66 4.823 5.572 6.677 5.572c1.886 0 3.072 1.034 4.633 1.034 1.515 0 2.438-1.036 4.62-1.036 1.65 0 3.397.901 4.643 2.456-4.082 2.245-3.42 8.087.927 9.315z" />
             </svg>
           )}
           {tab.os === "linux" && (
-            <svg
-              aria-hidden="true"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2c-2.07 0-3.5 2.13-3.5 5 0 .97.18 1.86.46 2.6-1.34.86-2.46 2.7-2.46 5.4 0 1.62.55 2.65 1.16 3.36L6 19.5c-.41.41-.41 1.09 0 1.5l.5.5c.41.41 1.09.41 1.5 0l1.07-1.07c.6.36 1.32.57 2.18.57h1.5c.86 0 1.58-.21 2.18-.57L16 21.5c.41.41 1.09.41 1.5 0l.5-.5c.41-.41.41-1.09 0-1.5l-1.66-1.14c.61-.71 1.16-1.74 1.16-3.36 0-2.7-1.12-4.54-2.46-5.4.28-.74.46-1.63.46-2.6 0-2.87-1.43-5-3.5-5zm-1.4 4.4c.39 0 .7.36.7.8s-.31.8-.7.8-.7-.36-.7-.8.31-.8.7-.8zm2.8 0c.39 0 .7.36.7.8s-.31.8-.7.8-.7-.36-.7-.8.31-.8.7-.8zM12 9.6c.55 0 1 .45 1 1 0 .35-.18.65-.45.83l-.55.36-.55-.36A.99.99 0 0 1 11 10.6c0-.55.45-1 1-1z" />
             </svg>
           )}
           {tab.os === "windows" && (
-            <svg
-              aria-hidden="true"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M3 5.6 10.5 4.6v6.9H3V5.6zm8.5-1.1L21 3v8.5h-9.5V4.5zM3 12.5h7.5v6.9L3 18.4v-5.9zm8.5 0H21V21l-9.5-1.5v-7z" />
             </svg>
           )}
@@ -114,9 +96,8 @@ const tabs = [
   function detectOS(): OS {
     // Prefer the modern, non-deprecated User-Agent Client Hints API where
     // available; fall back to the userAgent string everywhere else.
-    const uaData = (
-      navigator as Navigator & { userAgentData?: { platform?: string } }
-    ).userAgentData;
+    const uaData = (navigator as Navigator & { userAgentData?: { platform?: string } })
+      .userAgentData;
     const probe = `${uaData?.platform ?? ""} ${navigator.userAgent ?? ""}`.toLowerCase();
     if (probe.includes("mac")) return "macos";
     if (probe.includes("win")) return "windows";
@@ -145,9 +126,7 @@ const tabs = [
   for (const group of groups) {
     if (detected !== "macos") activate(group, detected);
 
-    const tabs = Array.from(
-      group.querySelectorAll<HTMLButtonElement>("[role='tab']"),
-    );
+    const tabs = Array.from(group.querySelectorAll<HTMLButtonElement>("[role='tab']"));
 
     for (const tab of tabs) {
       tab.addEventListener("click", () => {
