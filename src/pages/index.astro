@@ -2,8 +2,19 @@
 import Base from "~/layouts/Base.astro";
 import CopyableCommand from "~/components/CopyableCommand.astro";
 import Diagram from "~/components/Diagram.astro";
+import OsInstallTabs from "~/components/OsInstallTabs.astro";
 
-const installCommand = "brew install siropkin/budi/budi && budi init && budi integrations install";
+// Per-OS install commands surfaced in the hero + #install OS-tabbed installer.
+// macOS stays the SSR default — see OsInstallTabs.astro for the client-side
+// upgrade. Linux/Windows mirror the curl/PowerShell entries in `altInstalls`
+// below so a copy/paste from any tab matches the canonical README.
+const installCommands = {
+  macos: "brew install siropkin/budi/budi && budi init && budi integrations install",
+  linux:
+    "curl -fsSL https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.sh | bash && budi init && budi integrations install",
+  windows:
+    "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init; budi integrations install",
+};
 
 // The currently shipping budi release. Shown next to every install-command
 // block so fresh users can tell what version they're getting before they
@@ -109,15 +120,10 @@ const agents = [
   },
 ];
 
+// "Other install methods" inside the disclosure now only carries the
+// power-user path. The macOS / Linux / Windows one-liners are first-class
+// tabs on the install block via `installCommands` above.
 const altInstalls = [
-  {
-    label: "Shell script (macOS / Linux, glibc)",
-    code: "curl -fsSL https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.sh | bash",
-  },
-  {
-    label: "PowerShell (Windows 10+)",
-    code: "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex",
-  },
   {
     label: "From source (Rust toolchain)",
     code: "git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh",
@@ -283,7 +289,7 @@ const upgradeSteps = [
 
     {/* Install block spans the full section width — same style as #install. */}
     <div class="mt-6 sm:mt-8">
-      <CopyableCommand command={installCommand} variant="hero" />
+      <OsInstallTabs id="install-hero" commands={installCommands} variant="hero" />
       <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
         <span>
           Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.
@@ -687,7 +693,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </p>
     </header>
 
-    <CopyableCommand command={installCommand} variant="hero" />
+    <OsInstallTabs id="install-section" commands={installCommands} variant="hero" />
     <p class="text-fg-dim mt-2 text-xs">
       Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>. Latest release
       on <a
