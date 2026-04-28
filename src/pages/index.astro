@@ -1,7 +1,6 @@
 ---
 import Base from "~/layouts/Base.astro";
 import CopyableCommand from "~/components/CopyableCommand.astro";
-import Diagram from "~/components/Diagram.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
 
 const faqJsonLd = {
@@ -35,10 +34,6 @@ const faqJsonLd = {
   ],
 };
 
-// Per-OS install commands surfaced in the hero + #install OS-tabbed installer.
-// macOS stays the SSR default — see OsInstallTabs.astro for the client-side
-// upgrade. Linux/Windows mirror the curl/PowerShell entries in `altInstalls`
-// below so a copy/paste from any tab matches the canonical README.
 const installCommands = {
   macos: "brew install siropkin/budi/budi && budi init && budi integrations install",
   linux:
@@ -47,44 +42,29 @@ const installCommands = {
     "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init; budi integrations install",
 };
 
-// The currently shipping budi release. Shown next to every install-command
-// block so fresh users can tell what version they're getting before they
-// paste the one-liner. Bump on release — the canonical value is the latest
-// `siropkin/budi` tag. The Cursor extension is versioned independently in
-// the `siropkin/budi-cursor` repo; see the marketplace block below.
 const LATEST_BUDI_VERSION = "v8.3.0";
 const LATEST_CURSOR_EXTENSION_VERSION = "v1.3.x";
 
 const features = [
   {
-    title: "Multi-agent tracking, no interception",
-    body: "Claude Code, Codex CLI, Copilot CLI, and Cursor — all attributed by the same daemon. Budi reads the transcript files those tools already write to disk, so there is nothing in your network path and nothing to mis-route.",
-    foot: "Reads transcripts from disk — no network interception",
+    title: "Multi-agent, no interception",
+    body: "Claude Code, Codex CLI, Copilot CLI, and Cursor — all attributed by the same daemon. Reads the transcript files those tools already write to disk. Nothing in your network path.",
+    foot: "Reads transcripts from disk — no proxy",
   },
   {
     title: "Per repo, branch, and ticket",
-    body: "Cost is attributed to the repo and branch you were on, with ticket IDs lifted out of branch names and promoted to first-class CLI dimensions. Filter by ticket, activity, file, model, or custom tag.",
+    body: "Cost attributed to the repo and branch you were on, with ticket IDs lifted from branch names. Filter by ticket, activity, file, model, or custom tag.",
     foot: "budi stats --branches · --tickets · --files",
   },
   {
-    title: "Quiet by default",
-    body: "The statusline and Cursor status bar are intentionally cost-only and provider-scoped. Session health vitals — context growth, cache reuse, cost acceleration, retry loops — are available as opt-in coach / full presets, or on demand via budi vitals. Not a wall of emoji by default.",
-    foot: 'budi vitals · ~/.config/budi/statusline.toml → preset = "coach"',
-  },
-  {
-    title: "Live status line (rolling 1d / 7d / 30d)",
-    body: "A rolling cost string in Claude Code and a matching single status bar item in Cursor. Each surface is scoped to its own provider — the Claude Code line shows Claude Code spend only, the Cursor line shows Cursor spend only. Click through to the cloud dashboard.",
+    title: "Live status line",
+    body: "Rolling 1d / 7d / 30d cost in Claude Code and Cursor, scoped per provider. The Claude Code line shows Claude Code spend only; the Cursor line shows Cursor spend only.",
     foot: "🟢 budi · $1.24 1d · $8.50 7d · $32.10 30d",
   },
   {
-    title: "One-time historical import",
-    body: "budi db import backfills from Claude Code JSONL, Codex Desktop/CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You don't lose the months you already spent.",
-    foot: "budi db import",
-  },
-  {
-    title: "Pricing you can audit",
-    body: "Every cost row tags its source. Model prices flow through a single pricing::lookup against the LiteLLM manifest — one place to reconcile when a provider changes a rate, no per-agent drift. Old rows are never silently backdated: history stays at the price that was in effect when the row was recorded.",
-    foot: "budi pricing status · pricing_source = litellm",
+    title: "Session health on demand",
+    body: "budi vitals shows context growth, cache reuse, cost acceleration, and retry loops in plain English. Not a wall of emoji by default — quiet unless you ask.",
+    foot: 'budi vitals · preset = "coach"',
   },
 ];
 
@@ -103,94 +83,33 @@ const numbers = [
   },
 ];
 
-const localCloudRows = [
-  {
-    q: "Where does Budi run?",
-    a: "On your machine. A small Rust daemon (~6 MB) on port 7878 that watches the transcript files your AI agents already write locally. Nothing sits in your network path.",
-  },
-  {
-    q: "What leaves my machine?",
-    a: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails.",
-  },
-  {
-    q: "Why would I turn cloud on?",
-    a: "You want your team lead to see one dashboard for the whole team. Otherwise, leave it off.",
-  },
-];
-
-const agents = [
-  {
-    name: "Claude Code",
-    tier: "Tier 1",
-    status: "Supported",
-    how: "Live tailing of ~/.claude/projects JSONL transcripts. Zero config — Claude Code already writes them.",
-  },
-  {
-    name: "Codex CLI",
-    tier: "Tier 1",
-    status: "Supported",
-    how: "Live tailing of ~/.codex/sessions JSONL transcripts. Zero config — Codex already writes them.",
-  },
-  {
-    name: "Copilot CLI",
-    tier: "Tier 2",
-    status: "Supported",
-    how: "Live tailing of ~/.copilot/session-state JSONL transcripts. Zero config — Copilot already writes them.",
-  },
-  {
-    name: "Cursor",
-    tier: "Tier 2",
-    status: "Supported",
-    how: "Live transcript tailing plus Cursor Usage API cost reconciliation (cost may lag the live row by up to ~10 min while the Usage API catches up).",
-  },
-  {
-    name: "Gemini CLI",
-    tier: "Tier 3",
-    status: "Deferred",
-    how: "Different transcript format; not yet wired into the tailer.",
-  },
-];
-
-// "Other install methods" inside the disclosure now only carries the
-// power-user path. The macOS / Linux / Windows one-liners are first-class
-// tabs on the install block via `installCommands` above.
-const altInstalls = [
-  {
-    label: "From source (Rust toolchain)",
-    code: "git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh",
-  },
-];
-
-// "Why not just use X?" — honest, not dismissive. Every row names the real
-// alternative, what it's good at, and where it stops. The Budi row is last
-// and visually distinct.
 const alternatives = [
   {
     name: "Provider dashboards",
     examples: "Anthropic Console · OpenAI usage · Cursor usage",
     good: "Official, authoritative totals. Free.",
-    gap: "Single-provider. No repo, branch, or ticket attribution. No session health vitals signal. Nothing cross-agent.",
+    gap: "Single-provider. No repo, branch, or ticket attribution. Nothing cross-agent.",
     kind: "alt" as const,
   },
   {
     name: "Open-source CLI usage tools",
     examples: "ccusage · codeburn · claude-usage",
     good: "Local, lightweight, correct for the one agent they target.",
-    gap: "Single-agent only (ccusage tracks Claude/Codex; codeburn tracks Claude/Codex/Cursor). No cross-agent rollups, no branch/ticket attribution, no team view.",
+    gap: "Single-agent. No cross-agent rollups, no branch/ticket attribution, no team view.",
     kind: "alt" as const,
   },
   {
     name: "SaaS cost trackers that upload prompts",
     examples: "Generic observability vendors that ingest LLM payloads",
-    good: "Central dashboard, often with deep analytics on the prompts themselves.",
-    gap: "Your prompts, code, and responses leave your machine. For most teams, that is a hard no for source code.",
+    good: "Central dashboard with deep analytics.",
+    gap: "Your prompts, code, and responses leave your machine — a hard no for most source code.",
     kind: "alt" as const,
   },
   {
     name: "Budi",
     examples: "Local daemon · transcript tailing · multi-agent · opt-in cloud",
-    good: "Multi-agent via local transcript tailing — nothing in your network path. Repo/branch/ticket attribution. Live session health vitals (budi vitals). Optional team dashboard with aggregates only.",
-    gap: "You run a small daemon. Live row updates lag the wire by seconds, so very fast tools may briefly read $0 before the row settles. Cursor-attributed cost can additionally lag by up to ~10 minutes while the Cursor Usage API catches up. Not every agent is supported yet (Gemini deferred).",
+    good: "Multi-agent via local transcript tailing — nothing in your network path. Repo/branch/ticket attribution. Live session health vitals. Optional team dashboard with aggregates only.",
+    gap: "You run a small daemon. Live rows lag by seconds; Cursor cost can additionally lag ~10 min via the Cursor Usage API. Not every agent supported yet (Gemini deferred).",
     kind: "budi" as const,
   },
 ];
@@ -199,71 +118,36 @@ const firstRunSteps = [
   {
     n: "1",
     cmd: "budi init",
-    body: "Starts the daemon on port 7878, installs the platform-native autostart service, and wires the Claude Code statusline. Does not touch your shell profile, Cursor settings, or Codex config.",
+    body: "Starts the daemon on port 7878, installs the platform-native autostart service, and wires the Claude Code statusline.",
   },
   {
     n: "2",
     cmd: "budi doctor",
-    body: 'End-to-end verifier: daemon, tailer readiness, schema, transcript visibility, and attribution health for sessions, branches, tickets, and activities. When the top line reads "All checks passed." you are done.',
+    body: 'End-to-end verifier: daemon, tailers, schema, transcript visibility, and attribution health. When "All checks passed." you are done.',
   },
   {
     n: "3",
     cmd: "budi status",
-    body: "Today-cost snapshot: daemon state and today's spend. For the full breakdown, use budi stats --projects / --branches / --tickets / --activities / --files.",
+    body: "Today-cost snapshot: daemon state and today's spend. For the full breakdown, use budi stats --projects / --branches / --tickets.",
   },
   {
     n: "4",
     cmd: "budi db import   # optional",
-    body: "One-time backfill from Claude Code JSONL transcripts, Codex Desktop / CLI sessions, Copilot CLI sessions, and the Cursor Usage API. Skip if you only want live tracking going forward.",
+    body: "One-time backfill from Claude Code, Codex, Copilot, and Cursor. Skip if you only want live tracking going forward.",
   },
 ];
 
-// "Screenshots" are rendered as terminal-fidelity text blocks, not PNGs.
-// This matches the product: budi is a CLI / statusline tool, and the
-// authentic artifact a user will see is terminal output. Keeping the
-// surface as styled <pre> blocks also stays inside the site's static /
-// JS-light budget and the "no animated GIF / video" discipline (SOUL.md).
-const productShots = [
+const altInstalls = [
   {
-    caption:
-      "Claude Code statusline — rolling 1d / 7d / 30d Claude-only spend with a green health dot. The line updates every ~10 s and stays quiet by default.",
-    hint: "claude code session · statusline preset = default",
-    body: `🟢 budi · $ 1.24 1d   $ 8.50 7d   $ 32.10 30d   claude-code
- ╭───────────────────────────────────────────────────────────
- │ > help me wire the feature flag
- │`,
-  },
-  {
-    caption:
-      "budi vitals — session health in plain English: context growth, cache reuse, cost acceleration, retry loops. No wall of emoji, no dashboard required.",
-    hint: "~ budi vitals",
-    body: `Session Health: 🟢 GREEN  (session healthy)
-─────────────────────────────────────────────────────────────
-Context growth     →  18.2 %/hr        (within normal band)
-Cache reuse        →  72.8 %           (good — >60 % target)
-Cost acceleration  →  +$ 0.81 / 10 min (stable)
-Retry loops        →  0                (no retries)
-
-Session:  2h 14m · claude-3.5-sonnet · 46 msgs · $ 4.92`,
-  },
-  {
-    caption:
-      "budi stats --tickets — per-ticket attribution across the last 7 days, reconciled to the cent. Tickets are lifted from branch names (BUD-214 → siropkin/budi/feat/cloud-ingest).",
-    hint: "~ budi stats --tickets -p 7d",
-    body: `Ticket         cost       msgs    top repo
-─────────────────────────────────────────────────────────────
-BUD-214       $ 11.62    7,104    siropkin/budi
-WEB-1180      $  6.04    3,218    acme/web
-WEB-1199      $  4.88    2,641    acme/web
-INFRA-88      $  3.21    1,402    acme/infra
-(untagged)    $  2.40      812    personal/notes
-─────────────────────────────────────────────────────────────
-Total (7d)    $ 28.15   15,177    reconciles to budi stats`,
+    label: "From source (Rust toolchain)",
+    code: "git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh",
   },
 ];
 ---
 
 <Base>
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(faqJsonLd)} />
+
   {/* 1. HERO */}
   <section class="container-readable pt-16 pb-14 sm:pt-24 sm:pb-20">
     <div class="flex max-w-3xl flex-col items-start gap-6 sm:gap-8">
@@ -280,33 +164,20 @@ Total (7d)    $ 28.15   15,177    reconciles to budi stats`,
       </h1>
 
       <p class="text-fg-muted text-lg leading-relaxed text-pretty sm:text-xl">
-        Budi is a local-first AI coding cost tracker for Claude Code, Cursor, Codex, and Copilot. A
-        small Rust daemon on your machine reads the transcripts your agents already write to disk
-        and shows you exactly where your tokens and money go — by repo, branch, ticket, and model.
-        Nothing sits in your network path. Your prompts, code, and responses never leave your
-        machine.
+        A small Rust daemon reads the transcripts Claude Code, Cursor, Codex, and Copilot already
+        write to disk. Cost by repo, branch, and ticket. Nothing in your network path — prompts
+        never leave your machine.
       </p>
     </div>
 
-    {/* Install block spans the full section width — same style as #install. */}
     <div class="mt-6 sm:mt-8">
       <OsInstallTabs id="install-hero" commands={installCommands} variant="hero" />
       <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-        <span>
-          Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.
-        </span>
-        <span>One command. macOS / Linux / Windows binaries. No account needed.</span>
+        <span>Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.</span>
+        <span>One command. macOS / Linux / Windows. No account needed.</span>
       </p>
     </div>
 
-    {
-      /*
-       * Per-archetype CTA row:
-       *   - Individual developer  → brew install ... (above, hero) + "View on GitHub"
-       *   - Team lead / manager   → jumps to #teams block (cloud sign-up CTA)
-       *   - Tire-kicker / contributor → jumps to comparison section + footer repos
-       */
-    }
     <div class="mt-6 flex max-w-3xl flex-wrap items-center gap-3 text-sm sm:mt-8">
       <a
         href="https://github.com/siropkin/budi"
@@ -332,7 +203,6 @@ Total (7d)    $ 28.15   15,177    reconciles to budi stats`,
       </a>
     </div>
 
-    {/* Hero visual: a static, copy-paste-shaped budi stats sample. No video, no JS. */}
     <div class="card mt-12 overflow-hidden">
       <div
         class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs"
@@ -369,19 +239,16 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     </div>
   </section>
 
-  {/* 2. THE PROBLEM (real numbers) */}
+  {/* 2. THE PROBLEM */}
   <section id="how" class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-10 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">The problem</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">You are not imagining it.</h2>
       <p class="text-fg-muted mt-3">
-        Active solo developers using AI coding agents typically see <strong class="text-fg"
-          >$120 – $800 / month</strong
-        > across providers. A heavy month — multiple agents, Opus-class models, and no idle days — can
-        run an order of magnitude higher. The numbers below are from one such month: one developer, multiple
-        agents and providers, and zero per-repo visibility from the upstream dashboards. The provider
-        bill arrived at the end of the month with a single total and no answer to the obvious follow-up:
-        <em>where</em>.
+        Active solo developers typically see <strong class="text-fg">$120 – $800 / month</strong> across
+        AI coding providers. A heavy month can run an order of magnitude higher. The numbers below are
+        from one such month — one developer, multiple agents, and zero per-repo visibility from the upstream
+        dashboards.
       </p>
     </header>
 
@@ -397,29 +264,22 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         ))
       }
     </div>
-
-    <p class="text-fg-dim mt-4 max-w-2xl text-xs">
-      Anonymized example, drawn from the same kind of monthly bill that prompted this project — this
-      is what a heavy month looks like. Your numbers are probably smaller — but until something
-      counts them by repo, branch, and ticket, you will not actually know.
-    </p>
   </section>
 
-  {/* 3. WHAT BUDI DOES */}
+  {/* 3. FEATURES */}
   <section id="features" class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-10 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">AI coding cost tracking</p>
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What it does</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Invisible by default. Real attribution.
+        Multi-agent. Real attribution. Zero interception.
       </h2>
       <p class="text-fg-muted mt-3">
-        Six things, on purpose. Budi is not an LLM gateway, a prompt router, or a "cost
-        optimization" consulting product. It reads the transcripts your agents already write locally
-        — nothing sits in your network path.
+        Claude Code, Codex CLI, Copilot CLI, and Cursor — tracked by tailing the transcripts each
+        agent already writes to disk. No proxy, no gateway, nothing in your network path.
       </p>
     </header>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-4 sm:grid-cols-2">
       {
         features.map((f) => (
           <article class="card flex flex-col gap-3 p-5 sm:p-6">
@@ -433,51 +293,31 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       }
     </div>
 
-    <p class="text-fg-dim mt-6 max-w-2xl text-xs">
-      The Claude Code statusline, the Cursor status bar, and the cloud dashboard's provider-scoped
-      tiles all speak the same shape: rolling <code class="text-xs">1d</code> /
-      <code class="text-xs">7d</code> / <code class="text-xs">30d</code> windows, one
-      <code class="text-xs">provider</code> filter, no blended totals.
-    </p>
+    <figure class="card mt-6 flex flex-col overflow-hidden">
+      <div
+        class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs"
+      >
+        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+        <span class="ml-3 font-mono">~ budi vitals</span>
+      </div>
+      <pre
+        class="text-fg m-0 flex-1 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[12.5px]"><code>{`Session Health: 🟢 GREEN  (session healthy)
+─────────────────────────────────────────────────────────────
+Context growth     →  18.2 %/hr        (within normal band)
+Cache reuse        →  72.8 %           (good — >60 % target)
+Cost acceleration  →  +$ 0.81 / 10 min (stable)
+Retry loops        →  0                (no retries)
+
+Session:  2h 14m · claude-3.5-sonnet · 46 msgs · $ 4.92`}</code></pre>
+      <figcaption class="text-fg-muted border-line/70 border-t px-4 py-3 text-xs leading-relaxed">
+        <code>budi vitals</code> — session health in plain English. No dashboard required.
+      </figcaption>
+    </figure>
   </section>
 
-  {/* 3a. WHAT IT LOOKS LIKE — terminal-fidelity shots of the real surfaces */}
-  <section id="screenshots" class="container-readable border-line/70 border-t py-14 sm:py-20">
-    <header class="mb-10 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What it looks like</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Three surfaces, one contract.
-      </h2>
-      <p class="text-fg-muted mt-3">
-        The statusline, <code class="text-xs">budi vitals</code>, and
-        <code class="text-xs">budi stats</code> all render the same rolling window and the same attribution.
-        These are the real surfaces, rendered the way your terminal will render them.
-      </p>
-    </header>
-
-    <div class="flex flex-col gap-4">
-      {
-        productShots.map((shot) => (
-          <figure class="card flex flex-col overflow-hidden">
-            <div class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs">
-              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-              <span class="ml-3 font-mono">{shot.hint}</span>
-            </div>
-            <pre class="text-fg m-0 flex-1 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[12.5px]">
-              <code>{shot.body}</code>
-            </pre>
-            <figcaption class="text-fg-muted border-line/70 border-t px-4 py-3 text-xs leading-relaxed">
-              {shot.caption}
-            </figcaption>
-          </figure>
-        ))
-      }
-    </div>
-  </section>
-
-  {/* 3b. WHY NOT JUST USE X — honest comparison */}
+  {/* 4. COMPARE */}
   <section id="compare" class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-10 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Why not just use X?</p>
@@ -485,8 +325,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         The realistic alternatives, named honestly.
       </h2>
       <p class="text-fg-muted mt-3">
-        Before you install anything new, the fair question is: what does the obvious existing option
-        already give you? Here is where Budi does and does not help.
+        If one of these already fits your workflow, use it. Budi exists for the case where you run
+        more than one agent, care about per-repo attribution, and are not willing to upload prompts.
       </p>
     </header>
 
@@ -526,50 +366,16 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         ))
       }
     </div>
-
-    <p class="text-fg-dim mt-4 max-w-2xl text-xs">
-      If one of the above already fits your workflow, use it. Budi exists for the case where you are
-      running <em>more than one</em> agent, care about per-repo or per-ticket attribution, and are not
-      willing to upload prompts to a third party.
-    </p>
   </section>
 
-  {/* FAQPage structured data for the local-first Q&A — enables rich results in search. */}
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(faqJsonLd)} />
-
-  {/* 4. LOCAL-FIRST, BY DESIGN */}
-  <section id="local-first" class="container-readable border-line/70 border-t py-14 sm:py-20">
-    <header class="mb-10 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Local-first, by design</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Three questions, answered before you scroll past.
-      </h2>
-    </header>
-
-    <div class="flex flex-col gap-6">
-      <dl class="card divide-line divide-y">
-        {
-          localCloudRows.map((row) => (
-            <div class="grid gap-2 px-5 py-4 sm:grid-cols-[14rem_1fr] sm:gap-6 sm:px-6">
-              <dt class="text-fg font-medium">{row.q}</dt>
-              <dd class="text-fg-muted text-sm leading-relaxed">{row.a}</dd>
-            </div>
-          ))
-        }
-      </dl>
-
-      <Diagram />
-    </div>
-  </section>
-
-  {/* 5. PRIVACY CONTRACT */}
+  {/* 5. PRIVACY */}
   <section id="privacy" class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Privacy contract</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Stated, not sold.</h2>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Local-first, by design.</h2>
       <p class="text-fg-muted mt-3">
-        Three bullets in plain English. What leaves your machine, what doesn't, and how you turn
-        sync on.
+        A small Rust daemon (~6 MB) on your machine watches the transcript files your agents already
+        write to disk. Nothing sits in your network path. Three things in plain English:
       </p>
     </header>
 
@@ -585,95 +391,32 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <h3 class="text-fg mb-2 font-semibold">Can optionally leave</h3>
         <p class="text-fg-muted text-sm leading-relaxed">
           Pre-aggregated daily numbers — tokens, cost, model name, hashed repo ID, branch name,
-          ticket ID. Push-only, HTTPS-only, daily granularity. 90-day cloud retention in alpha.
+          ticket ID. Push-only, HTTPS-only. Off by default.
         </p>
       </div>
       <div class="card border-l-line-strong border-l-4 p-5">
-        <h3 class="text-fg mb-2 font-semibold">How you turn it on</h3>
+        <h3 class="text-fg mb-2 font-semibold">How to turn it on</h3>
         <p class="text-fg-muted text-sm leading-relaxed">
           Sign up at <a
             href="https://app.getbudi.dev"
             class="link-underline hover:text-fg"
             target="_blank"
             rel="noopener noreferrer">app.getbudi.dev</a
-          >, drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>, set <code
-            class="text-xs">enabled = true</code
-          >, then restart the daemon. <code class="text-xs">budi cloud status</code> and
-          <code class="text-xs">budi cloud sync</code> confirm and push from the CLI. Off by default.
+          >, drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>, set
+          <code class="text-xs">enabled = true</code>, restart the daemon.
         </p>
       </div>
     </div>
 
     <p id="analytics" class="text-fg-muted mt-8 scroll-mt-24 text-sm leading-relaxed">
       <strong class="text-fg font-medium">Analytics.</strong>
-      This marketing site (<code class="text-xs">getbudi.dev</code>) counts anonymous page views via
-      Vercel Web Analytics: cookieless, IP hashed daily, no prompts, no code, no session replay, no
-      cross-site tracking. It only runs on this site — it is not part of the product and never sees
-      anything the <a href="#privacy" class="link-underline hover:text-fg">privacy contract</a> above
-      covers.
+      This site (<code class="text-xs">getbudi.dev</code>) counts anonymous page views via Vercel
+      Web Analytics: cookieless, IP hashed daily, no session replay, no cross-site tracking. It only
+      runs on this site — not part of the product.
     </p>
   </section>
 
-  {/* 6. SUPPORTED AGENTS */}
-  <section id="agents" class="container-readable border-line/70 border-t py-14 sm:py-20">
-    <header class="mb-8 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Supported agents</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Tracked by tailing the transcripts your agents already write.
-      </h2>
-      <p class="text-fg-muted mt-3">
-        Tier 1 agents tail their JSONL transcripts directly. Tier 2 agents work the same way; Cursor
-        additionally reconciles cost via the Cursor Usage API, which has a known short lag. No
-        proxy, no network interception — just the transcript files your agents already write to
-        disk.
-      </p>
-    </header>
-
-    <div class="card overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="text-fg-muted text-left text-xs tracking-wider uppercase">
-          <tr class="border-line border-b">
-            <th class="px-5 py-3 font-medium whitespace-nowrap">Agent</th>
-            <th class="px-5 py-3 font-medium whitespace-nowrap">Tier</th>
-            <th class="px-5 py-3 font-medium">Status</th>
-            <th class="px-5 py-3 font-medium">How</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            agents.map((agent, idx) => (
-              <tr class:list={[idx !== agents.length - 1 ? "border-line/70 border-b" : ""]}>
-                <td class="text-fg px-5 py-3 font-medium whitespace-nowrap">{agent.name}</td>
-                <td class="text-fg-muted px-5 py-3 font-mono whitespace-nowrap">{agent.tier}</td>
-                <td class="px-5 py-3">
-                  <span
-                    class:list={[
-                      "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs",
-                      agent.status === "Supported"
-                        ? "bg-accent-soft text-accent"
-                        : "bg-surface-3 text-fg-muted",
-                    ]}
-                  >
-                    <span
-                      aria-hidden="true"
-                      class:list={[
-                        "h-1.5 w-1.5 rounded-full",
-                        agent.status === "Supported" ? "bg-accent" : "bg-fg-dim",
-                      ]}
-                    />
-                    {agent.status}
-                  </span>
-                </td>
-                <td class="text-fg-muted px-5 py-3">{agent.how}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  {/* 7. INSTALL */}
+  {/* 6. INSTALL */}
   <section id="install" class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Install</p>
@@ -682,12 +425,10 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <code class="text-accent">budi integrations install</code>.
       </h2>
       <p class="text-fg-muted mt-3">
-        <code>budi init</code> starts the daemon and installs the autostart service. <code
-          >budi integrations install</code
-        > wires the Claude Code statusline and, if Cursor is detected, offers the Cursor extension. <strong
-          class="text-fg"
-          >Restart Claude Code after <code class="text-xs">budi integrations install</code></strong
-        > so it picks up the new <code class="text-xs">statusLine</code> command.
+        <code>budi init</code> starts the daemon and installs the autostart service.
+        <code>budi integrations install</code> wires the Claude Code statusline and offers the Cursor
+        extension if detected. <strong class="text-fg">Restart Claude Code afterwards</strong> so it picks
+        up the new <code class="text-xs">statusLine</code> command.
       </p>
     </header>
 
@@ -699,80 +440,39 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         class="link-underline hover:text-fg"
         target="_blank"
         rel="noopener noreferrer">GitHub</a
-      >.
+      >. Using Cursor? <a
+        href="https://open-vsx.org/extension/siropkin/budi"
+        class="link-underline hover:text-fg"
+        target="_blank"
+        rel="noopener noreferrer">Install the budi extension from Open VSX</a
+      > ({LATEST_CURSOR_EXTENSION_VERSION}) — its welcome view guides you through the daemon
+      install.
     </p>
 
-    <div class="text-fg-muted mt-4 max-w-3xl text-sm">
-      <strong class="text-fg">One install on PATH.</strong>
-      Don't mix Homebrew with <code class="text-xs">~/.local/bin</code> (or
-      <code class="text-xs">%LOCALAPPDATA%\budi\bin</code> on Windows): you can end up with different
-      binaries and confusing restarts.
-      <code class="text-xs">budi doctor</code> warns you when it sees duplicates.
-    </div>
-
-    {/* Cursor marketplace as a first-class acquisition path */}
-    <div class="card mt-8 flex flex-col gap-3 p-5 sm:flex-row sm:items-start sm:gap-6 sm:p-6">
-      <div class="flex-1">
-        <h3
-          class="text-fg flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-tight"
-        >
-          <span>Install via Open VSX</span>
-          <code class="text-fg-dim text-[11px] font-normal">
-            {LATEST_CURSOR_EXTENSION_VERSION}
-          </code>
-        </h3>
-        <p class="text-fg-muted mt-1.5 text-sm leading-relaxed">
-          Discovered Budi inside Cursor? Install the
-          <a
-            href="https://open-vsx.org/extension/siropkin/budi"
-            class="link-underline hover:text-fg"
-            target="_blank"
-            rel="noopener noreferrer">budi extension</a
-          > from Open VSX and its welcome view will guide you through installing the daemon in an integrated
-          terminal, then hand you off to <code class="text-xs">budi init</code>. The extension
-          surfaces a gray dot (<span
-            aria-hidden="true"
-            class="inline-block h-2 w-2 rounded-full bg-[#9aa3b2]"></span>
-          <code class="text-xs">budi · setup</code>) while the daemon is not installed yet, then
-          switches to the same green/yellow/red health dots as the Claude Code statusline once
-          everything is wired. If you already have the CLI, run <code class="text-xs"
-            >budi integrations install --with cursor-extension</code
-          > to wire the extension without visiting the marketplace.
-        </p>
-        <p class="text-fg-dim mt-3 text-xs leading-relaxed">
-          The marketplace extension is versioned independently of the CLI (see
-          <a
-            href="https://github.com/siropkin/budi-cursor"
-            class="link-underline hover:text-fg"
-            target="_blank"
-            rel="noopener noreferrer">siropkin/budi-cursor</a
-          >).
-        </p>
-      </div>
-      <div class="sm:self-center">
-        <a
-          href="https://open-vsx.org/extension/siropkin/budi"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="border-line-strong hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
-        >
-          Open in Open VSX
-          <svg
-            aria-hidden="true"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <line x1="7" y1="17" x2="17" y2="7"></line>
-            <polyline points="7 7 17 7 17 17"></polyline>
-          </svg>
-        </a>
-      </div>
+    <div class="mt-10">
+      <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Four steps to verify.</h3>
+      <p class="text-fg-muted mb-6 text-sm">
+        If anything looks wrong, <code class="text-xs">budi doctor</code> is the source of truth. For
+        a live session health read, run <code class="text-xs">budi vitals</code>.
+      </p>
+      <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="list">
+        {
+          firstRunSteps.map((step) => (
+            <li class="card flex flex-col gap-3 p-5">
+              <div class="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
+                >
+                  {step.n}
+                </span>
+                <code class="text-fg font-mono text-sm">{step.cmd}</code>
+              </div>
+              <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
+            </li>
+          ))
+        }
+      </ol>
     </div>
 
     <details class="group mt-8">
@@ -806,39 +506,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         }
       </div>
     </details>
-
-    <div class="mt-12">
-      <header class="mb-6 max-w-2xl">
-        <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">After you install</p>
-        <h3 class="text-xl font-semibold tracking-tight sm:text-2xl">Four steps to verify.</h3>
-        <p class="text-fg-muted mt-3 text-sm">
-          If anything looks wrong, <code class="text-xs">budi doctor</code> is the source of truth. For
-          a live session health read, run <code class="text-xs">budi vitals</code>.
-        </p>
-      </header>
-
-      <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
-        {
-          firstRunSteps.map((step) => (
-            <li class="card flex flex-col gap-3 p-5 sm:p-6">
-              <div class="flex items-center gap-3">
-                <span
-                  aria-hidden="true"
-                  class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
-                >
-                  {step.n}
-                </span>
-                <code class="text-fg font-mono text-sm">{step.cmd}</code>
-              </div>
-              <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
   </section>
 
-  {/* 8. FOR TEAMS (opt-in cloud) */}
+  {/* 7. FOR TEAMS */}
   <section id="teams" class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">For teams (opt-in)</p>
@@ -846,15 +516,13 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         One dashboard for the team. No prompts, no code, no surprises.
       </h2>
       <p class="text-fg-muted mt-3">
-        If a team lead now owns an "AI coding spend" line item, the cloud dashboard at
-        <a
+        The cloud dashboard at <a
           href="https://app.getbudi.dev"
           class="link-underline hover:text-fg"
           target="_blank"
           rel="noopener noreferrer">app.getbudi.dev</a
-        >
-        gives them daily cost per user, repo, model, branch, and ticket. Without reading anyone's prompts,
-        responses, or file paths.
+        > gives team leads daily cost per user, repo, model, branch, and ticket — without reading anyone's
+        prompts or source code.
       </p>
     </header>
 
@@ -865,13 +533,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
           <li>Daily cost per user, repo, model, branch, ticket</li>
           <li>
             Rolling <code class="text-xs">1d</code> / <code class="text-xs">7d</code> /
-            <code class="text-xs">30d</code> windows — the same contract the local statusline uses
+            <code class="text-xs">30d</code> windows
           </li>
-          <li>
-            Sync-freshness badge on every page (<em>Linked — waiting for first sync</em>,
-            <em>Synced Xm ago</em>, or <em>Stalled — last synced Xh ago</em>)
-          </li>
-          <li>Session summaries: duration, model mix, health vitals</li>
+          <li>Sync-freshness badge and session summaries</li>
           <li>Manager / member roles for small teams (1–20 devs)</li>
         </ul>
       </div>
@@ -915,31 +579,6 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       >
         Read the privacy contract →
       </a>
-    </div>
-
-    {/* Discoverable cloud-ops commands matching the CLI */}
-    <div class="mt-8 grid gap-4 md:grid-cols-2">
-      <div class="card p-5 sm:p-6">
-        <h3 class="text-fg mb-2 font-semibold">
-          <code class="text-sm">budi cloud status</code>
-        </h3>
-        <p class="text-fg-muted mb-3 text-sm leading-relaxed">
-          Reports whether sync is enabled, when it last succeeded, and how many records are queued
-          locally. Useful right after you drop your API key in so you can see the link go healthy.
-        </p>
-        <CopyableCommand command="budi cloud status" variant="compact" />
-      </div>
-      <div class="card p-5 sm:p-6">
-        <h3 class="text-fg mb-2 font-semibold">
-          <code class="text-sm">budi cloud sync</code>
-        </h3>
-        <p class="text-fg-muted mb-3 text-sm leading-relaxed">
-          Pushes queued local rollups and session summaries to the cloud on demand, instead of
-          waiting for the background worker interval. Reports records upserted, watermark, and
-          endpoint.
-        </p>
-        <CopyableCommand command="budi cloud sync" variant="compact" />
-      </div>
     </div>
   </section>
 </Base>
