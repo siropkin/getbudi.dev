@@ -197,25 +197,24 @@ function auditPage(filePath) {
     }
   }
 
-  // 7. JSON-LD: exactly one inline SoftwareApplication block on `/`,
-  // or at least one well-formed block on other pages.
+  // 7. JSON-LD: at least one well-formed SoftwareApplication block on `/`
+  // (additional blocks such as FAQPage are allowed), or at least one
+  // well-formed block on other pages.
   const ldScripts = root.querySelectorAll('script[type="application/ld+json"]');
   if (rel === "index.html") {
-    check(ldScripts.length === 1, "exactly one JSON-LD block on /", rel);
-    if (ldScripts.length === 1) {
+    check(ldScripts.length >= 1, "at least one JSON-LD block on /", rel);
+    let hasSoftwareApp = false;
+    for (const s of ldScripts) {
       let parsed = null;
       try {
-        parsed = JSON.parse(ldScripts[0].text);
+        parsed = JSON.parse(s.text);
       } catch {
-        // parsed stays null — surfaced below.
+        // surfaced by per-block parse check below
       }
       check(parsed !== null, "JSON-LD parses as JSON", rel);
-      check(
-        parsed?.["@type"] === "SoftwareApplication",
-        "JSON-LD @type = SoftwareApplication",
-        rel,
-      );
+      if (parsed?.["@type"] === "SoftwareApplication") hasSoftwareApp = true;
     }
+    check(hasSoftwareApp, "JSON-LD SoftwareApplication block present on /", rel);
   } else {
     for (const s of ldScripts) {
       let ok = true;

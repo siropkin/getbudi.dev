@@ -4,6 +4,37 @@ import CopyableCommand from "~/components/CopyableCommand.astro";
 import Diagram from "~/components/Diagram.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Where does Budi run?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "On your machine. A small Rust daemon (~6 MB) on port 7878 that watches the transcript files your AI agents already write locally. Nothing sits in your network path.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What leaves my machine when using Budi?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Why would I turn Budi cloud sync on?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "You want your team lead to see one dashboard for the whole team. Otherwise, leave it off.",
+      },
+    },
+  ],
+};
+
 // Per-OS install commands surfaced in the hero + #install OS-tabbed installer.
 // macOS stays the SSR default — see OsInstallTabs.astro for the client-side
 // upgrade. Linux/Windows mirror the curl/PowerShell entries in `altInstalls`
@@ -143,9 +174,9 @@ const alternatives = [
   },
   {
     name: "Open-source CLI usage tools",
-    examples: "ccusage and similar",
+    examples: "ccusage · codeburn · claude-usage",
     good: "Local, lightweight, correct for the one agent they target.",
-    gap: "Usually single-agent. No team view. No cross-agent rollups, no branch/ticket attribution.",
+    gap: "Single-agent only (ccusage tracks Claude/Codex; codeburn tracks Claude/Codex/Cursor). No cross-agent rollups, no branch/ticket attribution, no team view.",
     kind: "alt" as const,
   },
   {
@@ -269,7 +300,7 @@ const upgradeSteps = [
     <div class="flex max-w-3xl flex-col items-start gap-6 sm:gap-8">
       <span class="chip">
         <span aria-hidden="true" class="bg-accent inline-block h-1.5 w-1.5 rounded-full"></span>
-        Local-first · open source · MIT
+        AI coding cost tracker · local-first · open source · MIT
       </span>
 
       <h1
@@ -280,10 +311,11 @@ const upgradeSteps = [
       </h1>
 
       <p class="text-fg-muted text-lg leading-relaxed text-pretty sm:text-xl">
-        Budi is a local-first cost tracker for AI coding agents. A small Rust daemon on your machine
-        reads the transcripts your agents already write to disk and shows you exactly where your
-        tokens and money go — by repo, branch, ticket, and model. Nothing sits in your network path.
-        Your prompts, code, and responses never leave your machine.
+        Budi is a local-first AI coding cost tracker for Claude Code, Cursor, Codex, and Copilot. A
+        small Rust daemon on your machine reads the transcripts your agents already write to disk
+        and shows you exactly where your tokens and money go — by repo, branch, ticket, and model.
+        Nothing sits in your network path. Your prompts, code, and responses never leave your
+        machine.
       </p>
     </div>
 
@@ -407,7 +439,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   {/* 3. WHAT BUDI DOES */}
   <section id="features" class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-10 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What Budi does</p>
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">AI coding cost tracking</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
         Invisible by default. Real attribution.
       </h2>
@@ -532,6 +564,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       willing to upload prompts to a third party.
     </p>
   </section>
+
+  {/* FAQPage structured data for the local-first Q&A — enables rich results in search. */}
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(faqJsonLd)} />
 
   {/* 4. LOCAL-FIRST, BY DESIGN */}
   <section id="local-first" class="container-readable border-line/70 border-t py-14 sm:py-20">
