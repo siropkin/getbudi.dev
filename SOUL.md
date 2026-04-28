@@ -31,7 +31,7 @@ src/
   layouts/Base.astro         # <html>, head, header, footer, skip link, OG/Twitter meta, JSON-LD, icons, Vercel Web Analytics
   components/
     CopyableCommand.astro    # one-click-copy install block (hero + compact)
-    Diagram.astro            # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript
+    Diagram.astro            # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript (currently unused — kept for reference)
   pages/
     index.astro              # landing page: hero → problem → features → screenshots → compare → local-first → privacy → agents → install (+ 5-step after-install + upgrade-from-8.0/8.1 disclosure) → teams
     404.astro                # static "not found" page, noindex, linked back to /
@@ -82,7 +82,7 @@ The site should read the way the Reddit posts read — first-person, specific, h
 
 Intentionally a single marketing page plus a 404 — deep docs, changelog, and pricing stay out of this repo.
 
-- `/` — hero, the cost-problem numbers, features, terminal-fidelity product screenshots (statusline, vitals, stats breakdown), honest compare table, local-first FAQ + diagram, privacy contract, supported-agents table, install (with 5-step after-install checklist inline + upgrade-from-8.0/8.1 disclosure), for-teams block.
+- `/` — hero (tagline + install command + `budi stats` terminal shot), the cost-problem numbers, features (4 cards + inline `budi vitals` shot), honest compare table, privacy contract (local-first + what leaves / never leaves / how to enable cloud), install (OS tabs + 4-step after-install checklist), for-teams block.
 - `/404` — static "not found", `noindex`, linked back to `/`. Excluded from `sitemap-index.xml` by `astro.config.mjs`.
 
 Deep reference links out to `siropkin/budi` (README, releases) or `app.getbudi.dev`. No `/docs`, `/pricing`, or `/changelog` page is planned — adding one re-opens the docs-drift problem we deliberately avoid by keeping a single surface.
