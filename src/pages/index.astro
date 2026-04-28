@@ -190,41 +190,31 @@ const alternatives = [
     name: "Budi",
     examples: "Local daemon · transcript tailing · multi-agent · opt-in cloud",
     good: "Multi-agent via local transcript tailing — nothing in your network path. Repo/branch/ticket attribution. Live session health vitals (budi vitals). Optional team dashboard with aggregates only.",
-    gap: "You run a small daemon. Live row updates lag the wire by seconds (vs the millisecond proxy in 8.1) so very fast tools may briefly read $0 before the row settles. Cursor-attributed cost can additionally lag by up to ~10 minutes while the Cursor Usage API catches up. Not every agent is supported yet (Gemini deferred).",
+    gap: "You run a small daemon. Live row updates lag the wire by seconds, so very fast tools may briefly read $0 before the row settles. Cursor-attributed cost can additionally lag by up to ~10 minutes while the Cursor Usage API catches up. Not every agent is supported yet (Gemini deferred).",
     kind: "budi" as const,
   },
 ];
 
-// Full 5-step "after you install" block. Mirrors the canonical first-run
-// checklist in the siropkin/budi README (§ First run checklist) so a fresh
-// user can finish setup without leaving the site. Step 5 is marked optional
-// to keep the critical path short; the upgrade-from-8.0/8.1 flow lives in
-// a separate disclosure below the Install section.
 const firstRunSteps = [
   {
     n: "1",
     cmd: "budi init",
-    body: "Starts the daemon (port 7878), installs the platform-native autostart service, wires the Claude Code statusline and (if detected) the Cursor extension, and prints any agents detected on your machine. Does not touch your shell profile, Cursor settings, or Codex config — your tools keep working exactly as they do today.",
+    body: "Starts the daemon on port 7878, installs the platform-native autostart service, and wires the Claude Code statusline. Does not touch your shell profile, Cursor settings, or Codex config.",
   },
   {
     n: "2",
-    cmd: "# open your agent and send a prompt",
-    body: "Open Claude Code, Codex CLI, Copilot CLI, or Cursor as usual and send any prompt. Budi tails the local transcript / session files your agent already writes to disk — there is nothing extra to configure.",
+    cmd: "budi doctor",
+    body: 'End-to-end verifier: daemon, tailer readiness, schema, transcript visibility, and attribution health for sessions, branches, tickets, and activities. When the top line reads "All checks passed." you are done.',
   },
   {
     n: "3",
-    cmd: "budi doctor",
-    body: 'Canonical end-to-end verifier: daemon, tailer readiness, schema, transcript visibility, and any leftover 8.0/8.1 proxy residue. Also reports attribution health for sessions, branches, tickets, and activities. When the report top line reads "All checks passed." you are done.',
+    cmd: "budi status",
+    body: "Today-cost snapshot: daemon state and today's spend. For the full breakdown, use budi stats --projects / --branches / --tickets / --activities / --files.",
   },
   {
     n: "4",
-    cmd: "budi status",
-    body: "Today-cost snapshot: daemon state and today's spend. If nothing has been recorded yet, it prints a friendly nudge to open your agent instead of an all-zero summary. For the full breakdown, use budi stats --projects / --branches / --tickets / --activities / --files.",
-  },
-  {
-    n: "5",
     cmd: "budi db import   # optional",
-    body: "Optional one-time backfill from Claude Code JSONL transcripts, Codex Desktop / CLI sessions, Copilot CLI sessions, and the Cursor Usage API. You do not lose the months you already spent. Skip this step if you only want live tracking going forward.",
+    body: "One-time backfill from Claude Code JSONL transcripts, Codex Desktop / CLI sessions, Copilot CLI sessions, and the Cursor Usage API. Skip if you only want live tracking going forward.",
   },
 ];
 
@@ -272,26 +262,6 @@ Total (7d)    $ 28.15   15,177    reconciles to budi stats`,
   },
 ];
 
-// Upgrade-from-8.1 surfaces (#330 in siropkin/budi). 8.2 removes the proxy
-// entirely (ADR-0089) and exposes a consent-first cleanup command for the
-// shell/editor blocks that 8.0/8.1 wrote to disk.
-const upgradeSteps = [
-  {
-    n: "1",
-    cmd: "brew upgrade budi   # or rerun the install command above",
-    body: "Updates the budi binary and budi-daemon. The daemon now boots in tailer-only mode — there is no proxy port, no ANTHROPIC_BASE_URL injection, no shell-profile mutation.",
-  },
-  {
-    n: "2",
-    cmd: "budi init --cleanup",
-    body: "Reviews and removes the managed Budi blocks that 8.0/8.1 wrote into your shell profile (~/.zshrc / ~/.bashrc), Cursor settings.json, and ~/.codex/config.toml. Every removal is shown to you first and requires explicit consent — nothing is stripped silently.",
-  },
-  {
-    n: "3",
-    cmd: "budi doctor",
-    body: "Confirms the tailer is healthy, transcripts are visible, and no proxy-era residue remains. budi doctor is the single source of truth for whether the upgrade is finished — if it says All checks passed, you are done.",
-  },
-];
 ---
 
 <Base>
@@ -445,8 +415,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </h2>
       <p class="text-fg-muted mt-3">
         Six things, on purpose. Budi is not an LLM gateway, a prompt router, or a "cost
-        optimization" consulting product. Since 8.2 it is also no longer in your network path — Budi
-        reads the transcripts your agents already write locally and stays out of the way.
+        optimization" consulting product. It reads the transcripts your agents already write locally
+        — nothing sits in your network path.
       </p>
     </header>
 
@@ -713,15 +683,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <code class="text-accent">budi integrations install</code>.
       </h2>
       <p class="text-fg-muted mt-3">
-        <code>budi init</code> starts the daemon on port 7878, installs the platform-native autostart
-        service, and prints any agents detected on your machine. <code
+        <code>budi init</code> starts the daemon and installs the autostart service. <code
           >budi integrations install</code
-        >
-        then wires the Claude Code statusline into <code class="text-xs"
-          >~/.claude/settings.json</code
-        >
-        and, if Cursor is detected, offers to install the Cursor extension. Neither step patches your
-        shell profile or Codex config — your tools keep working exactly as they do today. <strong
+        > wires the Claude Code statusline and, if Cursor is detected, offers the Cursor extension. <strong
           class="text-fg"
           >Restart Claude Code after <code class="text-xs">budi integrations install</code></strong
         > so it picks up the new <code class="text-xs">statusLine</code> command.
@@ -783,9 +747,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
             class="link-underline hover:text-fg"
             target="_blank"
             rel="noopener noreferrer">siropkin/budi-cursor</a
-          >). <strong class="text-fg-muted"
-            >Earlier 1.0.x builds referenced the retired 8.0 / 8.1 proxy</strong
-          > — make sure you are on the current release from the marketplace.
+          >).
         </p>
       </div>
       <div class="sm:self-center">
@@ -846,30 +808,13 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </div>
     </details>
 
-    {
-      /*
-       * "After you install" — the canonical 5-step first-run checklist
-       * mirrored inline from siropkin/budi README (§ First run checklist).
-       * A fresh user finishes setup without leaving the site; the README
-       * remains the upstream source of truth but is no longer a required
-       * stop on the critical path.
-       */
-    }
     <div class="mt-12">
       <header class="mb-6 max-w-2xl">
         <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">After you install</p>
-        <h3 class="text-xl font-semibold tracking-tight sm:text-2xl">
-          Five steps to prove it works.
-        </h3>
+        <h3 class="text-xl font-semibold tracking-tight sm:text-2xl">Four steps to verify.</h3>
         <p class="text-fg-muted mt-3 text-sm">
-          About five minutes end to end. If any step looks wrong, <code class="text-xs"
-            >budi doctor</code
-          > will say so out loud — it is the source of truth, not this page. For a per-session health
-          read (context growth, cache reuse, cost acceleration, retry loops), run
-          <code class="text-xs">budi vitals</code>. For the active pricing manifest — which model
-          prices the tailer is using and where they came from — run <code class="text-xs"
-            >budi pricing status</code
-          >. Those three are the canonical local-read commands.
+          If anything looks wrong, <code class="text-xs">budi doctor</code> is the source of truth.
+          For a live session health read, run <code class="text-xs">budi vitals</code>.
         </p>
       </header>
 
@@ -893,85 +838,6 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </ol>
     </div>
 
-    {
-      /*
-       * Upgrade-from-8.0/8.1 flow, collapsed behind a disclosure so fresh
-       * users on clean machines don't see it. The block used to live as a
-       * full top-level section (#upgrade) which made Budi look like it had
-       * a hard migration even on first install. See siropkin/budi#444.
-       */
-    }
-    <details id="upgrade" class="group mt-10 scroll-mt-24">
-      <summary
-        class="text-fg-muted hover:text-fg inline-flex cursor-pointer list-none items-center gap-2 text-sm transition-colors"
-      >
-        <svg
-          aria-hidden="true"
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="transition-transform group-open:rotate-90"
-        >
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-        <span
-          >Upgrading from 8.0 / 8.1? Proxy removal + <code class="text-xs">budi init --cleanup</code
-          ></span
-        >
-      </summary>
-
-      <div class="mt-6">
-        <p class="text-fg-muted max-w-2xl text-sm leading-relaxed">
-          Budi 8.2 removes the local proxy entirely — the daemon now tails transcripts only and is
-          no longer in your network path. The 8.0 / 8.1 daemon wrote managed proxy config blocks
-          into your shell profile, Cursor <code class="text-xs">settings.json</code>, and
-          <code class="text-xs">~/.codex/config.toml</code>. After upgrading, those blocks no longer
-          do anything — <code class="text-xs">budi init --cleanup</code> shows you each one and asks for
-          explicit consent before removing it. Existing analytics from your 8.0 / 8.1 proxy traffic stay
-          intact.
-        </p>
-
-        <ol class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
-          {
-            upgradeSteps.map((step) => (
-              <li class="card flex flex-col gap-3 p-5 sm:p-6">
-                <div class="flex items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
-                  >
-                    {step.n}
-                  </span>
-                  <code class="text-fg font-mono text-xs">{step.cmd}</code>
-                </div>
-                <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
-              </li>
-            ))
-          }
-        </ol>
-
-        <p class="text-fg-dim mt-4 max-w-2xl text-xs">
-          Tracking ticket:
-          <a
-            href="https://github.com/siropkin/budi/issues/330"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link-underline hover:text-fg">siropkin/budi#330</a
-          >. Full upgrade notes live in the
-          <a
-            href="https://github.com/siropkin/budi/releases/tag/v8.2.0"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="link-underline hover:text-fg">v8.2.0 release notes</a
-          >.
-        </p>
-      </div>
-    </details>
   </section>
 
   {/* 8. FOR TEAMS (opt-in cloud) */}
