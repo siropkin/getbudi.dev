@@ -82,7 +82,7 @@ The site should read the way the Reddit posts read — first-person, specific, h
 
 Intentionally a single marketing page plus a 404 — deep docs, changelog, and pricing stay out of this repo.
 
-- `/` — hero (tagline + install command + `budi stats` terminal shot), the cost-problem numbers, features (4 cards + inline `budi vitals` shot), honest compare table, privacy contract (local-first + what leaves / never leaves / how to enable cloud), install (OS tabs + 4-step after-install checklist), for-teams block.
+- `/` — hero (tagline + install command + `budi stats project` terminal shot), the cost-problem numbers, features (4 cards + inline `budi sessions <id>` shot), honest compare table, privacy contract (local-first + what leaves / never leaves / how to enable cloud), install (OS tabs + 4-step after-install checklist), for-teams block.
 - `/404` — static "not found", `noindex`, linked back to `/`. Excluded from `sitemap-index.xml` by `astro.config.mjs`.
 
 Deep reference links out to `siropkin/budi` (README, releases) or `app.getbudi.dev`. No `/docs`, `/pricing`, or `/changelog` page is planned — adding one re-opens the docs-drift problem we deliberately avoid by keeping a single surface.
