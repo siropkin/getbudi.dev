@@ -42,7 +42,7 @@ const installCommands = {
     "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init; budi integrations install",
 };
 
-const LATEST_BUDI_VERSION = "v8.3.0";
+const LATEST_BUDI_VERSION = "v8.3.14";
 const LATEST_CURSOR_EXTENSION_VERSION = "v1.3.x";
 
 const features = [
@@ -54,7 +54,7 @@ const features = [
   {
     title: "Per repo, branch, and ticket",
     body: "Cost attributed to the repo and branch you were on, with ticket IDs lifted from branch names. Filter by ticket, activity, file, model, or custom tag.",
-    foot: "budi stats --branches · --tickets · --files",
+    foot: "budi stats branch · ticket · file",
   },
   {
     title: "Live status line",
@@ -63,8 +63,8 @@ const features = [
   },
   {
     title: "Session health on demand",
-    body: "budi vitals shows context growth, cache reuse, cost acceleration, and retry loops in plain English. Not a wall of emoji by default — quiet unless you ask.",
-    foot: 'budi vitals · preset = "coach"',
+    body: "budi sessions <id> shows context growth, cache reuse, cost acceleration, and retry loops in plain English. Not a wall of emoji by default — quiet unless you ask.",
+    foot: "budi sessions <id>",
   },
 ];
 
@@ -128,7 +128,7 @@ const firstRunSteps = [
   {
     n: "3",
     cmd: "budi status",
-    body: "Today-cost snapshot: daemon state and today's spend. For the full breakdown, use budi stats --projects / --branches / --tickets.",
+    body: "Today-cost snapshot: daemon state and today's spend. For the full breakdown, use budi stats project / branch / ticket.",
   },
   {
     n: "4",
@@ -210,7 +210,7 @@ const altInstalls = [
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
-        <span class="ml-3 font-mono">~ budi stats --projects</span>
+        <span class="ml-3 font-mono">~ budi stats project</span>
       </div>
       <pre
         class="text-fg m-0 overflow-x-auto px-4 py-5 text-[12.5px] leading-[1.55] sm:px-6 sm:py-6 sm:text-[13.5px]"><code>{`Today                                           7d        30d
@@ -300,7 +300,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
         <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
-        <span class="ml-3 font-mono">~ budi vitals</span>
+        <span class="ml-3 font-mono">~ budi sessions &lt;id&gt;</span>
       </div>
       <pre
         class="text-fg m-0 flex-1 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[12.5px]"><code>{`Session Health: 🟢 GREEN  (session healthy)
@@ -312,7 +312,7 @@ Retry loops        →  0                (no retries)
 
 Session:  2h 14m · claude-3.5-sonnet · 46 msgs · $ 4.92`}</code></pre>
       <figcaption class="text-fg-muted border-line/70 border-t px-4 py-3 text-xs leading-relaxed">
-        <code>budi vitals</code> — session health in plain English. No dashboard required.
+        <code>budi sessions &lt;id&gt;</code> — session health in plain English. No dashboard required.
       </figcaption>
     </figure>
   </section>
@@ -453,7 +453,7 @@ Session:  2h 14m · claude-3.5-sonnet · 46 msgs · $ 4.92`}</code></pre>
       <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Four steps to verify.</h3>
       <p class="text-fg-muted mb-6 text-sm">
         If anything looks wrong, <code class="text-xs">budi doctor</code> is the source of truth. For
-        a live session health read, run <code class="text-xs">budi vitals</code>.
+        a live session health read, run <code class="text-xs">budi sessions &lt;id&gt;</code>.
       </p>
       <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="list">
         {
