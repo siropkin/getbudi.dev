@@ -59,7 +59,7 @@ const features = [
   {
     title: "Live status line",
     body: "Rolling 1d / 7d / 30d cost in Claude Code and Cursor, scoped per provider. The Claude Code line shows Claude Code spend only; the Cursor line shows Cursor spend only.",
-    foot: "🟢 budi · $1.24 1d · $8.50 7d · $32.10 30d",
+    foot: "_projects/budi · main · budi · $3.47 session · $0.06 message",
   },
   {
     title: "Session health on demand",
@@ -303,14 +303,27 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <span class="ml-3 font-mono">~ budi sessions &lt;id&gt;</span>
       </div>
       <pre
-        class="text-fg m-0 flex-1 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[12.5px]"><code>{`Session Health: 🟢 GREEN  (session healthy)
-─────────────────────────────────────────────────────────────
-Context growth     →  18.2 %/hr        (within normal band)
-Cache reuse        →  72.8 %           (good — >60 % target)
-Cost acceleration  →  +$ 0.81 / 10 min (stable)
-Retry loops        →  0                (no retries)
+        class="text-fg m-0 flex-1 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[12.5px]"><code>{`  Session 2968337c-1e4
+  ──────────────────────────────────────────────────
+  Agent      claude_code
+  Models     claude-opus-4-7
+  Started    2026-05-06T02:22:27.194+00:00
+  Duration   2m22s
+  Repos      github.com/siropkin/budi-cloud
+  Branches   151-repos-companion-tables, main
+  Outcome    no_commit
+             …explanation…
 
-Session:  2h 14m · claude-3.5-sonnet · 46 msgs · $ 4.92`}</code></pre>
+  Messages   22
+  Input      32
+  Output     10.8K
+  Est. cost  $1.70
+
+  Tags
+    file_path: src/lib/dal.ts
+    …
+
+  🟢 Vitals: GREEN`}</code></pre>
       <figcaption class="text-fg-muted border-line/70 border-t px-4 py-3 text-xs leading-relaxed">
         <code>budi sessions &lt;id&gt;</code> — session health in plain English. No dashboard required.
       </figcaption>
