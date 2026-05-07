@@ -68,7 +68,16 @@ const installCommands = {
     "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init; budi integrations install",
 };
 
-const LATEST_BUDI_VERSION = "v8.4.0";
+let LATEST_BUDI_VERSION = "v8.4.0";
+try {
+  const res = await fetch("https://api.github.com/repos/siropkin/budi/releases/latest");
+  if (res.ok) {
+    const data = await res.json();
+    if (typeof data.tag_name === "string") LATEST_BUDI_VERSION = data.tag_name;
+  }
+} catch {
+  // keep fallback
+}
 const LATEST_CURSOR_EXTENSION_VERSION = "v1.3.x";
 
 const features = [
