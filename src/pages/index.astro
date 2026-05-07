@@ -456,8 +456,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </h2>
       <p class="text-fg-muted mt-3">
         <code>budi init</code> starts the daemon and installs the autostart service.
-        <code>budi integrations install</code> wires the Claude Code statusline and offers the
-        VS Code / Cursor extension if either editor is detected.
+        <code>budi integrations install</code> wires the Claude Code statusline and offers the VS Code
+        / Cursor extension if either editor is detected.
         <strong class="text-fg">Restart Claude Code afterwards</strong> so it picks up the new
         <code class="text-xs">statusLine</code> command.
       </p>
@@ -472,7 +472,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         target="_blank"
         rel="noopener noreferrer">GitHub</a
       >. Prefer to install the editor extension on its own?
-      <a href="#editor-extension" class="link-underline hover:text-fg">Pick VS Code or Cursor below</a
+      <a href="#editor-extension" class="link-underline hover:text-fg"
+        >Pick VS Code or Cursor below</a
       >.
     </p>
 
@@ -505,8 +506,8 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     <div id="editor-extension" class="mt-12 scroll-mt-24">
       <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Editor extension.</h3>
       <p class="text-fg-muted mb-6 text-sm">
-        Adds the budi status bar to VS Code or Cursor. <code class="text-xs">budi init</code> offers
-        this automatically, but if you want to install it on its own, pick your editor:
+        Adds the budi status bar to VS Code or Cursor. <code class="text-xs">budi init</code> offers this
+        automatically, but if you want to install it on its own, pick your editor:
       </p>
       <EditorInstallCards version={LATEST_CURSOR_EXTENSION_VERSION} />
     </div>
@@ -536,9 +537,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
           altInstalls.map((alt) => (
             <div>
               <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">{alt.label}</div>
-              {alt.note && (
-                <p class="text-fg-muted mb-2 text-xs leading-relaxed">{alt.note}</p>
-              )}
+              {alt.note && <p class="text-fg-muted mb-2 text-xs leading-relaxed">{alt.note}</p>}
               <CopyableCommand command={alt.code} variant="compact" />
             </div>
           ))
