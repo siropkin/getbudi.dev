@@ -93,7 +93,7 @@ const features = [
   },
   {
     title: "Live status line",
-    body: "Rolling 1d / 7d / 30d cost in Claude Code and Cursor, scoped per provider. The Claude Code line shows Claude Code spend only; the Cursor line shows Cursor spend only.",
+    body: "Rolling 1d / 7d / 30d cost in Claude Code, Cursor, and VS Code — scoped per host. The Cursor line shows Cursor spend only; the VS Code line shows Copilot Chat spend only.",
     foot: "_projects/budi · main · budi · $3.47 session · $0.06 message",
   },
   {
@@ -411,6 +411,86 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         ))
       }
     </div>
+
+    <figure class="mt-6 grid gap-4 sm:grid-cols-2">
+      {
+        [
+          {
+            host: "Cursor",
+            file: "payments.ts",
+            scope: "cursor",
+            statusBg: "bg-[#181818]",
+            statusBorder: "border-[#2a2a2a]",
+            d1: "$0.42",
+            d7: "$3.18",
+            d30: "$14.92",
+          },
+          {
+            host: "VS Code",
+            file: "payments.ts",
+            scope: "copilot_chat",
+            statusBg: "bg-[#007ACC]",
+            statusBorder: "border-[#005a9e]",
+            d1: "$0.31",
+            d7: "$2.04",
+            d30: "$9.87",
+          },
+        ].map((s) => (
+          <div class="card flex flex-col overflow-hidden">
+            <div class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs">
+              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+              <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+              <span class="ml-3 font-mono">
+                {s.host} — {s.file}
+              </span>
+            </div>
+            <div class="flex-1 bg-[#1e1e1e] px-4 py-5 font-mono text-[12px] leading-relaxed">
+              <p class="text-[#6a9955]">// src/lib/{s.file}</p>
+              <p>
+                <span class="text-[#c586c0]">export async function</span>{" "}
+                <span class="text-[#dcdcaa]">refundCharge</span>
+                <span class="text-[#d4d4d4]">(</span>
+                <span class="text-[#9cdcfe]">id</span>
+                <span class="text-[#d4d4d4]">: </span>
+                <span class="text-[#4ec9b0]">string</span>
+                <span class="text-[#d4d4d4]">) {"{"}</span>
+              </p>
+              <p class="pl-4 text-[#d4d4d4]">
+                <span class="text-[#c586c0]">return</span> stripe.refunds.
+                <span class="text-[#dcdcaa]">create</span>({"{ "}
+                <span class="text-[#9cdcfe]">charge</span>: id {"}"});
+              </p>
+              <p class="text-[#d4d4d4]">{"}"}</p>
+            </div>
+            <div
+              class:list={[
+                "flex items-center justify-between gap-3 border-t px-3 py-1 font-mono text-[11px] text-white",
+                s.statusBg,
+                s.statusBorder,
+              ]}
+              title={`budi scope: ${s.scope}`}
+            >
+              <div class="flex items-center gap-3 truncate opacity-90">
+                <span>main</span>
+                <span class="hidden sm:inline">{s.file}</span>
+              </div>
+              <div class="flex items-center gap-2 truncate">
+                <span aria-hidden="true" class="inline-block h-1.5 w-1.5 rounded-full bg-white" />
+                <span>
+                  budi · {s.d1} 1d · {s.d7} 7d · {s.d30} 30d
+                </span>
+              </div>
+            </div>
+            <figcaption class="text-fg-muted border-line/70 border-t px-4 py-3 text-xs leading-relaxed">
+              <strong class="text-fg font-medium">{s.host}</strong> — status bar scoped to{" "}
+              <code class="text-[11px]">{s.scope}</code>. Each editor shows only its own host's
+              spend.
+            </figcaption>
+          </div>
+        ))
+      }
+    </figure>
 
     <figure class="card mt-6 flex flex-col overflow-hidden">
       <div
