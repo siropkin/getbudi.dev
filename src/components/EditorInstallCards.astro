@@ -1,0 +1,73 @@
+---
+import CopyableCommand from "./CopyableCommand.astro";
+
+interface Props {
+  /** Extension version label, shown under each editor name. */
+  version: string;
+}
+
+const { version } = Astro.props;
+
+const editors = [
+  {
+    id: "vscode",
+    name: "VS Code",
+    note: "From the VS Code Marketplace",
+    command: "code --install-extension siropkin.budi",
+    storeName: "VS Code Marketplace",
+    storeUrl: "https://marketplace.visualstudio.com/items?itemName=siropkin.budi",
+  },
+  {
+    id: "cursor",
+    name: "Cursor",
+    note: "From Open VSX — recommended for Cursor",
+    command: "cursor --install-extension siropkin.budi",
+    storeName: "Open VSX",
+    storeUrl: "https://open-vsx.org/extension/siropkin/budi",
+  },
+] as const;
+---
+
+<div class="grid gap-4 md:grid-cols-2">
+  {
+    editors.map((ed) => (
+      <article class="card flex flex-col gap-3 p-5 sm:p-6">
+        <header class="flex items-center gap-3">
+          {ed.id === "vscode" ? (
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#0098FF">
+              <path d="M23.15 2.587 17.85.054a1.575 1.575 0 0 0-1.795.299L.792 14.479A1.05 1.05 0 0 0 .806 16l1.428 1.298a1.05 1.05 0 0 0 1.342.064L21.812 3.532a.7.7 0 0 1 1.116.553v.066L1.378 19.51a1.05 1.05 0 0 0-.572.882c-.014.318.13.62.388.808l1.428 1.299c.357.286.853.342 1.27.143l16.85-8.137a1.575 1.575 0 0 0 .894-1.42V4.044a1.575 1.575 0 0 0-.087-.486 1.575 1.575 0 0 0-.6-.971Z" />
+            </svg>
+          ) : (
+            <svg
+              aria-hidden="true"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="text-fg"
+            >
+              <path d="M11.925.024 2.483 5.477v10.91l9.45 5.453 9.45-5.453V5.477L11.925.024Zm-.058 1.96 7.642 4.41-7.642 4.41-7.642-4.41 7.642-4.41Zm-8.4 5.7 7.85 4.532v9.066l-7.85-4.532V7.683Zm16.8 0v9.066l-7.85 4.532v-9.066l7.85-4.532Z" />
+            </svg>
+          )}
+          <div class="flex min-w-0 flex-col">
+            <h3 class="text-fg leading-tight font-semibold tracking-tight">{ed.name}</h3>
+            <p class="text-fg-dim text-xs leading-snug">
+              {ed.note} · <code class="text-fg-muted text-[11px]">{version}</code>
+            </p>
+          </div>
+        </header>
+
+        <CopyableCommand command={ed.command} variant="compact" />
+
+        <a
+          href={ed.storeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-fg-muted hover:text-accent inline-flex items-center gap-1 self-start text-xs"
+        >
+          View on {ed.storeName} →
+        </a>
+      </article>
+    ))
+  }
+</div>

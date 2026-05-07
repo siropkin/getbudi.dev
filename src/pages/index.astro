@@ -2,6 +2,7 @@
 import Base from "~/layouts/Base.astro";
 import CopyableCommand from "~/components/CopyableCommand.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
+import EditorInstallCards from "~/components/EditorInstallCards.astro";
 
 const faqJsonLd = {
   "@context": "https://schema.org",
@@ -139,7 +140,22 @@ const firstRunSteps = [
 
 const altInstalls = [
   {
-    label: "From source (Rust toolchain)",
+    label: "Bundled extension via budi CLI",
+    note: "Same path budi init uses. Picks the right editor automatically.",
+    code: "budi integrations install --with cursor-extension",
+  },
+  {
+    label: "Manual VSIX in VS Code (offline / pinned)",
+    note: "Download cursor-budi.vsix from the budi-cursor releases page first.",
+    code: "code --install-extension cursor-budi.vsix --force",
+  },
+  {
+    label: "Manual VSIX in Cursor (offline / pinned)",
+    note: "Same VSIX file works in Cursor — Open VSX is just a discovery surface.",
+    code: "cursor --install-extension cursor-budi.vsix --force",
+  },
+  {
+    label: "Daemon from source (Rust toolchain)",
     code: "git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh",
   },
 ];
@@ -440,9 +456,10 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </h2>
       <p class="text-fg-muted mt-3">
         <code>budi init</code> starts the daemon and installs the autostart service.
-        <code>budi integrations install</code> wires the Claude Code statusline and offers the Cursor
-        extension if detected. <strong class="text-fg">Restart Claude Code afterwards</strong> so it picks
-        up the new <code class="text-xs">statusLine</code> command.
+        <code>budi integrations install</code> wires the Claude Code statusline and offers the VS Code
+        / Cursor extension if either editor is detected.
+        <strong class="text-fg">Restart Claude Code afterwards</strong> so it picks up the new
+        <code class="text-xs">statusLine</code> command.
       </p>
     </header>
 
@@ -454,13 +471,10 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         class="link-underline hover:text-fg"
         target="_blank"
         rel="noopener noreferrer">GitHub</a
-      >. Using Cursor? <a
-        href="https://open-vsx.org/extension/siropkin/budi"
-        class="link-underline hover:text-fg"
-        target="_blank"
-        rel="noopener noreferrer">Install the budi extension from Open VSX</a
-      > ({LATEST_CURSOR_EXTENSION_VERSION}) — its welcome view guides you through the daemon
-      install.
+      >. Prefer to install the editor extension on its own?
+      <a href="#editor-extension" class="link-underline hover:text-fg"
+        >Pick VS Code or Cursor below</a
+      >.
     </p>
 
     <div class="mt-10">
@@ -489,7 +503,16 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </ol>
     </div>
 
-    <details class="group mt-8">
+    <div id="editor-extension" class="mt-12 scroll-mt-24">
+      <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Editor extension.</h3>
+      <p class="text-fg-muted mb-6 text-sm">
+        Adds the budi status bar to VS Code or Cursor. <code class="text-xs">budi init</code> offers this
+        automatically, but if you want to install it on its own, pick your editor:
+      </p>
+      <EditorInstallCards version={LATEST_CURSOR_EXTENSION_VERSION} />
+    </div>
+
+    <details class="group mt-10">
       <summary
         class="text-fg-muted hover:text-fg inline-flex cursor-pointer list-none items-center gap-2 text-sm transition-colors"
       >
@@ -514,6 +537,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
           altInstalls.map((alt) => (
             <div>
               <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">{alt.label}</div>
+              {alt.note && <p class="text-fg-muted mb-2 text-xs leading-relaxed">{alt.note}</p>}
               <CopyableCommand command={alt.code} variant="compact" />
             </div>
           ))
