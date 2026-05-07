@@ -4,35 +4,60 @@ import CopyableCommand from "~/components/CopyableCommand.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
 import EditorInstallCards from "~/components/EditorInstallCards.astro";
 
+const faqs = [
+  {
+    q: "Where does Budi run?",
+    a: "On your machine. A small Rust daemon on port 7878 that watches the transcript files your AI agents already write locally. Nothing sits in your network path.",
+  },
+  {
+    q: "What leaves my machine when using Budi?",
+    a: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails.",
+  },
+  {
+    q: "Why would I turn Budi cloud sync on?",
+    a: "You want your team lead to see one dashboard for the whole team. Otherwise, leave it off.",
+  },
+  {
+    q: "Does budi work in VS Code?",
+    a: "Yes, starting v8.4.0 (May 2026). One extension covers Cursor and VS Code; the host detection picks the right provider scope automatically.",
+  },
+  {
+    q: "Do I need to install both Cursor and VS Code?",
+    a: "No. Use whichever you use day-to-day. A user with both installed sees the right host's data in each editor's status bar.",
+  },
+  {
+    q: "What about GitHub Copilot?",
+    a: "Copilot Chat is supported in 8.4.0, real per-message tokens parsed from VS Code's local session files. GitHub-side dollar reconciliation works for individually-licensed users via the GitHub Billing API; org-managed users see local-tail tokens priced through budi's pricing manifest.",
+  },
+  {
+    q: "Do I need a GitHub PAT for Copilot Chat?",
+    a: "Optional, but recommended for accuracy. Without a PAT, on May-2026+ VS Code builds you get output-only token dollars — useful as a relative trend, but typically a fraction of the actual bill (Copilot Chat doesn't persist prompt-token counts client-side on these builds). With a PAT scoped to billing, budi reconciles to GitHub's exact dollar number per (date, model) bucket. Org-managed licences see output-only forever (the user-level Billing API endpoint is empty for them).",
+  },
+  {
+    q: "What about Continue / Cline / Roo Code / Aider / Gemini CLI?",
+    a: "Planned for 9.0.0 (the breadth round). Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
+  },
+  {
+    q: "What about JetBrains?",
+    a: "Not in scope today. If/when budi adds JetBrains support, it'll ship as a sibling plugin (separate Kotlin codebase, separate marketplace).",
+  },
+  {
+    q: "Why local logs and not an API for everything?",
+    a: "Local-log parsing is the primary path because it works offline, doesn't depend on auth tokens, and degrades gracefully when an upstream API breaks. APIs are used only as supplementary reconciliation (Cursor Usage API, GitHub Billing API), never as the only path.",
+  },
+];
+
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "Where does Budi run?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "On your machine. A small Rust daemon on port 7878 that watches the transcript files your AI agents already write locally. Nothing sits in your network path.",
-      },
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: f.a,
     },
-    {
-      "@type": "Question",
-      name: "What leaves my machine when using Budi?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Why would I turn Budi cloud sync on?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "You want your team lead to see one dashboard for the whole team. Otherwise, leave it off.",
-      },
-    },
-  ],
+  })),
 };
 
 const installCommands = {
@@ -617,6 +642,53 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       >
         Read the privacy contract →
       </a>
+    </div>
+  </section>
+
+  {/* 8. FAQ */}
+  <section id="faq" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-8 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">FAQ</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+        The questions we keep getting asked.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        Editor coverage, Copilot, JetBrains, and why budi reads local logs instead of going through
+        a proxy. If yours isn't here,
+        <a
+          href="https://github.com/siropkin/budi/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link-underline hover:text-fg">open an issue</a
+        >.
+      </p>
+    </header>
+
+    <div class="grid gap-3">
+      {
+        faqs.map((f, i) => (
+          <details class="card group p-5 sm:p-6" open={i === 0}>
+            <summary class="text-fg flex cursor-pointer list-none items-start justify-between gap-3 font-semibold tracking-tight">
+              <span>{f.q}</span>
+              <svg
+                aria-hidden="true"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-fg-dim mt-1 shrink-0 transition-transform group-open:rotate-90"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </summary>
+            <p class="text-fg-muted mt-3 text-sm leading-relaxed">{f.a}</p>
+          </details>
+        ))
+      }
     </div>
   </section>
 </Base>
