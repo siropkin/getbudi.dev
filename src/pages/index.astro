@@ -35,7 +35,7 @@ const faqs = [
   },
   {
     q: "What about Continue / Cline / Roo Code / Aider / Gemini CLI?",
-    a: "Planned for 9.0.0 (the breadth round). Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
+    a: "Planned for 8.5.0 (the breadth round). Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
   },
   {
     q: "What about JetBrains?",
@@ -169,6 +169,74 @@ const firstRunSteps = [
     n: "4",
     cmd: "budi db import   # optional",
     body: "One-time backfill from Claude Code, Codex, Copilot, and Cursor. Skip if you only want live tracking going forward.",
+  },
+];
+
+const providers = [
+  {
+    name: "Cursor",
+    status: "Live",
+    statusKind: "live" as const,
+    source: "Local SQLite (`cursorDiskKV`) primary; Cursor Usage API supplementary",
+    notes:
+      "All Cursor plans. Local-tail produces real tokens × pricing-manifest dollars; the Usage API is a supplementary truth-up that can lag ~10 min.",
+  },
+  {
+    name: "Claude Code",
+    status: "Live",
+    statusKind: "live" as const,
+    source: "Local JSONL transcripts",
+    notes:
+      "All plans. Real per-message tokens parsed from the transcripts Claude Code already writes to disk.",
+  },
+  {
+    name: "Codex CLI",
+    status: "Live",
+    statusKind: "live" as const,
+    source: "Local JSONL transcripts",
+    notes: "Real per-message tokens parsed from disk.",
+  },
+  {
+    name: "Copilot CLI",
+    status: "Live",
+    statusKind: "live" as const,
+    source: "Local JSONL session-state",
+    notes: "Standalone GitHub Copilot CLI — not the VS Code extension.",
+  },
+  {
+    name: "Copilot Chat (VS Code)",
+    status: "8.4.0",
+    statusKind: "new" as const,
+    source: "Local JSON/JSONL primary; GitHub Billing API supplementary",
+    notes: "Three sub-states for cost accuracy — see the breakdown below.",
+    breakdown: [
+      {
+        label: "Individual licence + GitHub Billing API PAT",
+        confidence: "exact",
+        confidenceKind: "exact" as const,
+        body: "GitHub-side dollar truth-up — the authoritative number per (date, model) bucket.",
+      },
+      {
+        label: "Individual licence, no PAT",
+        confidence: "estimated · output-only",
+        confidenceKind: "estimated" as const,
+        body: "Local-tail tokens × manifest pricing. May-2026+ VS Code builds persist response tokens but drop prompt-token counts client-side, so the dollar number is output-only — meaningful as a relative trend, but a fraction of the actual bill.",
+      },
+      {
+        label: "Org-managed licence",
+        confidence: "estimated · output-only",
+        confidenceKind: "estimated" as const,
+        body: "Same output-only manifest pricing, with no Billing API truth-up — the user-level Billing API endpoint returns empty for org-managed Copilot licences.",
+      },
+    ],
+  },
+  {
+    name: "Continue, Cline, Roo Code, Aider, Gemini CLI",
+    status: "8.5.0 (planned)",
+    statusKind: "planned" as const,
+    source: "Local logs",
+    notes:
+      "The 8.5.0 breadth round. Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
   },
 ];
 
@@ -379,6 +447,102 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         <code>budi sessions &lt;id&gt;</code> — session health in plain English. No dashboard required.
       </figcaption>
     </figure>
+  </section>
+
+  {/* 3b. PROVIDER MATRIX */}
+  <section id="providers" class="container-readable border-line/70 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What budi tracks</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+        Provider matrix, with the caveats spelled out.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        Local-log parsing is the primary path for every provider. APIs (Cursor Usage, GitHub
+        Billing) are supplementary truth-up, never the only signal — so attribution keeps working
+        offline, without auth tokens, and when an upstream API breaks.
+      </p>
+    </header>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      {
+        providers.map((p) => (
+          <article
+            class:list={[
+              "card flex flex-col gap-3 p-5 sm:p-6",
+              p.statusKind === "new" ? "border-accent bg-accent-soft/30" : "",
+            ]}
+          >
+            <header class="flex flex-wrap items-center justify-between gap-2">
+              <h3
+                class:list={[
+                  "font-semibold tracking-tight",
+                  p.statusKind === "new" ? "text-accent" : "text-fg",
+                ]}
+              >
+                {p.name}
+              </h3>
+              <span
+                class:list={[
+                  "chip",
+                  p.statusKind === "new" ? "border-accent text-accent" : "",
+                  p.statusKind === "planned" ? "text-fg-dim" : "",
+                ]}
+              >
+                {p.status}
+              </span>
+            </header>
+            <dl class="flex flex-col gap-2 text-sm">
+              <div>
+                <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Data source</dt>
+                <dd
+                  class="text-fg-muted leading-relaxed"
+                  set:html={p.source.replace(
+                    /`([^`]+)`/g,
+                    '<code class="bg-surface-3 border-line/70 rounded border px-1 py-0.5 text-[12px]">$1</code>',
+                  )}
+                />
+              </div>
+              <div>
+                <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Notes</dt>
+                <dd class="text-fg-muted leading-relaxed">{p.notes}</dd>
+              </div>
+            </dl>
+            {p.breakdown && (
+              <div class="border-line/70 mt-1 flex flex-col gap-2 border-t pt-3">
+                <p class="text-fg-dim text-xs tracking-wider uppercase">
+                  Cost accuracy by sub-state
+                </p>
+                {p.breakdown.map((b) => (
+                  <div class="bg-surface-3 border-line/70 flex flex-col gap-1 rounded-md border p-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <p class="text-fg text-sm font-medium">{b.label}</p>
+                      <span
+                        class:list={[
+                          "rounded-full border px-2 py-0.5 font-mono text-[11px]",
+                          b.confidenceKind === "exact"
+                            ? "border-accent text-accent"
+                            : "border-warn text-warn",
+                        ]}
+                      >
+                        {b.confidence}
+                      </span>
+                    </div>
+                    <p class="text-fg-muted text-xs leading-relaxed">{b.body}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </article>
+        ))
+      }
+    </div>
+
+    <p class="text-fg-dim mt-6 text-xs leading-relaxed">
+      Org-managed Copilot licences see local-tail tokens × pricing-manifest dollars only — the
+      GitHub-side reconciliation that individually-licensed users get is unavailable because the
+      user-level Billing API endpoint is empty for org-managed seats. Local-tail still produces real
+      tokens; the truth-up is the missing piece for that subset.
+    </p>
   </section>
 
   {/* 4. COMPARE */}
