@@ -1,0 +1,5 @@
+Contact: https://github.com/siropkin/budi/security/advisories/new
+Expires: 2027-05-07T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://getbudi.dev/.well-known/security.txt
+Policy: https://github.com/siropkin/budi/security/policy
