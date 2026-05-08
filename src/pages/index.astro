@@ -566,98 +566,98 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </summary>
 
       <div class="mt-10 grid gap-4 sm:grid-cols-2">
-      {
-        providers.map((p) => (
-          <article
-            class:list={[
-              "card flex flex-col gap-3 p-5 sm:p-6",
-              p.statusKind === "new" ? "border-accent bg-accent-soft/30" : "",
-            ]}
-          >
-            <header class="flex flex-wrap items-center justify-between gap-2">
-              <h3
-                class:list={[
-                  "font-semibold tracking-tight",
-                  p.statusKind === "new" ? "text-accent" : "text-fg",
-                ]}
-              >
-                {p.name}
-              </h3>
-              <span
-                class:list={[
-                  "chip",
-                  p.statusKind === "new" ? "border-accent text-accent" : "",
-                  p.statusKind === "planned" ? "text-fg-dim" : "",
-                ]}
-              >
-                {p.status}
-              </span>
-            </header>
-            <dl class="flex flex-col gap-2 text-sm">
-              <div>
-                <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Data source</dt>
-                <dd class="text-fg-muted leading-relaxed">
-                  {p.sourceParts.map((part, i) => {
-                    if (i % 2 === 0) return part;
-                    return (
-                      <code class="bg-surface-3 border-line/70 rounded border px-1 py-0.5 text-[12px]">
-                        {part}
-                      </code>
-                    );
-                  })}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Notes</dt>
-                <dd class="text-fg-muted leading-relaxed">{p.notes}</dd>
-              </div>
-            </dl>
-            {p.breakdown && (
-              <p class="text-fg-dim text-xs leading-relaxed">
-                Cost accuracy by sub-state — see breakdown below the matrix.
-              </p>
-            )}
-          </article>
-        ))
-      }
-    </div>
-
-    {
-      providers
-        .filter((p) => p.breakdown)
-        .map((p) => (
-          <div class="card mt-4 flex flex-col gap-3 p-5 sm:p-6">
-            <header class="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 class="text-fg font-semibold tracking-tight">
-                {p.name} — cost accuracy by sub-state
-              </h3>
-              <p class="text-fg-dim text-xs">
-                Three sub-states determine how close the dollar number gets to the actual bill.
-              </p>
-            </header>
-            <div class="grid gap-3 sm:grid-cols-3">
-              {p.breakdown!.map((b) => (
-                <div class="bg-surface-3 border-line/70 flex flex-col gap-1 rounded-md border p-3">
-                  <div class="flex flex-wrap items-center justify-between gap-2">
-                    <p class="text-fg text-sm font-medium">{b.label}</p>
-                    <span
-                      class:list={[
-                        "rounded-full border px-2 py-0.5 font-mono text-[11px]",
-                        b.confidenceKind === "exact"
-                          ? "border-accent text-accent"
-                          : "border-warn text-warn",
-                      ]}
-                    >
-                      {b.confidence}
-                    </span>
-                  </div>
-                  <p class="text-fg-muted text-xs leading-relaxed">{b.body}</p>
+        {
+          providers.map((p) => (
+            <article
+              class:list={[
+                "card flex flex-col gap-3 p-5 sm:p-6",
+                p.statusKind === "new" ? "border-accent bg-accent-soft/30" : "",
+              ]}
+            >
+              <header class="flex flex-wrap items-center justify-between gap-2">
+                <h3
+                  class:list={[
+                    "font-semibold tracking-tight",
+                    p.statusKind === "new" ? "text-accent" : "text-fg",
+                  ]}
+                >
+                  {p.name}
+                </h3>
+                <span
+                  class:list={[
+                    "chip",
+                    p.statusKind === "new" ? "border-accent text-accent" : "",
+                    p.statusKind === "planned" ? "text-fg-dim" : "",
+                  ]}
+                >
+                  {p.status}
+                </span>
+              </header>
+              <dl class="flex flex-col gap-2 text-sm">
+                <div>
+                  <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Data source</dt>
+                  <dd class="text-fg-muted leading-relaxed">
+                    {p.sourceParts.map((part, i) => {
+                      if (i % 2 === 0) return part;
+                      return (
+                        <code class="bg-surface-3 border-line/70 rounded border px-1 py-0.5 text-[12px]">
+                          {part}
+                        </code>
+                      );
+                    })}
+                  </dd>
                 </div>
-              ))}
+                <div>
+                  <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Notes</dt>
+                  <dd class="text-fg-muted leading-relaxed">{p.notes}</dd>
+                </div>
+              </dl>
+              {p.breakdown && (
+                <p class="text-fg-dim text-xs leading-relaxed">
+                  Cost accuracy by sub-state — see breakdown below the matrix.
+                </p>
+              )}
+            </article>
+          ))
+        }
+      </div>
+
+      {
+        providers
+          .filter((p) => p.breakdown)
+          .map((p) => (
+            <div class="card mt-4 flex flex-col gap-3 p-5 sm:p-6">
+              <header class="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 class="text-fg font-semibold tracking-tight">
+                  {p.name} — cost accuracy by sub-state
+                </h3>
+                <p class="text-fg-dim text-xs">
+                  Three sub-states determine how close the dollar number gets to the actual bill.
+                </p>
+              </header>
+              <div class="grid gap-3 sm:grid-cols-3">
+                {p.breakdown!.map((b) => (
+                  <div class="bg-surface-3 border-line/70 flex flex-col gap-1 rounded-md border p-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <p class="text-fg text-sm font-medium">{b.label}</p>
+                      <span
+                        class:list={[
+                          "rounded-full border px-2 py-0.5 font-mono text-[11px]",
+                          b.confidenceKind === "exact"
+                            ? "border-accent text-accent"
+                            : "border-warn text-warn",
+                        ]}
+                      >
+                        {b.confidence}
+                      </span>
+                    </div>
+                    <p class="text-fg-muted text-xs leading-relaxed">{b.body}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))
-    }
+          ))
+      }
 
       <p class="text-fg-dim mt-6 text-xs leading-relaxed">
         Org-managed Copilot licences see local-tail tokens × pricing-manifest dollars only — the
@@ -866,7 +866,10 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 7. FOR TEAMS — compact callout */}
-  <section id="teams" class="container-readable border-line/70 scroll-mt-24 border-t py-10 sm:py-14">
+  <section
+    id="teams"
+    class="container-readable border-line/70 scroll-mt-24 border-t py-10 sm:py-14"
+  >
     <div class="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
       <div class="max-w-2xl">
         <p class="text-fg-dim mb-1 text-xs tracking-[0.18em] uppercase">For teams (opt-in)</p>
