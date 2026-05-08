@@ -40,7 +40,7 @@ const faqs = [
   },
   {
     q: "What about JetBrains?",
-    a: "Not in scope today. If/when budi adds JetBrains support, it'll ship as a sibling plugin (separate Kotlin codebase, separate marketplace).",
+    a: "Early-stage. A sibling Kotlin plugin lives at siropkin/budi-jetbrains and is not shipped to the JetBrains Marketplace yet — same statusbar / local-tail pattern as the VS Code & Cursor extension when it lands. Track the repo for the first release.",
   },
   {
     q: "Why local logs and not an API for everything?",
@@ -69,7 +69,7 @@ const installCommands = {
     "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init; budi integrations install",
 };
 
-let LATEST_BUDI_VERSION = "v8.4.0";
+let LATEST_BUDI_VERSION = "v8.4.1";
 try {
   const res = await fetch("https://api.github.com/repos/siropkin/budi/releases/latest", {
     signal: AbortSignal.timeout(5000),
@@ -83,7 +83,7 @@ try {
 } catch {
   // keep fallback
 }
-const LATEST_CURSOR_EXTENSION_VERSION = "v1.3.x";
+const LATEST_CURSOR_EXTENSION_VERSION = "v1.4.x";
 
 const features = [
   {
