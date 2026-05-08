@@ -273,10 +273,18 @@ const altInstalls = [
         <span class="text-accent">AI coding agents.</span>
       </h1>
 
+      <div class="flex flex-wrap items-center gap-2 text-sm">
+        <span class="text-fg-dim text-xs tracking-[0.18em] uppercase">Tracks</span>
+        {
+          ["Cursor", "Claude Code", "Codex", "Copilot Chat"].map((agent) => (
+            <span class="chip border-line-strong text-fg">{agent}</span>
+          ))
+        }
+      </div>
+
       <p class="text-fg-muted text-lg leading-relaxed text-pretty sm:text-xl">
-        Cursor, Claude Code, Codex, and Copilot Chat — tracked by tailing the transcripts each tool
-        already writes to disk. Cost by repo, branch, and ticket. Nothing in your network path —
-        prompts never leave your machine.
+        One tool, one binary — tailing the transcripts each agent already writes to disk. Cost by
+        repo, branch, and ticket. Nothing in your network path — prompts never leave your machine.
       </p>
     </div>
 
