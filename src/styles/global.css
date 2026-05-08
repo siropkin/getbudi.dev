@@ -109,3 +109,45 @@
   border: 1px solid var(--color-line);
   color: var(--color-fg-muted);
 }
+
+/*
+ * Horizontally-scrolling terminal previews. Their ASCII tables are wider than
+ * a 390px mobile viewport, so we need a visible affordance that signals "pan
+ * to see more" — otherwise the rightmost columns look truncated rather than
+ * scrollable (issue #80).
+ *
+ * The mask fades the right edge so cut-off characters look soft instead of
+ * flush-clipped. The scrollbar is styled thin-but-visible so users see a
+ * familiar pan affordance even on mobile (where overlay scrollbars hide by
+ * default until interaction).
+ */
+@utility terminal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+.terminal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.terminal-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--color-line-strong);
+  border-radius: 3px;
+}
+.terminal-scroll::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Only fade the right edge on viewports where these blocks actually overflow.
+   At sm (640px) and up the ASCII tables fit inside `container-readable`, so the
+   fade would be unnecessary visual noise. */
+@media (max-width: 639.98px) {
+  .terminal-scroll {
+    mask-image: linear-gradient(to right, black 0, black calc(100% - 24px), transparent 100%);
+    -webkit-mask-image: linear-gradient(
+      to right,
+      black 0,
+      black calc(100% - 24px),
+      transparent 100%
+    );
+  }
+}
