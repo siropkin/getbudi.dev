@@ -95,18 +95,32 @@ const policy = [
 ].join("; ");
 
 const vercel = JSON.parse(readFileSync(vercelPath, "utf8"));
-const globalEntry = vercel.headers?.find((h) => h.source === "/(.*)");
-if (!globalEntry) {
-  console.error(`csp: could not find global headers entry (source: "/(.*)") in ${vercelPath}`);
+
+// Scope CSP to the production host. Vercel preview deploys
+// (*.vercel.app) inject the Vercel Toolbar / Comments runtime from
+// https://vercel.live/_next-live/feedback/feedback.js plus inline
+// bootstraps; under a strict CSP those get blocked, log console
+// errors, and drop the Lighthouse Best Practices score below the gate
+// even though production never sees those scripts. The toolbar is
+// only injected on preview hosts, so a host-scoped CSP gives prod the
+// real policy and lets preview deploys stay clean for Lighthouse.
+const PROD_HOST = "getbudi.dev";
+const cspEntry = vercel.headers?.find(
+  (h) => h.source === "/(.*)" && h.has?.some((c) => c.type === "host" && c.value === PROD_HOST),
+);
+if (!cspEntry) {
+  console.error(
+    `csp: could not find host-scoped CSP entry (source: "/(.*)", has host=${PROD_HOST}) in ${vercelPath}`,
+  );
   process.exit(1);
 }
 
-const idx = globalEntry.headers.findIndex((h) => h.key === "Content-Security-Policy");
+const idx = cspEntry.headers.findIndex((h) => h.key === "Content-Security-Policy");
 const next = { key: "Content-Security-Policy", value: policy };
 if (idx === -1) {
-  globalEntry.headers.push(next);
+  cspEntry.headers.push(next);
 } else {
-  globalEntry.headers[idx] = next;
+  cspEntry.headers[idx] = next;
 }
 
 const before = readFileSync(vercelPath, "utf8");
