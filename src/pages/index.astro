@@ -70,10 +70,15 @@ const installCommands = {
 
 let LATEST_BUDI_VERSION = "v8.4.0";
 try {
-  const res = await fetch("https://api.github.com/repos/siropkin/budi/releases/latest");
+  const res = await fetch(
+    "https://api.github.com/repos/siropkin/budi/releases/latest",
+    { signal: AbortSignal.timeout(5000) },
+  );
   if (res.ok) {
     const data = await res.json();
-    if (typeof data.tag_name === "string") LATEST_BUDI_VERSION = data.tag_name;
+    if (typeof data.tag_name === "string" && /^v\d+\.\d+\.\d+/.test(data.tag_name)) {
+      LATEST_BUDI_VERSION = data.tag_name;
+    }
   }
 } catch {
   // keep fallback
