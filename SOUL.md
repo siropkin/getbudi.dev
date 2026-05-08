@@ -6,14 +6,14 @@ This repo is the public face, not the product. Keep it small, fast, and static-f
 
 ## Product boundaries
 
-| Domain                     | Repo                                                                    | What lives there                                                                  |
-| -------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `getbudi.dev`              | **this repo** (`siropkin/getbudi.dev`)                                  | Marketing site: hero, features, local-first story, install flow, opt-in cloud CTA |
-| `app.getbudi.dev`          | [`siropkin/budi-cloud`](https://github.com/siropkin/budi-cloud)         | Authenticated cloud dashboard (Next.js + Supabase)                                |
-| Open-source CLI / daemon   | [`siropkin/budi`](https://github.com/siropkin/budi)                     | Rust workspace: transcript-tailing daemon, CLI, core business logic               |
-| Cursor / VS Code extension | [`siropkin/budi-cursor`](https://github.com/siropkin/budi-cursor)       | TypeScript extension targeting VS Code and Cursor (one VSIX, host-aware scope)    |
+| Domain                     | Repo                                                                    | What lives there                                                                                                                          |
+| -------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `getbudi.dev`              | **this repo** (`siropkin/getbudi.dev`)                                  | Marketing site: hero, features, local-first story, install flow, opt-in cloud CTA                                                         |
+| `app.getbudi.dev`          | [`siropkin/budi-cloud`](https://github.com/siropkin/budi-cloud)         | Authenticated cloud dashboard (Next.js + Supabase)                                                                                        |
+| Open-source CLI / daemon   | [`siropkin/budi`](https://github.com/siropkin/budi)                     | Rust workspace: transcript-tailing daemon, CLI, core business logic                                                                       |
+| Cursor / VS Code extension | [`siropkin/budi-cursor`](https://github.com/siropkin/budi-cursor)       | TypeScript extension targeting VS Code and Cursor (one VSIX, host-aware scope)                                                            |
 | JetBrains plugin           | [`siropkin/budi-jetbrains`](https://github.com/siropkin/budi-jetbrains) | Kotlin sibling plugin for IntelliJ-platform IDEs — status-bar widget published to the JetBrains Marketplace Beta channel (`0.0.1-beta.x`) |
-| Homebrew tap               | [`siropkin/homebrew-budi`](https://github.com/siropkin/homebrew-budi)   | `brew install siropkin/budi/budi` formula                                         |
+| Homebrew tap               | [`siropkin/homebrew-budi`](https://github.com/siropkin/homebrew-budi)   | `brew install siropkin/budi/budi` formula                                                                                                 |
 
 Do **not** mix cloud dashboard code, product features, or anything that touches user data into this repo. This is a static marketing surface only.
 
