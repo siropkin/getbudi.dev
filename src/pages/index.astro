@@ -288,53 +288,64 @@ const altInstalls = [
       </p>
     </div>
 
-    <div class="mt-6 sm:mt-8">
-      <OsInstallTabs id="install-hero" commands={installCommands} variant="hero" />
-      <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-        <span>Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.</span>
-        <span>
-          One command. macOS / Linux / Windows. No account needed.
-          <a href="#install" class="link-underline hover:text-fg">Editor wiring →</a>
-        </span>
-      </p>
-    </div>
-
-    <div class="mt-6 flex max-w-3xl flex-wrap items-center gap-3 text-sm sm:mt-8">
-      <a
-        href="https://github.com/siropkin/budi"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="border-line-strong hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors"
-      >
-        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"
-          ></path>
-        </svg>
-        View on GitHub
-      </a>
-      <a href="#teams" class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2">
-        For teams →
-      </a>
-      <a
-        href="#compare"
-        class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
-      >
-        Why not just X? ↓
-      </a>
-    </div>
-
-    <div class="card mt-12 overflow-hidden">
-      <div
-        class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs"
-      >
-        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
-        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
-        <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
-        <span class="ml-3 font-mono">~ budi stats project</span>
+    {
+      /*
+      Mobile/tablet (< lg): show the terminal screenshot first, then install + nav row.
+      Desktop (lg+): keep the original install → nav → terminal order. See issue #100.
+    */
+    }
+    <div class="mt-6 flex flex-col gap-6 sm:mt-8 sm:gap-8">
+      <div class="order-2 lg:order-1">
+        <OsInstallTabs id="install-hero" commands={installCommands} variant="hero" />
+        <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+          <span>Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.</span
+          >
+          <span>
+            One command. macOS / Linux / Windows. No account needed.
+            <a href="#install" class="link-underline hover:text-fg">Editor wiring →</a>
+          </span>
+        </p>
       </div>
-      <pre
-        class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-5 text-[12.5px] leading-[1.55] sm:px-6 sm:py-6 sm:text-[13.5px]"><code>{`Today                                           7d        30d
+
+      <div class="order-3 flex max-w-3xl flex-wrap items-center gap-3 text-sm lg:order-2">
+        <a
+          href="https://github.com/siropkin/budi"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="border-line-strong hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors"
+        >
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"
+            ></path>
+          </svg>
+          View on GitHub
+        </a>
+        <a
+          href="#teams"
+          class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
+        >
+          For teams →
+        </a>
+        <a
+          href="#compare"
+          class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
+        >
+          Why not just X? ↓
+        </a>
+      </div>
+
+      <div class="card order-1 overflow-hidden lg:order-3 lg:mt-4">
+        <div
+          class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs"
+        >
+          <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+          <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+          <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+          <span class="ml-3 font-mono">~ budi stats project</span>
+        </div>
+        <pre
+          class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-5 text-[12.5px] leading-[1.55] sm:px-6 sm:py-6 sm:text-[13.5px]"><code>{`Today                                           7d        30d
 ─────────────────────────────────────────────────────────────────
 $ 4.92 session    🟢 healthy        $ 38.10    $ 162.44
 
@@ -357,6 +368,7 @@ Branch hot list                              cost    ticket
 budi/feat/cloud-ingest                     $  6.91    BUD-214
 acme/web/fix/checkout-retry                $  4.38    WEB-1180
 acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
+      </div>
     </div>
   </section>
 
