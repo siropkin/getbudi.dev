@@ -3,6 +3,7 @@ import Base from "~/layouts/Base.astro";
 import CopyableCommand from "~/components/CopyableCommand.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
 import EditorInstallCards from "~/components/EditorInstallCards.astro";
+import JsonLd from "~/components/JsonLd.astro";
 
 const faqs = [
   {
@@ -242,7 +243,14 @@ const providers = [
     notes:
       "The 8.5.0 breadth round. Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
   },
-];
+].map((p) => ({
+  ...p,
+  // Pre-split the source string at backtick-wrapped fragments so the markup
+  // can render `<code>` segments via auto-escaped templating instead of
+  // injecting raw HTML through `set:html`. Even-index parts are plain text;
+  // odd-index parts (capture groups) become inline code.
+  sourceParts: p.source.split(/`([^`]+)`/g),
+}));
 
 const altInstalls = [
   {
@@ -268,7 +276,7 @@ const altInstalls = [
 ---
 
 <Base>
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(faqJsonLd)} />
+  <JsonLd data={faqJsonLd} />
 
   {/* 1. HERO */}
   <section class="container-readable pt-16 pb-14 sm:pt-24 sm:pb-20">
@@ -578,13 +586,16 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
             <dl class="flex flex-col gap-2 text-sm">
               <div>
                 <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Data source</dt>
-                <dd
-                  class="text-fg-muted leading-relaxed"
-                  set:html={p.source.replace(
-                    /`([^`]+)`/g,
-                    '<code class="bg-surface-3 border-line/70 rounded border px-1 py-0.5 text-[12px]">$1</code>',
-                  )}
-                />
+                <dd class="text-fg-muted leading-relaxed">
+                  {p.sourceParts.map((part, i) => {
+                    if (i % 2 === 0) return part;
+                    return (
+                      <code class="bg-surface-3 border-line/70 rounded border px-1 py-0.5 text-[12px]">
+                        {part}
+                      </code>
+                    );
+                  })}
+                </dd>
               </div>
               <div>
                 <dt class="text-fg-dim mb-0.5 text-xs tracking-wider uppercase">Notes</dt>

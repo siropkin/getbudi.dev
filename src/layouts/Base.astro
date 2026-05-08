@@ -1,6 +1,7 @@
 ---
 import "~/styles/global.css";
 import Analytics from "@vercel/analytics/astro";
+import JsonLd from "~/components/JsonLd.astro";
 
 interface Props {
   title?: string;
@@ -94,7 +95,7 @@ const jsonLd = {
 
     <meta name="theme-color" content="#0b0d10" />
 
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <JsonLd data={jsonLd} />
   </head>
   <body class="antialiased">
     <a

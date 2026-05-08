@@ -1,0 +1,17 @@
+---
+interface Props {
+  data: unknown;
+}
+
+const { data } = Astro.props;
+
+// `JSON.stringify` does not escape `</script>`. Escape angle brackets and
+// ampersand at the seam so a future dynamic field cannot break out of the
+// JSON-LD block, regardless of who edits the data shape later.
+const safe = JSON.stringify(data)
+  .replace(/</g, "\\u003c")
+  .replace(/>/g, "\\u003e")
+  .replace(/&/g, "\\u0026");
+---
+
+<script type="application/ld+json" is:inline set:html={safe} />
