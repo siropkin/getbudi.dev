@@ -7,44 +7,24 @@ import JsonLd from "~/components/JsonLd.astro";
 
 const faqs = [
   {
-    q: "Where does Budi run?",
-    a: "On your machine. A small Rust daemon on port 7878 that watches the transcript files your AI agents already write locally. Nothing sits in your network path.",
-  },
-  {
     q: "What leaves my machine when using Budi?",
-    a: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails.",
+    a: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails. Budi itself is open source (MIT) and free — the optional cloud dashboard at app.getbudi.dev is the only piece you ever pay for.",
   },
   {
-    q: "Why would I turn Budi cloud sync on?",
-    a: "You want your team lead to see one dashboard for the whole team. Otherwise, leave it off.",
-  },
-  {
-    q: "Does budi work in VS Code?",
-    a: "Yes, starting v8.4.0 (May 2026). One extension covers Cursor and VS Code; the host detection picks the right provider scope automatically.",
-  },
-  {
-    q: "Do I need to install both Cursor and VS Code?",
-    a: "No. Use whichever you use day-to-day. A user with both installed sees the right host's data in each editor's status bar.",
+    q: "Does budi work in VS Code, Cursor, and JetBrains?",
+    a: "Yes. One extension covers Cursor and VS Code (v8.4.0+, May 2026); a sibling Kotlin plugin covers JetBrains IDEs via the Marketplace Beta channel. Use whichever editor you use day-to-day — a user with multiple installed sees each host's own data in its status bar.",
   },
   {
     q: "What about GitHub Copilot?",
-    a: "Copilot Chat is supported in 8.4.0, real per-message tokens parsed from VS Code's local session files. GitHub-side dollar reconciliation works for individually-licensed users via the GitHub Billing API; org-managed users see local-tail tokens priced through budi's pricing manifest.",
+    a: "Copilot Chat is supported in 8.4.0 — real per-message tokens parsed from VS Code's local session files. GitHub-side dollar reconciliation works for individually-licensed users via the GitHub Billing API; org-managed users see local-tail tokens priced through budi's pricing manifest.",
   },
   {
     q: "Do I need a GitHub PAT for Copilot Chat?",
-    a: "Optional, but recommended for accuracy. Without a PAT, on May-2026+ VS Code builds you get output-only token dollars — useful as a relative trend, but typically a fraction of the actual bill (Copilot Chat doesn't persist prompt-token counts client-side on these builds). With a PAT scoped to billing, budi reconciles to GitHub's exact dollar number per (date, model) bucket. Org-managed licences see output-only forever (the user-level Billing API endpoint is empty for them).",
+    a: "Optional, but recommended for accuracy. Without a PAT, on May-2026+ VS Code builds you get output-only token dollars — useful as a relative trend, but typically a fraction of the actual bill. With a PAT scoped to billing, budi reconciles to GitHub's exact dollar number per (date, model) bucket. Org-managed licences see output-only forever (the user-level Billing API endpoint is empty for them).",
   },
   {
     q: "What about Continue / Cline / Roo Code / Aider / Gemini CLI?",
     a: "Planned for 8.5.0 (the breadth round). Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
-  },
-  {
-    q: "What about JetBrains?",
-    a: "Beta. A sibling Kotlin plugin lives at siropkin/budi-jetbrains and ships on the JetBrains Marketplace Beta channel — same statusbar / local-tail pattern as the VS Code & Cursor extension. JetBrains-rooted Copilot Chat usage is tracked under the `jetbrains` surface so the cloud dashboard can break costs down by editor host. Promotion to the Stable channel follows once daemon-path detection is confirmed on a non-dev machine.",
-  },
-  {
-    q: "Why local logs and not an API for everything?",
-    a: "Local-log parsing is the primary path because it works offline, doesn't depend on auth tokens, and degrades gracefully when an upstream API breaks. APIs are used only as supplementary reconciliation (Cursor Usage API, GitHub Billing API), never as the only path.",
   },
 ];
 
@@ -544,20 +524,48 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 3b. PROVIDER MATRIX */}
-  <section id="providers" class="container-readable border-line/70 border-t py-14 sm:py-20">
-    <header class="mb-10 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What budi tracks</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        Provider matrix, with the caveats spelled out.
-      </h2>
-      <p class="text-fg-muted mt-3">
-        Local-log parsing is the primary path for every provider. APIs (Cursor Usage, GitHub
-        Billing) are supplementary truth-up, never the only signal — so attribution keeps working
-        offline, without auth tokens, and when an upstream API breaks.
-      </p>
-    </header>
+  <section
+    id="providers"
+    class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20"
+  >
+    <details class="group">
+      <summary
+        class="flex cursor-pointer list-none flex-col gap-3 marker:hidden [&::-webkit-details-marker]:hidden"
+      >
+        <p class="text-fg-dim text-xs tracking-[0.18em] uppercase">What budi tracks</p>
+        <div class="flex max-w-2xl items-start justify-between gap-4">
+          <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Provider coverage, with the caveats spelled out.
+          </h2>
+          <span
+            class="text-fg-muted group-hover:text-fg group-open:text-fg mt-1 inline-flex shrink-0 items-center gap-1.5 text-sm transition-colors"
+          >
+            <span class="group-open:hidden">See coverage</span>
+            <span class="hidden group-open:inline">Hide</span>
+            <svg
+              aria-hidden="true"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="transition-transform group-open:rotate-90"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </span>
+        </div>
+        <p class="text-fg-muted max-w-2xl">
+          Local-log parsing is the primary path for every provider. APIs (Cursor Usage, GitHub
+          Billing) are supplementary truth-up, never the only signal — so attribution keeps working
+          offline, without auth tokens, and when an upstream API breaks.
+        </p>
+      </summary>
 
-    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="mt-10 grid gap-4 sm:grid-cols-2">
       {
         providers.map((p) => (
           <article
@@ -651,12 +659,13 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         ))
     }
 
-    <p class="text-fg-dim mt-6 text-xs leading-relaxed">
-      Org-managed Copilot licences see local-tail tokens × pricing-manifest dollars only — the
-      GitHub-side reconciliation that individually-licensed users get is unavailable because the
-      user-level Billing API endpoint is empty for org-managed seats. Local-tail still produces real
-      tokens; the truth-up is the missing piece for that subset.
-    </p>
+      <p class="text-fg-dim mt-6 text-xs leading-relaxed">
+        Org-managed Copilot licences see local-tail tokens × pricing-manifest dollars only — the
+        GitHub-side reconciliation that individually-licensed users get is unavailable because the
+        user-level Billing API endpoint is empty for org-managed seats. Local-tail still produces
+        real tokens; the truth-up is the missing piece for that subset.
+      </p>
+    </details>
   </section>
 
   {/* 4. COMPARE */}
@@ -856,56 +865,31 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     </details>
   </section>
 
-  {/* 7. FOR TEAMS */}
-  <section id="teams" class="container-readable border-line/70 border-t py-14 sm:py-20">
-    <header class="mb-8 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">For teams (opt-in)</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        One dashboard for the team. No prompts, no code, no surprises.
-      </h2>
-      <p class="text-fg-muted mt-3">
-        The cloud dashboard at <a
-          href="https://app.getbudi.dev"
-          class="link-underline hover:text-fg"
-          target="_blank"
-          rel="noopener noreferrer">app.getbudi.dev</a
-        > gives team leads daily cost per user, repo, model, branch, and ticket — without reading anyone's
-        prompts or source code.
-      </p>
-    </header>
-
-    <div class="grid gap-4 md:grid-cols-2">
-      <div class="card p-5 sm:p-6">
-        <h3 class="text-fg mb-2 font-semibold">What the manager sees</h3>
-        <ul class="text-fg-muted list-disc space-y-1.5 pl-5 text-sm">
-          <li>Daily cost per user, repo, model, branch, ticket</li>
-          <li>
-            Rolling <code class="text-xs">1d</code> / <code class="text-xs">7d</code> /
-            <code class="text-xs">30d</code> windows
-          </li>
-          <li>Sync-freshness badge and session summaries</li>
-          <li>Manager / member roles for small teams (1–20 devs)</li>
-        </ul>
+  {/* 7. FOR TEAMS — compact callout */}
+  <section id="teams" class="container-readable border-line/70 scroll-mt-24 border-t py-10 sm:py-14">
+    <div class="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div class="max-w-2xl">
+        <p class="text-fg-dim mb-1 text-xs tracking-[0.18em] uppercase">For teams (opt-in)</p>
+        <h2 class="text-fg text-lg font-semibold tracking-tight sm:text-xl">
+          One dashboard for the team — aggregates only, no prompts or code.
+        </h2>
+        <p class="text-fg-muted mt-2 text-sm leading-relaxed">
+          Daily cost per user, repo, model, branch, and ticket at <a
+            href="https://app.getbudi.dev"
+            class="link-underline hover:text-fg"
+            target="_blank"
+            rel="noopener noreferrer">app.getbudi.dev</a
+          >. <a href="#privacy" class="link-underline hover:text-fg">Privacy contract</a>
+          spells out exactly what does and doesn't leave your machine.
+        </p>
       </div>
-      <div class="card p-5 sm:p-6">
-        <h3 class="text-fg mb-2 font-semibold">What the cloud never sees</h3>
-        <ul class="text-fg-muted list-disc space-y-1.5 pl-5 text-sm">
-          <li>Prompts and AI responses</li>
-          <li>Source code or file contents</li>
-          <li>File paths and email addresses</li>
-          <li>Raw payloads or tag values</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="mt-6 flex flex-wrap items-center gap-3 text-sm">
       <a
         href="https://app.getbudi.dev"
         target="_blank"
         rel="noopener noreferrer"
-        class="bg-accent inline-flex items-center gap-2 rounded-lg px-4 py-2 font-semibold text-black transition-opacity hover:opacity-90"
+        class="bg-accent inline-flex shrink-0 items-center gap-2 self-start rounded-lg px-4 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90 sm:self-auto"
       >
-        Sign up at app.getbudi.dev
+        Sign up
         <svg
           aria-hidden="true"
           width="14"
@@ -920,12 +904,6 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
           <line x1="7" y1="17" x2="17" y2="7"></line>
           <polyline points="7 7 17 7 17 17"></polyline>
         </svg>
-      </a>
-      <a
-        href="#privacy"
-        class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-2 py-2"
-      >
-        Read the privacy contract →
       </a>
     </div>
   </section>
