@@ -13,6 +13,7 @@ const editors = [
     id: "vscode",
     name: "VS Code",
     note: "From the VS Code Marketplace",
+    versionLabel: version,
     command: "code --install-extension siropkin.budi",
     storeName: "VS Code Marketplace",
     storeUrl: "https://marketplace.visualstudio.com/items?itemName=siropkin.budi",
@@ -21,14 +22,25 @@ const editors = [
     id: "cursor",
     name: "Cursor",
     note: "From Open VSX — recommended for Cursor",
+    versionLabel: version,
     command: "cursor --install-extension siropkin.budi",
     storeName: "Open VSX",
     storeUrl: "https://open-vsx.org/extension/siropkin/budi",
   },
+  {
+    id: "jetbrains",
+    name: "JetBrains IDEs",
+    note: "JetBrains Marketplace · Beta channel",
+    versionLabel: "v0.0.1-beta.x",
+    command:
+      "Settings → Plugins → ⚙ → Manage Plugin Repositories… → add https://plugins.jetbrains.com/plugins/beta/list, then search for budi",
+    storeName: "JetBrains Marketplace",
+    storeUrl: "https://plugins.jetbrains.com/search?search=budi",
+  },
 ] as const;
 ---
 
-<div class="grid gap-4 md:grid-cols-2">
+<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
   {
     editors.map((ed) => (
       <article class="card flex min-w-0 flex-col gap-3 p-5 sm:p-6">
@@ -37,7 +49,7 @@ const editors = [
             <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="#0098FF">
               <path d="M23.15 2.587 17.85.054a1.575 1.575 0 0 0-1.795.299L.792 14.479A1.05 1.05 0 0 0 .806 16l1.428 1.298a1.05 1.05 0 0 0 1.342.064L21.812 3.532a.7.7 0 0 1 1.116.553v.066L1.378 19.51a1.05 1.05 0 0 0-.572.882c-.014.318.13.62.388.808l1.428 1.299c.357.286.853.342 1.27.143l16.85-8.137a1.575 1.575 0 0 0 .894-1.42V4.044a1.575 1.575 0 0 0-.087-.486 1.575 1.575 0 0 0-.6-.971Z" />
             </svg>
-          ) : (
+          ) : ed.id === "cursor" ? (
             <svg
               aria-hidden="true"
               width="22"
@@ -48,16 +60,31 @@ const editors = [
             >
               <path d="M11.925.024 2.483 5.477v10.91l9.45 5.453 9.45-5.453V5.477L11.925.024Zm-.058 1.96 7.642 4.41-7.642 4.41-7.642-4.41 7.642-4.41Zm-8.4 5.7 7.85 4.532v9.066l-7.85-4.532V7.683Zm16.8 0v9.066l-7.85 4.532v-9.066l7.85-4.532Z" />
             </svg>
+          ) : (
+            <svg
+              aria-hidden="true"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="text-fg"
+            >
+              <path d="M3 3h18v18H3V3Zm2 2v14h14V5H5Zm3.5 2.5h2v6.25c0 .55-.2 1-.6 1.35-.4.35-.95.5-1.65.5-.6 0-1.1-.13-1.5-.4l.45-1.4c.3.18.6.27.9.27.36 0 .55-.2.55-.6V7.5h-.15Zm5 0h4v1.4h-2.5v1.6h2.3v1.4h-2.3v1.7H17v1.4h-3.5V7.5Z" />
+            </svg>
           )}
           <div class="flex min-w-0 flex-col">
             <h3 class="text-fg leading-tight font-semibold tracking-tight">{ed.name}</h3>
             <p class="text-fg-dim text-xs leading-snug">
-              {ed.note} · <code class="text-fg-muted text-[11px]">{version}</code>
+              {ed.note} · <code class="text-fg-muted text-[11px]">{ed.versionLabel}</code>
             </p>
           </div>
         </header>
 
-        <CopyableCommand command={ed.command} variant="compact" />
+        {ed.id === "jetbrains" ? (
+          <p class="text-fg-muted text-xs leading-relaxed">{ed.command}</p>
+        ) : (
+          <CopyableCommand command={ed.command} variant="compact" />
+        )}
 
         <a
           href={ed.storeUrl}

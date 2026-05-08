@@ -40,7 +40,7 @@ const faqs = [
   },
   {
     q: "What about JetBrains?",
-    a: "Early-stage. A sibling Kotlin plugin lives at siropkin/budi-jetbrains and is not shipped to the JetBrains Marketplace yet — same statusbar / local-tail pattern as the VS Code & Cursor extension when it lands. Track the repo for the first release.",
+    a: "Beta. A sibling Kotlin plugin lives at siropkin/budi-jetbrains and ships on the JetBrains Marketplace Beta channel — same statusbar / local-tail pattern as the VS Code & Cursor extension. JetBrains-rooted Copilot Chat usage is tracked under the `jetbrains` surface so the cloud dashboard can break costs down by editor host. Promotion to the Stable channel follows once daemon-path detection is confirmed on a non-dev machine.",
   },
   {
     q: "Why local logs and not an API for everything?",
@@ -69,7 +69,7 @@ const installCommands = {
     "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init; budi integrations install",
 };
 
-let LATEST_BUDI_VERSION = "v8.4.1";
+let LATEST_BUDI_VERSION = "v8.4.2";
 try {
   const res = await fetch("https://api.github.com/repos/siropkin/budi/releases/latest", {
     signal: AbortSignal.timeout(5000),
@@ -98,7 +98,7 @@ const features = [
   },
   {
     title: "Live status line",
-    body: "Rolling 1d / 7d / 30d cost in Claude Code, Cursor, and VS Code — scoped per host. The Cursor line shows Cursor spend only; the VS Code line shows Copilot Chat spend only.",
+    body: "Rolling 1d / 7d / 30d cost in Claude Code, Cursor, VS Code, and JetBrains IDEs — scoped per host. The Cursor line shows Cursor spend only; the VS Code and JetBrains lines show their own Copilot Chat spend only.",
     foot: "_projects/budi · main · budi · $3.47 session · $0.06 message",
   },
   {
@@ -294,10 +294,10 @@ const altInstalls = [
       </h1>
 
       <p class="text-fg-muted text-lg leading-relaxed text-pretty sm:text-xl">
-        AI coding cost tracking for Cursor and VS Code — starting with Cursor and GitHub Copilot
-        Chat, plus Claude Code, Codex, and Copilot CLI. A small Rust daemon reads the transcripts
-        your tools already write to disk. Cost by repo, branch, and ticket. Nothing in your network
-        path — prompts never leave your machine.
+        AI coding cost tracking for Cursor, VS Code, and JetBrains IDEs — starting with Cursor and
+        GitHub Copilot Chat, plus Claude Code, Codex, and Copilot CLI. A small Rust daemon reads the
+        transcripts your tools already write to disk. Cost by repo, branch, and ticket. Nothing in
+        your network path — prompts never leave your machine.
       </p>
     </div>
 
@@ -816,8 +816,10 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     <div id="editor-extension" class="mt-12 scroll-mt-24">
       <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Editor extension.</h3>
       <p class="text-fg-muted mb-6 text-sm">
-        Adds the budi status bar to VS Code or Cursor. <code class="text-xs">budi init</code> offers this
-        automatically, but if you want to install it on its own, pick your editor:
+        Adds the budi status bar to VS Code, Cursor, or a JetBrains IDE. <code class="text-xs"
+          >budi init</code
+        > offers VS Code / Cursor automatically; the JetBrains plugin currently ships on the Marketplace
+        Beta channel and is installed from inside the IDE. Pick your editor:
       </p>
       <EditorInstallCards version={LATEST_CURSOR_EXTENSION_VERSION} />
     </div>
