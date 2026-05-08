@@ -45,9 +45,10 @@ public/
 scripts/
   generate-assets.mjs        # one-shot PNG/OG generator (resvg + cached fonts)
   audit-build.mjs            # post-build SEO / anchor / icon audit, runs after every `astro build`
+  generate-csp.mjs           # post-build CSP generator: hashes inline <script> blocks in dist/ and writes the Content-Security-Policy header into vercel.json
   fonts/                     # downloaded on first run and cached here (gitignored); Inter + JetBrains Mono TTFs used by the OG generator
 astro.config.mjs             # sitemap (404 filtered) + tailwindcss vite plugin + static output
-vercel.json                  # static output, security headers, HTML short-TTL, long-lived /_astro + image caches
+vercel.json                  # static output, security headers (HSTS + CSP + frame/perm/referrer), HTML short-TTL, long-lived /_astro + image caches
 lychee.toml                  # external-link health-check config (CI only)
 lighthouserc.{desktop,mobile}.json  # Lighthouse CI budgets enforced against Vercel preview deploys
 ```
@@ -63,6 +64,7 @@ npm run check            # astro check (TS + template diagnostics)
 npm run format           # prettier --write .
 npm run format:check     # prettier --check . (what CI runs)
 npm run audit            # re-run the post-build audit against an existing dist/
+npm run csp              # re-run the CSP hash generator against an existing dist/
 npm run generate-assets  # regenerate public/og.png + icon PNGs (see scripts/generate-assets.mjs)
 ```
 

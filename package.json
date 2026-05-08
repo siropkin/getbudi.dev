@@ -7,11 +7,12 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && npm run audit",
+    "build": "astro build && npm run audit && npm run csp",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
     "audit": "node scripts/audit-build.mjs dist",
+    "csp": "node scripts/generate-csp.mjs dist",
     "generate-assets": "node scripts/generate-assets.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
