@@ -62,11 +62,11 @@ const faqJsonLd = {
 };
 
 const installCommands = {
-  macos: "brew install siropkin/budi/budi && budi init && budi integrations install",
+  macos: "brew install siropkin/budi/budi && budi init",
   linux:
-    "curl -fsSL https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.sh | bash && budi init && budi integrations install",
+    "curl -fsSL https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.sh | bash && budi init",
   windows:
-    "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init; budi integrations install",
+    "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init",
 };
 
 let LATEST_BUDI_VERSION = "v8.4.2";
@@ -158,22 +158,22 @@ const firstRunSteps = [
   {
     n: "1",
     cmd: "budi init",
-    body: "Starts the daemon on port 7878, installs the platform-native autostart service, and wires the Claude Code statusline.",
+    body: "Starts the daemon on port 7878 and installs the platform-native autostart service. The hero install runs this for you — listed here so you know what just happened.",
   },
   {
     n: "2",
+    cmd: "budi integrations install",
+    body: "Wires the Claude Code statusline and offers the VS Code / Cursor extension if either editor is detected. Restart Claude Code afterwards so it picks up the new statusLine command.",
+  },
+  {
+    n: "3",
     cmd: "budi doctor",
     body: 'End-to-end verifier: daemon, tailers, schema, transcript visibility, and attribution health. When "All checks passed." you are done.',
   },
   {
-    n: "3",
+    n: "4",
     cmd: "budi status",
     body: "Today-cost snapshot: daemon state and today's spend. For the full breakdown, use budi stats projects / branches / tickets.",
-  },
-  {
-    n: "4",
-    cmd: "budi db import   # optional",
-    body: "One-time backfill from Claude Code, Codex, Copilot, and Cursor. Skip if you only want live tracking going forward.",
   },
 ];
 
@@ -289,15 +289,14 @@ const altInstalls = [
       <h1
         class="text-[2.25rem] leading-[1.05] font-semibold tracking-tight text-balance sm:text-[3.25rem]"
       >
-        See where your AI coding money
-        <span class="text-accent">actually goes.</span>
+        Local-first cost tracker for
+        <span class="text-accent">AI coding agents.</span>
       </h1>
 
       <p class="text-fg-muted text-lg leading-relaxed text-pretty sm:text-xl">
-        AI coding cost tracking for Cursor, VS Code, and JetBrains IDEs — starting with Cursor and
-        GitHub Copilot Chat, plus Claude Code, Codex, and Copilot CLI. A small Rust daemon reads the
-        transcripts your tools already write to disk. Cost by repo, branch, and ticket. Nothing in
-        your network path — prompts never leave your machine.
+        Cursor, Claude Code, Codex, and Copilot Chat — tracked by tailing the transcripts each tool
+        already writes to disk. Cost by repo, branch, and ticket. Nothing in your network path —
+        prompts never leave your machine.
       </p>
     </div>
 
@@ -305,7 +304,10 @@ const altInstalls = [
       <OsInstallTabs id="install-hero" commands={installCommands} variant="hero" />
       <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
         <span>Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.</span>
-        <span>One command. macOS / Linux / Windows. No account needed.</span>
+        <span>
+          One command. macOS / Linux / Windows. No account needed.
+          <a href="#install" class="link-underline hover:text-fg">Editor wiring →</a>
+        </span>
       </p>
     </div>
 
@@ -761,15 +763,11 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Install</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        One paste. <code class="text-accent">budi init</code>, then
-        <code class="text-accent">budi integrations install</code>.
+        One paste, then four steps to verify.
       </h2>
       <p class="text-fg-muted mt-3">
-        <code>budi init</code> starts the daemon and installs the autostart service.
-        <code>budi integrations install</code> wires the Claude Code statusline and offers the VS Code
-        / Cursor extension if either editor is detected.
-        <strong class="text-fg">Restart Claude Code afterwards</strong> so it picks up the new
-        <code class="text-xs">statusLine</code> command.
+        The command below installs budi and runs <code>budi init</code> — the daemon is up and the autostart
+        service is wired. Editor statusline + extension wiring is the second step in the checklist below.
       </p>
     </header>
 
