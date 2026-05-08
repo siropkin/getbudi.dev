@@ -603,34 +603,51 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
               </div>
             </dl>
             {p.breakdown && (
-              <div class="border-line/70 mt-1 flex flex-col gap-2 border-t pt-3">
-                <p class="text-fg-dim text-xs tracking-wider uppercase">
-                  Cost accuracy by sub-state
-                </p>
-                {p.breakdown.map((b) => (
-                  <div class="bg-surface-3 border-line/70 flex flex-col gap-1 rounded-md border p-3">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                      <p class="text-fg text-sm font-medium">{b.label}</p>
-                      <span
-                        class:list={[
-                          "rounded-full border px-2 py-0.5 font-mono text-[11px]",
-                          b.confidenceKind === "exact"
-                            ? "border-accent text-accent"
-                            : "border-warn text-warn",
-                        ]}
-                      >
-                        {b.confidence}
-                      </span>
-                    </div>
-                    <p class="text-fg-muted text-xs leading-relaxed">{b.body}</p>
-                  </div>
-                ))}
-              </div>
+              <p class="text-fg-dim text-xs leading-relaxed">
+                Cost accuracy by sub-state — see breakdown below the matrix.
+              </p>
             )}
           </article>
         ))
       }
     </div>
+
+    {
+      providers
+        .filter((p) => p.breakdown)
+        .map((p) => (
+          <div class="card mt-4 flex flex-col gap-3 p-5 sm:p-6">
+            <header class="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 class="text-fg font-semibold tracking-tight">
+                {p.name} — cost accuracy by sub-state
+              </h3>
+              <p class="text-fg-dim text-xs">
+                Three sub-states determine how close the dollar number gets to the actual bill.
+              </p>
+            </header>
+            <div class="grid gap-3 sm:grid-cols-3">
+              {p.breakdown!.map((b) => (
+                <div class="bg-surface-3 border-line/70 flex flex-col gap-1 rounded-md border p-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p class="text-fg text-sm font-medium">{b.label}</p>
+                    <span
+                      class:list={[
+                        "rounded-full border px-2 py-0.5 font-mono text-[11px]",
+                        b.confidenceKind === "exact"
+                          ? "border-accent text-accent"
+                          : "border-warn text-warn",
+                      ]}
+                    >
+                      {b.confidence}
+                    </span>
+                  </div>
+                  <p class="text-fg-muted text-xs leading-relaxed">{b.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+    }
 
     <p class="text-fg-dim mt-6 text-xs leading-relaxed">
       Org-managed Copilot licences see local-tail tokens × pricing-manifest dollars only — the
