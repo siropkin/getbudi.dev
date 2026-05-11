@@ -12,6 +12,15 @@ brew install siropkin/budi/budi && budi init && budi integrations install
 
 Other install methods and the full first-run checklist live on the site.
 
+## Ecosystem
+
+- [`siropkin/budi`](https://github.com/siropkin/budi) — Rust daemon + CLI (the product itself)
+- [`siropkin/budi-cursor`](https://github.com/siropkin/budi-cursor) — VS Code / Cursor extension
+- [`siropkin/budi-jetbrains`](https://github.com/siropkin/budi-jetbrains) — JetBrains IDE plugin
+- [`siropkin/budi-cloud`](https://github.com/siropkin/budi-cloud) — Cloud dashboard at `app.getbudi.dev`
+- [`siropkin/homebrew-budi`](https://github.com/siropkin/homebrew-budi) — Homebrew tap
+- [`siropkin/getbudi.dev`](https://github.com/siropkin/getbudi.dev) ← you are here
+
 ## Stack
 
 Astro 5 + Tailwind CSS v4, fully static output, deployed on Vercel.
