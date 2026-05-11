@@ -88,21 +88,6 @@ const features = [
   },
 ];
 
-const numbers = [
-  {
-    figure: "$6,154",
-    body: "in a single month on AI coding agents — across one developer, multiple subscriptions and pay-as-you-go bills.",
-  },
-  {
-    figure: "136K",
-    body: "messages over that month. The provider dashboards showed a total. They did not show which repo, branch, or ticket.",
-  },
-  {
-    figure: "5,508",
-    body: "Haiku calls that nobody asked for. Cheap individually, real money in aggregate. Invisible until something started counting.",
-  },
-];
-
 const alternatives = [
   {
     name: "Provider dashboards",
@@ -373,33 +358,6 @@ budi/feat/cloud-ingest                     $  6.91    BUD-214
 acme/web/fix/checkout-retry                $  4.38    WEB-1180
 acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </div>
-    </div>
-  </section>
-
-  {/* 2. THE PROBLEM */}
-  <section id="how" class="container-readable border-line/70 border-t py-14 sm:py-20">
-    <header class="mb-10 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">The problem</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">You are not imagining it.</h2>
-      <p class="text-fg-muted mt-3">
-        Active solo developers typically see <strong class="text-fg">$120 – $800 / month</strong> across
-        AI coding providers. A heavy month can run an order of magnitude higher. The numbers below are
-        from one such month — one developer, multiple agents, and zero per-repo visibility from the upstream
-        dashboards.
-      </p>
-    </header>
-
-    <div class="grid gap-4 sm:grid-cols-3">
-      {
-        numbers.map((n) => (
-          <div class="card p-5 sm:p-6">
-            <div class="text-accent mb-2 font-mono text-[1.7rem] font-semibold sm:text-3xl">
-              {n.figure}
-            </div>
-            <p class="text-fg-muted text-sm leading-relaxed">{n.body}</p>
-          </div>
-        ))
-      }
     </div>
   </section>
 
