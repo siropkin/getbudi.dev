@@ -1,19 +1,10 @@
 ---
 import CopyableCommand from "./CopyableCommand.astro";
 
-interface Props {
-  /** Extension version label, shown under each editor name. */
-  version: string;
-}
-
-const { version } = Astro.props;
-
 const editors = [
   {
     id: "vscode",
     name: "VS Code",
-    note: "From the VS Code Marketplace",
-    versionLabel: version,
     command: "code --install-extension siropkin.budi",
     storeName: "VS Code Marketplace",
     storeUrl: "https://marketplace.visualstudio.com/items?itemName=siropkin.budi",
@@ -21,8 +12,6 @@ const editors = [
   {
     id: "cursor",
     name: "Cursor",
-    note: "From Open VSX — recommended for Cursor",
-    versionLabel: version,
     command: "cursor --install-extension siropkin.budi",
     storeName: "Open VSX",
     storeUrl: "https://open-vsx.org/extension/siropkin/budi",
@@ -30,8 +19,6 @@ const editors = [
   {
     id: "jetbrains",
     name: "JetBrains IDEs",
-    note: "From the JetBrains Marketplace",
-    versionLabel: "v0.0.1-beta.x",
     command: "Settings → Plugins → Marketplace → search for budi",
     storeName: "JetBrains Marketplace",
     storeUrl: "https://plugins.jetbrains.com/plugin/31662-budi",
@@ -78,19 +65,8 @@ const editors = [
               <path d="M2.345 23.997A2.347 2.347 0 0 1 0 21.652V10.988C0 9.665.535 8.37 1.473 7.433l5.965-5.961A5.01 5.01 0 0 1 10.989 0h10.666A2.347 2.347 0 0 1 24 2.345v10.664a5.056 5.056 0 0 1-1.473 3.554l-5.965 5.965A5.017 5.017 0 0 1 13.007 24v-.003H2.345Zm8.969-6.854H5.486v1.371h5.828v-1.371ZM3.963 6.514h13.523v13.519l4.257-4.257a3.936 3.936 0 0 0 1.146-2.767V2.345c0-.678-.552-1.234-1.234-1.234H10.989a3.897 3.897 0 0 0-2.767 1.145L3.963 6.514Zm-.192.192L2.256 8.22a3.944 3.944 0 0 0-1.145 2.768v10.664c0 .678.552 1.234 1.234 1.234h10.666a3.9 3.9 0 0 0 2.767-1.146l1.512-1.511H3.771V6.706Z" />
             </svg>
           )}
-          <div class="flex min-w-0 flex-col">
-            <h3 class="text-fg leading-tight font-semibold tracking-tight">{ed.name}</h3>
-            <p class="text-fg-dim text-xs leading-snug">
-              {ed.note} · <code class="text-fg-muted text-[11px]">{ed.versionLabel}</code>
-            </p>
-          </div>
+          <h3 class="text-fg min-w-0 leading-tight font-semibold tracking-tight">{ed.name}</h3>
         </header>
-
-        {ed.id === "jetbrains" ? (
-          <p class="text-fg-muted text-xs leading-relaxed">{ed.command}</p>
-        ) : (
-          <CopyableCommand command={ed.command} variant="compact" />
-        )}
 
         <a
           href={ed.storeUrl}
@@ -100,6 +76,12 @@ const editors = [
         >
           View on {ed.storeName} →
         </a>
+
+        {ed.id === "jetbrains" ? (
+          <p class="text-fg-muted text-xs leading-relaxed">{ed.command}</p>
+        ) : (
+          <CopyableCommand command={ed.command} variant="compact" />
+        )}
       </article>
     ))
   }
