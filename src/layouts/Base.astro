@@ -122,6 +122,32 @@ const jsonLd = {
           <a href="/#privacy" class="hover:text-fg hidden sm:inline">Privacy</a>
           <a href="/#teams" class="hover:text-fg hidden md:inline">For teams</a>
           <a href="/#faq" class="hover:text-fg hidden md:inline">FAQ</a>
+          <details class="relative sm:hidden">
+            <summary
+              class="hover:text-fg flex cursor-pointer list-none items-center gap-1"
+              aria-label="Open sections menu"
+            >
+              Sections
+              <svg
+                aria-hidden="true"
+                width="10"
+                height="10"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+              >
+                <path d="M2 4l4 4 4-4z"></path>
+              </svg>
+            </summary>
+            <div
+              class="border-line/70 bg-surface-2 absolute right-0 top-full z-20 mt-2 flex min-w-[160px] flex-col gap-2 rounded-md border p-3 shadow-lg"
+            >
+              <a href="/#providers" class="hover:text-fg">Providers</a>
+              <a href="/#compare" class="hover:text-fg">Compare</a>
+              <a href="/#privacy" class="hover:text-fg">Privacy</a>
+              <a href="/#teams" class="hover:text-fg">For teams</a>
+              <a href="/#faq" class="hover:text-fg">FAQ</a>
+            </div>
+          </details>
           <a
             href="https://github.com/siropkin/budi"
             class="hover:text-fg flex items-center gap-1.5"
