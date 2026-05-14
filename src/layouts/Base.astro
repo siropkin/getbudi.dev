@@ -2,6 +2,7 @@
 import "~/styles/global.css";
 import Analytics from "@vercel/analytics/astro";
 import JsonLd from "~/components/JsonLd.astro";
+import { ANCHORS, anchorHref, siteAnchorHref } from "~/lib/anchors";
 
 interface Props {
   title?: string;
@@ -99,7 +100,7 @@ const jsonLd = {
   </head>
   <body class="antialiased">
     <a
-      href="#main"
+      href={anchorHref(ANCHORS.main)}
       class="focus:bg-accent sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:px-3 focus:py-2 focus:text-black"
     >
       Skip to content
@@ -116,12 +117,20 @@ const jsonLd = {
           <span class="text-fg-dim text-xs font-normal">/ getbudi.dev</span>
         </a>
         <nav class="text-fg-muted flex items-center gap-5 text-sm">
-          <a href="/#install" class="hover:text-fg">Install</a>
-          <a href="/#providers" class="hover:text-fg hidden md:inline">Providers</a>
-          <a href="/#compare" class="hover:text-fg hidden sm:inline">Compare</a>
-          <a href="/#privacy" class="hover:text-fg hidden sm:inline">Privacy</a>
-          <a href="/#teams" class="hover:text-fg hidden md:inline">For teams</a>
-          <a href="/#faq" class="hover:text-fg hidden md:inline">FAQ</a>
+          <a href={siteAnchorHref(ANCHORS.install)} class="hover:text-fg">Install</a>
+          <a href={siteAnchorHref(ANCHORS.providers)} class="hover:text-fg hidden md:inline"
+            >Providers</a
+          >
+          <a href={siteAnchorHref(ANCHORS.compare)} class="hover:text-fg hidden sm:inline"
+            >Compare</a
+          >
+          <a href={siteAnchorHref(ANCHORS.privacy)} class="hover:text-fg hidden sm:inline"
+            >Privacy</a
+          >
+          <a href={siteAnchorHref(ANCHORS.teams)} class="hover:text-fg hidden md:inline"
+            >For teams</a
+          >
+          <a href={siteAnchorHref(ANCHORS.faq)} class="hover:text-fg hidden md:inline">FAQ</a>
           <details class="relative sm:hidden">
             <summary
               class="hover:text-fg flex cursor-pointer list-none items-center gap-1"
@@ -141,11 +150,11 @@ const jsonLd = {
             <div
               class="border-line/70 bg-surface-2 absolute top-full right-0 z-20 mt-2 flex min-w-[160px] flex-col gap-2 rounded-md border p-3 shadow-lg"
             >
-              <a href="/#providers" class="hover:text-fg">Providers</a>
-              <a href="/#compare" class="hover:text-fg">Compare</a>
-              <a href="/#privacy" class="hover:text-fg">Privacy</a>
-              <a href="/#teams" class="hover:text-fg">For teams</a>
-              <a href="/#faq" class="hover:text-fg">FAQ</a>
+              <a href={siteAnchorHref(ANCHORS.providers)} class="hover:text-fg">Providers</a>
+              <a href={siteAnchorHref(ANCHORS.compare)} class="hover:text-fg">Compare</a>
+              <a href={siteAnchorHref(ANCHORS.privacy)} class="hover:text-fg">Privacy</a>
+              <a href={siteAnchorHref(ANCHORS.teams)} class="hover:text-fg">For teams</a>
+              <a href={siteAnchorHref(ANCHORS.faq)} class="hover:text-fg">FAQ</a>
             </div>
           </details>
           <a
@@ -166,7 +175,7 @@ const jsonLd = {
       </div>
     </header>
 
-    <main id="main">
+    <main id={ANCHORS.main}>
       <slot />
     </main>
 
@@ -276,7 +285,7 @@ const jsonLd = {
           <span>© {new Date().getFullYear()} budi contributors. Public alpha.</span>
           <span>
             Built static.{" "}
-            <a href="/#analytics" class="link-underline hover:text-fg"
+            <a href={siteAnchorHref(ANCHORS.analytics)} class="link-underline hover:text-fg"
               >Privacy-friendly analytics via Vercel</a
             >. Source on{" "}
             <a

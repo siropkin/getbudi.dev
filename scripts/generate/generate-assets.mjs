@@ -14,7 +14,7 @@
  *   - public/apple-touch-icon.png  180×180 (rendered from favicon.svg)
  *   - public/icon-192.png       192×192  (rendered from favicon.svg)
  *   - public/icon-512.png       512×512  (rendered from favicon.svg)
- *   - scripts/fonts/*.ttf       cached Inter + JetBrains Mono TTFs
+ *   - scripts/generate/fonts/*.ttf  cached Inter + JetBrains Mono TTFs
  *                               (gitignored; first-run download from
  *                               cdn.jsdelivr.net)
  *
@@ -29,11 +29,11 @@
  * REPRODUCE A FAILURE LOCALLY
  *   1. `npm run generate-assets`
  *   2. On font-fetch failure, confirm access to cdn.jsdelivr.net; the
- *      cache is in scripts/fonts/ — delete a file there if it is
- *      corrupt or zero-byte.
+ *      cache is in scripts/generate/fonts/ — delete a file there if it
+ *      is corrupt or zero-byte.
  *   3. After regenerating, commit the resulting public/*.png changes.
- *      `scripts/audit-build.mjs` enforces minimum icon dimensions and
- *      OG asset existence, so a bad regenerate will fail the next
+ *      `scripts/build/audit-build.mjs` enforces minimum icon dimensions
+ *      and OG asset existence, so a bad regenerate will fail the next
  *      `npm run build`.
  *
  * Why standalone and not the Astro pipeline:
@@ -50,7 +50,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fontsDir = resolve(__dirname, "fonts");
-const pubDir = resolve(__dirname, "..", "public");
+const pubDir = resolve(__dirname, "..", "..", "public");
 mkdirSync(fontsDir, { recursive: true });
 
 const FONT_SOURCES = {

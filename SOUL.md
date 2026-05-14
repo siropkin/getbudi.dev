@@ -35,7 +35,10 @@ src/
     OsInstallTabs.astro      # macOS / Linux / Windows install tabs; SSR default macOS, upgrades to the visitor's OS via a tiny inline script. Wraps CopyableCommand
     EditorInstallCards.astro # VS Code / Cursor / JetBrains install cards (logo + name → marketplace link → command — simplified in #121)
     JsonLd.astro             # escapes and emits a single <script type="application/ld+json"> block — used by Base.astro (SoftwareApplication) and index.astro (FAQPage)
-    Diagram.astro            # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript (currently unused — kept for reference; fate decided in #128)
+    _unused/                 # components kept for reference but NOT imported by any page (see _unused/README.md; final fate decided in #128)
+      Diagram.astro          # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript
+  lib/
+    anchors.ts               # single source of truth for in-page section anchor IDs — imported by Base.astro (header nav, mobile-nav disclosure #119) and index.astro (section ids + cross-section links) so the audit-build invariant (#8 "every <a href='#X'> has a matching id") cannot drift via grep
   pages/
     index.astro              # landing page: hero → features → providers → compare → privacy → install → teams → FAQ (see "Pages" below for what each section ships)
     404.astro                # static "not found" page, noindex, linked back to /
@@ -44,13 +47,16 @@ public/
   favicon.svg                # SVG favicon, source of truth for icon generation
   apple-touch-icon.png       # 180×180 (generated from favicon.svg)
   icon-192.png, icon-512.png # PWA-size icons (generated from favicon.svg)
-  og.png                     # 1200×630 social preview (generated, see scripts/)
+  og.png                     # 1200×630 social preview (generated, see scripts/generate/)
   robots.txt                 # allow-all + sitemap pointer
+  .well-known/security.txt   # RFC 9116 contact + policy pointer (auto-served from public/)
 scripts/
-  generate-assets.mjs        # one-shot PNG/OG generator (resvg + cached fonts)
-  audit-build.mjs            # post-build SEO / anchor / icon audit, runs after every `astro build`
-  generate-csp.mjs           # post-build CSP generator: hashes inline <script> blocks in dist/ and writes the Content-Security-Policy header into vercel.json
-  fonts/                     # downloaded on first run and cached here (gitignored); Inter + JetBrains Mono TTFs used by the OG generator
+  build/                     # chained by `npm run build` after `astro build`; non-zero exit blocks the deploy
+    audit-build.mjs          # post-build SEO / anchor / icon audit, runs after every `astro build`
+    generate-csp.mjs         # post-build CSP generator: hashes inline <script> blocks in dist/ and writes the Content-Security-Policy header into vercel.json
+  generate/                  # manual one-shot generators; NOT chained from build, NOT invoked by CI
+    generate-assets.mjs      # PNG/OG generator (resvg + cached fonts)
+    fonts/                   # downloaded on first run and cached here (gitignored); Inter + JetBrains Mono TTFs used by the OG generator
 astro.config.mjs             # sitemap (404 filtered) + tailwindcss vite plugin + static output
 vercel.json                  # static output, security headers (HSTS + CSP + frame/perm/referrer), HTML short-TTL, long-lived /_astro + image caches
 lychee.toml                  # external-link health-check config (CI only)
@@ -62,23 +68,23 @@ lighthouserc.{desktop,mobile}.json  # Lighthouse CI budgets enforced against Ver
 ```bash
 npm install
 npm run dev              # local dev server at http://localhost:4321
-npm run build            # astro build → scripts/audit-build.mjs → scripts/generate-csp.mjs
+npm run build            # astro build → scripts/build/audit-build.mjs → scripts/build/generate-csp.mjs
 npm run preview          # serve dist/ locally
 npm run check            # astro check (TS + template diagnostics)
 npm run format           # prettier --write .
 npm run format:check     # prettier --check . (what CI runs)
 npm run audit            # re-run the post-build audit against an existing dist/
 npm run csp              # re-run the CSP hash generator against an existing dist/
-npm run generate-assets  # regenerate public/og.png + icon PNGs (see scripts/generate-assets.mjs)
+npm run generate-assets  # regenerate public/og.png + icon PNGs (see scripts/generate/generate-assets.mjs)
 ```
 
 Node 22.12+ (Astro 6 minimum; CI pins `node-version: 22`). CI and Vercel both use the `npm run build` target, so both gating scripts (`audit-build.mjs`, `generate-csp.mjs`) run on every deploy.
 
-Each script under `scripts/` carries a header comment documenting when it runs, what it produces, its exit-code contract, and how to reproduce a failure locally. Start there when triaging a red build:
+Scripts are grouped by **when they run**: `scripts/build/` is everything `npm run build` chains after `astro build` (gates the deploy on non-zero exit); `scripts/generate/` is manual one-shots that are _not_ invoked by CI. Each file carries a header comment documenting when it runs, what it produces, its exit-code contract, and how to reproduce a failure locally. Start there when triaging a red build:
 
-- `scripts/audit-build.mjs` — post-build SEO / structured-data / anchor / image / sitemap / icon audit. Enumerates 13 invariants in its header (per-page checks #1–10, build-wide checks #11–13).
-- `scripts/generate-csp.mjs` — post-build inline-script hashing into `vercel.json`'s `Content-Security-Policy` header.
-- `scripts/generate-assets.mjs` — manual one-shot OG + app-icon PNG generator. Not chained from `build` and not invoked by CI.
+- `scripts/build/audit-build.mjs` — post-build SEO / structured-data / anchor / image / sitemap / icon audit. Enumerates 13 invariants in its header (per-page checks #1–10, build-wide checks #11–13).
+- `scripts/build/generate-csp.mjs` — post-build inline-script hashing into `vercel.json`'s `Content-Security-Policy` header.
+- `scripts/generate/generate-assets.mjs` — manual one-shot OG + app-icon PNG generator. Not chained from `build` and not invoked by CI.
 
 ## Content principles
 
@@ -116,12 +122,12 @@ Deployment target: **Vercel**, auto-deploy from `main` (per [ADR-0087 §3](https
 
 Two GitHub Actions workflows in `.github/workflows/` gate every PR:
 
-- `ci.yml` — on every PR and push to `main`: `npm run format:check`, `astro check`, `npm run build` (which chains `astro build` → `scripts/audit-build.mjs` → `scripts/generate-csp.mjs`), then a second job runs [lychee](https://lychee.cli.rs/) against the built `dist/` using `lychee.toml` to flag broken outbound links. Internal anchor + SEO + image invariants are the audit script's job; lychee is for external URLs only. When CI fails on the build step, read the script header comment in `scripts/<file>.mjs` for the exit-code contract and the local repro recipe.
-- `lighthouse.yml` — on non-draft PRs from the same repo only (fork PRs skip because they can't read the Vercel bypass secret). Resolves the Vercel preview URL from the Deployments API, runs Lighthouse CI desktop + mobile against it using `lighthouserc.{desktop,mobile}.json`, and upserts a single sticky PR comment with the scores. The gate is median-of-3 ≥ 0.95 on performance, accessibility, and best-practices. SEO is collected and surfaced in the comment but intentionally not asserted — Vercel preview deploys ship `x-robots-tag: noindex`, which caps the SEO score below the gate regardless of real SEO quality. Static SEO invariants are enforced by `scripts/audit-build.mjs` on every PR instead.
+- `ci.yml` — on every PR and push to `main`: `npm run format:check`, `astro check`, `npm run build` (which chains `astro build` → `scripts/build/audit-build.mjs` → `scripts/build/generate-csp.mjs`), then a second job runs [lychee](https://lychee.cli.rs/) against the built `dist/` using `lychee.toml` to flag broken outbound links. Internal anchor + SEO + image invariants are the audit script's job; lychee is for external URLs only. When CI fails on the build step, read the script header comment in `scripts/build/<file>.mjs` for the exit-code contract and the local repro recipe.
+- `lighthouse.yml` — on non-draft PRs from the same repo only (fork PRs skip because they can't read the Vercel bypass secret). Resolves the Vercel preview URL from the Deployments API, runs Lighthouse CI desktop + mobile against it using `lighthouserc.{desktop,mobile}.json`, and upserts a single sticky PR comment with the scores. The gate is median-of-3 ≥ 0.95 on performance, accessibility, and best-practices. SEO is collected and surfaced in the comment but intentionally not asserted — Vercel preview deploys ship `x-robots-tag: noindex`, which caps the SEO score below the gate regardless of real SEO quality. Static SEO invariants are enforced by `scripts/build/audit-build.mjs` on every PR instead.
 
 ## SEO and social
 
-- `og.png` (1200×630) and the app-icon PNGs are generated from `scripts/generate-assets.mjs` using resvg + cached TTF fonts. They are committed to `public/` so the Astro build pipeline does not need a font download on every CI run. Regenerate with `npm run generate-assets` only when the brand/copy on those assets changes.
+- `og.png` (1200×630) and the app-icon PNGs are generated from `scripts/generate/generate-assets.mjs` using resvg + cached TTF fonts. They are committed to `public/` so the Astro build pipeline does not need a font download on every CI run. Regenerate with `npm run generate-assets` only when the brand/copy on those assets changes.
 - `Base.astro` ships the full OG/Twitter card set, canonical URL, theme-color, and a JSON-LD `SoftwareApplication` block. The `noindex` prop on `Base.astro` is the seam for per-page robots hints (used by `404.astro`).
 - The sitemap is generated by `@astrojs/sitemap` with the 404 page explicitly filtered out. `robots.txt` is allow-all and points at `/sitemap-index.xml`.
 
@@ -130,6 +136,15 @@ Two GitHub Actions workflows in `.github/workflows/` gate every PR:
 Vercel Web Analytics is wired in `Base.astro` via `@vercel/analytics/astro` and counts anonymous page views only: cookieless, IP hashed daily, no prompts, no code, no session replay, no cross-site tracking. The `#analytics` anchor on `/` (inside the privacy section) discloses this in plain English and is linked from the footer.
 
 The privacy pitch (ADR-0083 §5/§7) is the product, so anything stricter than the above stays off this repo forever: no Google Analytics, no session replay, no fingerprinting, no script that sets third-party cookies. Swapping to a different privacy-respecting backend (Plausible, self-hosted Umami) is a drop-in replacement for the `<Analytics />` component — keep the footer disclosure in sync if that happens.
+
+## Code organization
+
+A few deliberate choices that come up often enough to be worth writing down (see [#123](https://github.com/siropkin/getbudi.dev/issues/123)):
+
+- **`pages/index.astro` stays as one file.** It's long (~940 lines) but the data for each section (`features`, `providers`, `alternatives`, `faqs`, …) is defined immediately above its markup in the same file. Extracting each section into its own `*.astro` component would either fragment that data across multiple files or force a shared module just to pass props around — neither of which beats the "one file, one diff, one search" cost. The in-source `{/* N. NAME */}` comments are the table of contents.
+- **Section anchor IDs live in `src/lib/anchors.ts`.** The header nav (`Base.astro`), the mobile-nav `<details>` disclosure (#119), the `<section id="…">` tags in `index.astro`, and every cross-section `<a href="#…">` all import from that single constant. The audit-build script's anchor-integrity check (invariant #8) is a runtime backstop, not the primary defense — drift fails at type-check now.
+- **`src/components/_unused/`** is for components kept for reference (cost of re-authoring vs. cost of carrying) but not imported anywhere. The leading underscore marks them in directory listings; `_unused/README.md` enumerates each resident's reason. Final delete-or-restore is tracked in the legacy-cleanup ticket ([#128](https://github.com/siropkin/getbudi.dev/issues/128)).
+- **`scripts/` is grouped by when it runs.** `scripts/build/` is chained by `npm run build` and gates the deploy; `scripts/generate/` is manual one-shots. Each file's header explains its exit-code contract and local-repro recipe — start there when CI is red.
 
 ## Dev notes
 

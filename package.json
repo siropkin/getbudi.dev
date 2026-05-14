@@ -11,9 +11,9 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "audit": "node scripts/audit-build.mjs dist",
-    "csp": "node scripts/generate-csp.mjs dist",
-    "generate-assets": "node scripts/generate-assets.mjs",
+    "audit": "node scripts/build/audit-build.mjs dist",
+    "csp": "node scripts/build/generate-csp.mjs dist",
+    "generate-assets": "node scripts/generate/generate-assets.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
