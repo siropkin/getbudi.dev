@@ -15,7 +15,8 @@
     "csp": "node scripts/build/generate-csp.mjs dist",
     "generate-assets": "node scripts/generate/generate-assets.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
