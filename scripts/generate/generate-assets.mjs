@@ -95,7 +95,7 @@ function buildOGSvg() {
   const headline1 = "See where your AI coding money";
   const headline2 = "actually goes.";
   const sub = "Local-first cost tracker for Claude Code, Cursor, Codex, and Copilot.";
-  const sub2 = "One proxy. Real attribution. Prompts never leave your machine.";
+  const sub2 = "No proxy. Real attribution. Prompts never leave your machine.";
   const install = "brew install siropkin/budi/budi && budi init";
 
   return `<?xml version="1.0" encoding="UTF-8"?>
