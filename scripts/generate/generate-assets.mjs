@@ -46,12 +46,11 @@
 import { Resvg } from "@resvg/resvg-js";
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const fontsDir = resolve(__dirname, "fonts");
-const pubDir = resolve(__dirname, "..", "..", "public");
-mkdirSync(fontsDir, { recursive: true });
+const defaultFontsDir = resolve(__dirname, "fonts");
+const defaultPubDir = resolve(__dirname, "..", "..", "public");
 
 const FONT_SOURCES = {
   // Fontsource's jsDelivr mirror ships the exact static TTF subsets we need
@@ -65,7 +64,8 @@ const FONT_SOURCES = {
     "https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-500-normal.ttf",
 };
 
-async function ensureFont(name) {
+async function ensureFont(name, fontsDir = defaultFontsDir) {
+  mkdirSync(fontsDir, { recursive: true });
   const path = resolve(fontsDir, name);
   if (!existsSync(path)) {
     const url = FONT_SOURCES[name];
@@ -89,7 +89,7 @@ function esc(text) {
  * resvg renders the SVG straight to PNG using the three fonts we
  * download.
  */
-function buildOGSvg() {
+export function buildOGSvg() {
   const W = 1200;
   const H = 630;
   const headline1 = "See where your AI coding money";
@@ -136,11 +136,11 @@ function buildOGSvg() {
 </svg>`;
 }
 
-async function renderOG() {
+export async function renderOG({ pubDir = defaultPubDir, fontsDir = defaultFontsDir } = {}) {
   await Promise.all([
-    ensureFont("Inter-Regular.ttf"),
-    ensureFont("Inter-SemiBold.ttf"),
-    ensureFont("JetBrainsMono-Medium.ttf"),
+    ensureFont("Inter-Regular.ttf", fontsDir),
+    ensureFont("Inter-SemiBold.ttf", fontsDir),
+    ensureFont("JetBrainsMono-Medium.ttf", fontsDir),
   ]);
 
   const svg = buildOGSvg();
@@ -162,7 +162,7 @@ async function renderOG() {
   console.log("  wrote public/og.png");
 }
 
-function renderIcons() {
+export function renderIcons({ pubDir = defaultPubDir } = {}) {
   // Derive the app-icon PNG sizes from the existing favicon.svg so the
   // brand stays in one place. resvg does not need fonts for this SVG.
   const svg = readFileSync(resolve(pubDir, "favicon.svg"), "utf8");
@@ -183,7 +183,12 @@ function renderIcons() {
   }
 }
 
-console.log("Generating launch assets:");
-renderIcons();
-await renderOG();
-console.log("Done.");
+// CLI entry — guarded so the module can be imported in tests without
+// running the full generator (which would otherwise fetch fonts from
+// jsDelivr on first import).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  console.log("Generating launch assets:");
+  renderIcons();
+  await renderOG();
+  console.log("Done.");
+}
