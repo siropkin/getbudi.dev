@@ -76,6 +76,19 @@
     border: 0;
     border-top: 1px solid var(--color-line);
   }
+
+  /*
+   * Site-wide keyboard focus ring. Header nav, footer links, mobile-nav
+   * <summary>, and FAQ <details> all rely on hover-only feedback and had no
+   * visible focus indicator (issue #135). Buttons that already opt into
+   * `focus-visible:outline-*` utilities keep their existing styling — these
+   * outlines compose cleanly.
+   */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
 
 @utility container-readable {
