@@ -3,19 +3,45 @@
  * One-shot generator for the binary launch assets that cannot live inside
  * an Astro build: the OG social image and the app-icon PNG sizes.
  *
- * Run with `npm run generate-assets` when the brand or copy on these assets
- * changes. The outputs are committed to `public/` so the Astro build stays
- * dependency-free at runtime.
+ * WHEN IT RUNS
+ *   - Manual only: `npm run generate-assets`. NOT chained from build,
+ *     NOT invoked by CI. The outputs are committed to `public/` and
+ *     shipped verbatim, so a contributor runs this when brand colors,
+ *     headline copy, or favicon.svg change.
  *
- * Why a standalone script and not the Astro pipeline:
+ * WHAT IT PRODUCES
+ *   - public/og.png             1200×630 OG/Twitter card
+ *   - public/apple-touch-icon.png  180×180 (rendered from favicon.svg)
+ *   - public/icon-192.png       192×192  (rendered from favicon.svg)
+ *   - public/icon-512.png       512×512  (rendered from favicon.svg)
+ *   - scripts/fonts/*.ttf       cached Inter + JetBrains Mono TTFs
+ *                               (gitignored; first-run download from
+ *                               cdn.jsdelivr.net)
+ *
+ * EXIT CODES
+ *   0         every asset written (or already up to date).
+ *   non-zero  font fetch failed (offline / non-2xx from jsDelivr) or
+ *             resvg could not parse favicon.svg / the inline OG SVG.
+ *             Errors are thrown and bubble out — there is no partial-
+ *             success path. The script is idempotent: re-running after
+ *             a transient failure is safe.
+ *
+ * REPRODUCE A FAILURE LOCALLY
+ *   1. `npm run generate-assets`
+ *   2. On font-fetch failure, confirm access to cdn.jsdelivr.net; the
+ *      cache is in scripts/fonts/ — delete a file there if it is
+ *      corrupt or zero-byte.
+ *   3. After regenerating, commit the resulting public/*.png changes.
+ *      `scripts/audit-build.mjs` enforces minimum icon dimensions and
+ *      OG asset existence, so a bad regenerate will fail the next
+ *      `npm run build`.
+ *
+ * Why standalone and not the Astro pipeline:
  *   - OG images change maybe twice a year; a build-time generator would
  *     pull fonts + run resvg on every CI build for no real benefit.
  *   - `public/*.png` ships verbatim through Vercel with long-lived cache
  *     headers (see vercel.json), so committing the PNGs is the cheapest
  *     delivery path.
- *
- * Fonts are downloaded on first run and cached under `scripts/fonts/`
- * (gitignored). The script is idempotent and safe to re-run.
  */
 import { Resvg } from "@resvg/resvg-js";
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
