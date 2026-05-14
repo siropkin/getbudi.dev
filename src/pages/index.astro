@@ -4,6 +4,7 @@ import CopyableCommand from "~/components/CopyableCommand.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
 import EditorInstallCards from "~/components/EditorInstallCards.astro";
 import JsonLd from "~/components/JsonLd.astro";
+import { ANCHORS, anchorHref } from "~/lib/anchors";
 
 const faqs = [
   {
@@ -289,7 +290,9 @@ const altInstalls = [
           >
           <span>
             One command. macOS / Linux / Windows. No account needed.
-            <a href="#install" class="link-underline hover:text-fg">Editor wiring →</a>
+            <a href={anchorHref(ANCHORS.install)} class="link-underline hover:text-fg"
+              >Editor wiring →</a
+            >
           </span>
         </p>
       </div>
@@ -309,13 +312,13 @@ const altInstalls = [
           View on GitHub
         </a>
         <a
-          href="#teams"
+          href={anchorHref(ANCHORS.teams)}
           class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
         >
           For teams →
         </a>
         <a
-          href="#compare"
+          href={anchorHref(ANCHORS.compare)}
           class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
         >
           Why not just X? ↓
@@ -360,7 +363,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 3. FEATURES */}
-  <section id="features" class="container-readable border-line/70 border-t py-14 sm:py-20">
+  <section id={ANCHORS.features} class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-10 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What it does</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -505,7 +508,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
 
   {/* 3b. PROVIDER MATRIX */}
   <section
-    id="providers"
+    id={ANCHORS.providers}
     class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20"
   >
     <details class="group" open>
@@ -649,7 +652,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 4. COMPARE */}
-  <section id="compare" class="container-readable border-line/70 border-t py-14 sm:py-20">
+  <section id={ANCHORS.compare} class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-10 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Why not just use X?</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -700,7 +703,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 5. PRIVACY */}
-  <section id="privacy" class="container-readable border-line/70 border-t py-14 sm:py-20">
+  <section id={ANCHORS.privacy} class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Privacy contract</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Local-first, by design.</h2>
@@ -739,7 +742,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </div>
     </div>
 
-    <p id="analytics" class="text-fg-muted mt-8 scroll-mt-24 text-sm leading-relaxed">
+    <p id={ANCHORS.analytics} class="text-fg-muted mt-8 scroll-mt-24 text-sm leading-relaxed">
       <strong class="text-fg font-medium">Analytics.</strong>
       This site (<code class="text-xs">getbudi.dev</code>) counts anonymous page views via Vercel
       Web Analytics: cookieless, IP hashed daily, no session replay, no cross-site tracking. It only
@@ -748,7 +751,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 6. INSTALL */}
-  <section id="install" class="container-readable border-line/70 border-t py-14 sm:py-20">
+  <section id={ANCHORS.install} class="container-readable border-line/70 border-t py-14 sm:py-20">
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Install</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -769,7 +772,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         target="_blank"
         rel="noopener noreferrer">GitHub</a
       >. Prefer to install the editor extension on its own?
-      <a href="#editor-extension" class="link-underline hover:text-fg"
+      <a href={anchorHref(ANCHORS.editorExtension)} class="link-underline hover:text-fg"
         >Pick VS Code or Cursor below</a
       >.
     </p>
@@ -800,7 +803,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       </ol>
     </div>
 
-    <div id="editor-extension" class="mt-12 scroll-mt-24">
+    <div id={ANCHORS.editorExtension} class="mt-12 scroll-mt-24">
       <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Editor extension.</h3>
       <p class="text-fg-muted mb-6 text-sm">
         Adds the budi status bar to VS Code, Cursor, or a JetBrains IDE. <code class="text-xs"
@@ -847,7 +850,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
 
   {/* 7. FOR TEAMS — compact callout */}
   <section
-    id="teams"
+    id={ANCHORS.teams}
     class="container-readable border-line/70 scroll-mt-24 border-t py-10 sm:py-14"
   >
     <div class="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
@@ -862,7 +865,9 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
             class="link-underline hover:text-fg"
             target="_blank"
             rel="noopener noreferrer">app.getbudi.dev</a
-          >. <a href="#privacy" class="link-underline hover:text-fg">Privacy contract</a>
+          >. <a href={anchorHref(ANCHORS.privacy)} class="link-underline hover:text-fg"
+            >Privacy contract</a
+          >
           spells out exactly what does and doesn't leave your machine.
         </p>
       </div>
@@ -892,7 +897,10 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   </section>
 
   {/* 8. FAQ */}
-  <section id="faq" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+  <section
+    id={ANCHORS.faq}
+    class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20"
+  >
     <header class="mb-8 max-w-2xl">
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">FAQ</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
