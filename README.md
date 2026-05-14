@@ -7,10 +7,10 @@ This repo is the public face, not the product. The CLI / daemon lives in [`sirop
 ## Install budi
 
 ```bash
-brew install siropkin/budi/budi && budi init && budi integrations install
+brew install siropkin/budi/budi && budi init
 ```
 
-Other install methods and the full first-run checklist live on the site.
+This matches the primary CTA on the site. Editor wiring, the 4-step verifier (`budi integrations install` / `budi doctor` / `budi status`), and other install methods live in the `#install` section on [getbudi.dev](https://getbudi.dev).
 
 ## Ecosystem
 
@@ -23,7 +23,7 @@ Other install methods and the full first-run checklist live on the site.
 
 ## Stack
 
-Astro 5 + Tailwind CSS v4, fully static output, deployed on Vercel.
+Astro 6 + Tailwind CSS v4, fully static output, deployed on Vercel.
 
 ## Develop
 
@@ -35,7 +35,7 @@ npm run check          # astro type + template check
 npm run format:check   # prettier (same command CI runs)
 ```
 
-Node 20.3+.
+Node 22.12+.
 
 ## Contributing
 

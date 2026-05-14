@@ -19,7 +19,7 @@ Do **not** mix cloud dashboard code, product features, or anything that touches 
 
 ## Stack
 
-Chosen in [#2](https://github.com/siropkin/getbudi.dev/issues/2): **Astro 5 + Tailwind CSS v4**, fully static output.
+Chosen in [#2](https://github.com/siropkin/getbudi.dev/issues/2) (Astro 5 at the time, upgraded in-place to Astro 6 — same static-first contract): **Astro 6 + Tailwind CSS v4**, fully static output.
 
 - Astro is static-first: the only JS that ships is what a component explicitly opts into (here, a small clipboard handler on `CopyableCommand`). This matches the "a marketing site that takes 4 seconds to render is not a good ad" rule below.
 - Tailwind v4 is configured CSS-first in `src/styles/global.css` via `@theme` — no `tailwind.config.js`, no PostCSS pipeline. Theme tokens (`--color-*`, `--font-*`) auto-generate matching utilities like `bg-surface-2`, `text-fg-muted`, `border-accent`. Avoid arbitrary `[--var]` syntax in templates — in v4 it does not wrap in `var()` and silently breaks.
@@ -29,12 +29,15 @@ Chosen in [#2](https://github.com/siropkin/getbudi.dev/issues/2): **Astro 5 + Ta
 
 ```
 src/
-  layouts/Base.astro         # <html>, head, header, footer, skip link, OG/Twitter meta, JSON-LD, icons, Vercel Web Analytics
+  layouts/Base.astro         # <html>, head, header (with mobile-nav <details> disclosure for the sections hidden below the sm: breakpoint), footer, skip link, OG/Twitter meta, JSON-LD seam (via <JsonLd />), icons, Vercel Web Analytics
   components/
-    CopyableCommand.astro    # one-click-copy install block (hero + compact)
-    Diagram.astro            # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript (currently unused — kept for reference)
+    CopyableCommand.astro    # one-click-copy install block (hero + compact variants)
+    OsInstallTabs.astro      # macOS / Linux / Windows install tabs; SSR default macOS, upgrades to the visitor's OS via a tiny inline script. Wraps CopyableCommand
+    EditorInstallCards.astro # VS Code / Cursor / JetBrains install cards (logo + name → marketplace link → command — simplified in #121)
+    JsonLd.astro             # escapes and emits a single <script type="application/ld+json"> block — used by Base.astro (SoftwareApplication) and index.astro (FAQPage)
+    Diagram.astro            # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript (currently unused — kept for reference; fate decided in #128)
   pages/
-    index.astro              # landing page: hero → problem → features → screenshots → provider matrix → compare → privacy → install (+ 4-step after-install verifier + editor extension picker) → teams → FAQ
+    index.astro              # landing page: hero → features → providers → compare → privacy → install → teams → FAQ (see "Pages" below for what each section ships)
     404.astro                # static "not found" page, noindex, linked back to /
   styles/global.css          # Tailwind v4 import + @theme tokens + base layer
 public/
@@ -69,7 +72,7 @@ npm run csp              # re-run the CSP hash generator against an existing dis
 npm run generate-assets  # regenerate public/og.png + icon PNGs (see scripts/generate-assets.mjs)
 ```
 
-Node 20.3+ (Astro 5 minimum). CI and Vercel both use the `npm run build` target, so both gating scripts (`audit-build.mjs`, `generate-csp.mjs`) run on every deploy.
+Node 22.12+ (Astro 6 minimum; CI pins `node-version: 22`). CI and Vercel both use the `npm run build` target, so both gating scripts (`audit-build.mjs`, `generate-csp.mjs`) run on every deploy.
 
 Each script under `scripts/` carries a header comment documenting when it runs, what it produces, its exit-code contract, and how to reproduce a failure locally. Start there when triaging a red build:
 
@@ -91,7 +94,16 @@ The site should read the way the Reddit posts read — first-person, specific, h
 
 Intentionally a single marketing page plus a 404 — deep docs, changelog, and pricing stay out of this repo.
 
-- `/` — hero (tagline + install command + `budi stats project` terminal shot), the cost-problem numbers, features (4 cards + inline `budi sessions <id>` shot), honest compare table, privacy contract (local-first + what leaves / never leaves / how to enable cloud), install (OS tabs + 4-step after-install checklist), for-teams block.
+- `/` — section order (matches the in-source `{/* N. NAME */}` comments and the header nav anchors):
+  1. **Hero** — tagline, `OsInstallTabs` install command (macOS / Linux / Windows), GitHub / For teams / Compare nav row, and a `budi stats project` terminal shot. Mobile/tablet (`< lg`) reorders to terminal-first, then install + nav (#100).
+  2. **Features** (`#features`) — 4 feature cards, a paired Cursor / VS Code status-bar mock figure, and a `budi sessions <id>` terminal shot.
+  3. **Providers** (`#providers`) — provider coverage matrix inside a `<details open>` (opened by default since #118) with a Copilot Chat cost-accuracy sub-state breakdown card.
+  4. **Compare** (`#compare`) — honest "why not just X?" alternative table; the Budi row is highlighted.
+  5. **Privacy** (`#privacy`) — three-column "never leaves / can optionally leave / how to enable" contract, plus the `#analytics` disclosure anchor linked from the footer.
+  6. **Install** (`#install`) — second `OsInstallTabs`, 4-step after-install verifier (`budi init` / `budi integrations install` / `budi doctor` / `budi status`), and the `#editor-extension` picker rendered by `EditorInstallCards` (logo + name → marketplace link → command — simplified in #121). A `<details>` block exposes `Other install methods` (bundled VSIX, manual VSIX in VS Code / Cursor, daemon-from-source).
+  7. **For teams** (`#teams`) — compact callout linking to `app.getbudi.dev`.
+  8. **FAQ** (`#faq`) — five expandable Q&A items (first one open by default); the FAQ JSON-LD is emitted from `index.astro` via `<JsonLd />` for `FAQPage` rich results.
+- Header nav (in `Base.astro`) keeps Install always visible; Compare / Privacy collapse below `sm:`, Providers / For teams / FAQ collapse below `md:`. A `<details>` "Sections" disclosure surfaces the hidden anchors on mobile (#119).
 - `/404` — static "not found", `noindex`, linked back to `/`. Excluded from `sitemap-index.xml` by `astro.config.mjs`.
 
 Deep reference links out to `siropkin/budi` (README, releases) or `app.getbudi.dev`. No `/docs`, `/pricing`, or `/changelog` page is planned — adding one re-opens the docs-drift problem we deliberately avoid by keeping a single surface.
