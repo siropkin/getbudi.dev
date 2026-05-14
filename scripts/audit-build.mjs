@@ -3,9 +3,60 @@
 //
 // Enforces the SEO, social, structured-data, anchor, image, and asset
 // invariants established in R1.4 so the marketing site can't silently
-// regress those guarantees. The audit runs after `astro build` (locally
-// via `npm run build` and in CI) and mirrors the manual curl+rg checks
+// regress those guarantees. The audit mirrors the manual curl+rg checks
 // that were used to verify the initial launch.
+//
+// WHEN IT RUNS
+//   - Chained from `npm run build` (after `astro build`, before
+//     `npm run csp`). Any non-zero exit blocks the rest of the build.
+//   - Re-runnable standalone with `npm run audit` against an existing
+//     dist/ — useful when iterating on a fix without rebuilding.
+//   - CI: indirectly via the `Astro build` step in
+//     .github/workflows/ci.yml (which runs `npm run build`). The
+//     workflow's explicit `Static build audit` step re-runs the audit
+//     against the same dist/ so the PASS/FAIL line is visible in the
+//     log at a glance.
+//
+// EXIT CODES
+//   0  every check passed.
+//   1  dist/ missing, dist/ contains no HTML, or any per-page or
+//      build-wide invariant failed (counted in `failed` below). Non-zero
+//      from `npm run build` blocks both the Vercel deploy and the PR.
+//
+// REPRODUCE A FAILURE LOCALLY
+//   1. `npm run build`   (or `astro build && npm run audit`)
+//   2. Look for `✗` lines in the output — every line includes the page
+//      or asset path so you can grep dist/ for the offending source.
+//   3. After fixing the source, re-run `npm run audit` alone if the
+//      issue was in dist HTML the audit could re-scan unchanged; rerun
+//      `npm run build` if you edited an Astro template, vercel.json
+//      header logic, or any source under src/.
+//
+// INVARIANTS ENFORCED (per page unless noted "build-wide")
+//   1.  Exactly one <link rel="canonical">; href = canonical for path.
+//   2.  Non-empty <title>.
+//   3.  <meta name="description"> length in 50..200 chars.
+//   4.  OG tags present and non-empty: og:title, og:description, og:url,
+//       og:image, og:image:width, og:image:height, og:image:alt.
+//   5.  Twitter tags present and non-empty: twitter:title,
+//       twitter:description, twitter:image, twitter:image:alt; and
+//       twitter:card="summary_large_image".
+//   6.  og:image and twitter:image are absolute under SITE_ORIGIN and
+//       the file resolves to a real asset under dist/.
+//   7.  JSON-LD: on /, at least one block AND a SoftwareApplication
+//       block; on every page, each block parses as JSON.
+//   8.  Anchor integrity: every <a href="#fragment"> has a matching id
+//       in the same document (bare `#` is allowed for JS-toggled UI).
+//   9.  Every <img> declares an alt attribute (empty string allowed).
+//   10. Robots meta mirrors NOINDEX_PAGES — listed pages must carry
+//       `noindex`; unlisted pages must NOT carry a robots meta tag.
+//   11. (build-wide) dist/sitemap-0.xml exists, lists ≥1 URL, never
+//       lists /404, and every listed URL resolves to a built HTML page.
+//   12. (build-wide) dist/robots.txt exists and references
+//       SITE_ORIGIN/sitemap-index.xml.
+//   13. (build-wide) Every REQUIRED_ICONS entry exists, is non-zero,
+//       and (for PNGs) is a valid PNG with at least the declared
+//       width × height.
 //
 // Intentionally dependency-light: only `node-html-parser` (devDep) is
 // used. No color output — CI logs stay readable when scrollback is

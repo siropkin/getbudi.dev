@@ -59,7 +59,7 @@ lighthouserc.{desktop,mobile}.json  # Lighthouse CI budgets enforced against Ver
 ```bash
 npm install
 npm run dev              # local dev server at http://localhost:4321
-npm run build            # static build to dist/, then runs scripts/audit-build.mjs
+npm run build            # astro build → scripts/audit-build.mjs → scripts/generate-csp.mjs
 npm run preview          # serve dist/ locally
 npm run check            # astro check (TS + template diagnostics)
 npm run format           # prettier --write .
@@ -69,7 +69,13 @@ npm run csp              # re-run the CSP hash generator against an existing dis
 npm run generate-assets  # regenerate public/og.png + icon PNGs (see scripts/generate-assets.mjs)
 ```
 
-Node 20.3+ (Astro 5 minimum). CI and Vercel both use the `npm run build` target, so the audit step gates every deploy.
+Node 20.3+ (Astro 5 minimum). CI and Vercel both use the `npm run build` target, so both gating scripts (`audit-build.mjs`, `generate-csp.mjs`) run on every deploy.
+
+Each script under `scripts/` carries a header comment documenting when it runs, what it produces, its exit-code contract, and how to reproduce a failure locally. Start there when triaging a red build:
+
+- `scripts/audit-build.mjs` — post-build SEO / structured-data / anchor / image / sitemap / icon audit. Enumerates 13 invariants in its header (per-page checks #1–10, build-wide checks #11–13).
+- `scripts/generate-csp.mjs` — post-build inline-script hashing into `vercel.json`'s `Content-Security-Policy` header.
+- `scripts/generate-assets.mjs` — manual one-shot OG + app-icon PNG generator. Not chained from `build` and not invoked by CI.
 
 ## Content principles
 
@@ -98,7 +104,7 @@ Deployment target: **Vercel**, auto-deploy from `main` (per [ADR-0087 §3](https
 
 Two GitHub Actions workflows in `.github/workflows/` gate every PR:
 
-- `ci.yml` — on every PR and push to `main`: `npm run format:check`, `astro check`, `astro build` (which chains into `scripts/audit-build.mjs`), then a second job runs [lychee](https://lychee.cli.rs/) against the built `dist/` using `lychee.toml` to flag broken outbound links. Internal anchor + SEO + image invariants are the audit script's job; lychee is for external URLs only.
+- `ci.yml` — on every PR and push to `main`: `npm run format:check`, `astro check`, `npm run build` (which chains `astro build` → `scripts/audit-build.mjs` → `scripts/generate-csp.mjs`), then a second job runs [lychee](https://lychee.cli.rs/) against the built `dist/` using `lychee.toml` to flag broken outbound links. Internal anchor + SEO + image invariants are the audit script's job; lychee is for external URLs only. When CI fails on the build step, read the script header comment in `scripts/<file>.mjs` for the exit-code contract and the local repro recipe.
 - `lighthouse.yml` — on non-draft PRs from the same repo only (fork PRs skip because they can't read the Vercel bypass secret). Resolves the Vercel preview URL from the Deployments API, runs Lighthouse CI desktop + mobile against it using `lighthouserc.{desktop,mobile}.json`, and upserts a single sticky PR comment with the scores. The gate is median-of-3 ≥ 0.95 on performance, accessibility, and best-practices. SEO is collected and surfaced in the comment but intentionally not asserted — Vercel preview deploys ship `x-robots-tag: noindex`, which caps the SEO score below the gate regardless of real SEO quality. Static SEO invariants are enforced by `scripts/audit-build.mjs` on every PR instead.
 
 ## SEO and social
