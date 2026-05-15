@@ -31,7 +31,7 @@ jobs:
       # status works regardless of whether protection is on.
       - name: Resolve Vercel preview URL
         id: preview
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         with:
@@ -127,7 +127,7 @@ jobs:
 
       - name: Comment Lighthouse report links on PR
         if: always() && steps.preview.outputs.display_url != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           PREVIEW_URL: ${{ steps.preview.outputs.display_url }}
           BYPASS_ENABLED: ${{ steps.preview.outputs.bypass_enabled }}
