@@ -10,7 +10,11 @@ import { ANCHORS, anchorHref } from "~/lib/anchors";
 const faqs = [
   {
     q: "What leaves my machine when using Budi?",
-    a: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails. Budi itself is open source (MIT) and free — the optional cloud dashboard at app.getbudi.dev is the only piece you ever pay for.",
+    a: "By default, nothing. Optionally, only pre-aggregated daily numbers (tokens, cost, model, hashed repo ID, branch, ticket ID). Never prompts, code, responses, file paths, or emails.",
+  },
+  {
+    q: "Is it free?",
+    a: "Yes for solo use. The budi daemon and CLI are open source (MIT) and free forever — self-hosted, no signup. The optional cloud dashboard at app.getbudi.dev is free for personal use: sign up, get a workspace, push aggregates from your machine. Paid plans cover teams that share a workspace and need multi-seat dashboards.",
   },
   {
     q: "Does budi work in VS Code, Cursor, and JetBrains?",
@@ -248,7 +252,7 @@ const altInstalls = [
     <div class="flex max-w-3xl flex-col items-start gap-6 sm:gap-8">
       <span class="chip">
         <span aria-hidden="true" class="bg-accent inline-block h-1.5 w-1.5 rounded-full"></span>
-        AI coding cost tracker · local-first · open source · MIT
+        Free · self-hosted · no signup · open source (MIT)
       </span>
 
       <h1
@@ -312,7 +316,7 @@ const altInstalls = [
           href={anchorHref(ANCHORS.teams)}
           class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
         >
-          For teams →
+          Cloud dashboard →
         </a>
         <a
           href={anchorHref(ANCHORS.compare)}
@@ -728,7 +732,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
       <div class="card border-l-line-strong border-l-4 p-5">
         <h3 class="text-fg mb-2 font-semibold">How to turn it on</h3>
         <p class="text-fg-muted text-sm leading-relaxed">
-          Sign up at <a
+          Free for personal use — sign up at <a
             href="https://app.getbudi.dev"
             class="link-underline hover:text-fg"
             target="_blank"
@@ -852,17 +856,18 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
   >
     <div class="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
       <div class="max-w-2xl">
-        <p class="text-fg-dim mb-1 text-xs tracking-[0.18em] uppercase">For teams (opt-in)</p>
+        <p class="text-fg-dim mb-1 text-xs tracking-[0.18em] uppercase">Cloud dashboard (opt-in)</p>
         <h2 class="text-fg text-lg font-semibold tracking-tight sm:text-xl">
-          One dashboard for the team — aggregates only, no prompts or code.
+          One workspace for your stats — aggregates only, no prompts or code.
         </h2>
         <p class="text-fg-muted mt-2 text-sm leading-relaxed">
-          Daily cost per user, repo, model, branch, and ticket at <a
+          Free for personal use. Daily cost per user, repo, model, branch, and ticket at <a
             href="https://app.getbudi.dev"
             class="link-underline hover:text-fg"
             target="_blank"
             rel="noopener noreferrer">app.getbudi.dev</a
-          >. <a href={anchorHref(ANCHORS.privacy)} class="link-underline hover:text-fg"
+          > — your first workspace is created automatically on signup. Paid plans cover teams that share
+          a workspace. <a href={anchorHref(ANCHORS.privacy)} class="link-underline hover:text-fg"
             >Privacy contract</a
           >
           spells out exactly what does and doesn't leave your machine.
@@ -874,7 +879,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
         rel="noopener noreferrer"
         class="bg-accent inline-flex shrink-0 items-center gap-2 self-start rounded-lg px-4 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90 sm:self-auto"
       >
-        Sign up
+        Try the free cloud dashboard
         <svg
           aria-hidden="true"
           width="14"
