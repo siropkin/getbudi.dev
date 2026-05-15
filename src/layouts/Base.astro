@@ -24,7 +24,7 @@ const OG_IMAGE = `${SITE_URL}/og.png`;
 
 const {
   title = "budi — AI coding cost tracker for Cursor, VS Code, Claude Code & Codex",
-  description = "AI coding cost tracker for Cursor and VS Code — Cursor, GitHub Copilot Chat, Claude Code, Codex, Copilot CLI. Rust daemon tails transcripts; cost by repo/branch/ticket. Nothing in your network path.",
+  description = "Free, self-hosted AI coding cost tracker — no signup needed. Cursor, Copilot Chat, Claude Code, Codex, Copilot CLI. Tails local transcripts; cost by repo/branch/ticket. Nothing in your network path.",
   canonical = `${SITE_URL}/`,
   noindex = false,
 } = Astro.props;
@@ -129,7 +129,7 @@ const jsonLd = {
             >Privacy</a
           >
           <a href={siteAnchorHref(ANCHORS.teams)} class="hover:text-fg hidden md:inline"
-            >For teams</a
+            >Cloud</a
           >
           <a href={siteAnchorHref(ANCHORS.faq)} class="hover:text-fg hidden md:inline">FAQ</a>
           <details class="relative sm:hidden">
@@ -154,7 +154,7 @@ const jsonLd = {
               <a href={siteAnchorHref(ANCHORS.providers)} class="hover:text-fg">Providers</a>
               <a href={siteAnchorHref(ANCHORS.compare)} class="hover:text-fg">Compare</a>
               <a href={siteAnchorHref(ANCHORS.privacy)} class="hover:text-fg">Privacy</a>
-              <a href={siteAnchorHref(ANCHORS.teams)} class="hover:text-fg">For teams</a>
+              <a href={siteAnchorHref(ANCHORS.teams)} class="hover:text-fg">Cloud</a>
               <a href={siteAnchorHref(ANCHORS.faq)} class="hover:text-fg">FAQ</a>
             </div>
           </details>
