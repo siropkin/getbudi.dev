@@ -135,7 +135,7 @@ const tabs = [
 
       tab.addEventListener("keydown", (event) => {
         const idx = ORDER.indexOf(tab.dataset.os as OS);
-        let nextIdx = idx;
+        let nextIdx: number;
         switch (event.key) {
           case "ArrowRight":
             nextIdx = (idx + 1) % ORDER.length;
@@ -154,6 +154,7 @@ const tabs = [
         }
         event.preventDefault();
         const next = ORDER[nextIdx];
+        if (!next) return;
         activate(group, next);
         tabs.find((t) => t.dataset.os === next)?.focus();
       });

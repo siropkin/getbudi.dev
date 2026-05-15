@@ -75,6 +75,7 @@ npm run dev              # local dev server at http://localhost:4321
 npm run build            # astro build → scripts/build/audit-build.mjs → scripts/build/generate-csp.mjs
 npm run preview          # serve dist/ locally
 npm run check            # astro check (TS + template diagnostics)
+npm run lint             # eslint . (unused imports, dead code, stray console.log)
 npm run format           # prettier --write .
 npm run format:check     # prettier --check . (what CI runs)
 npm test                 # unit tests for the build scripts (node --test, zero deps)
@@ -127,7 +128,9 @@ Deployment target: **Vercel**, auto-deploy from `main` (per [ADR-0087 §3](https
 
 Two GitHub Actions workflows in `.github/workflows/` gate every PR:
 
-- `ci.yml` — on every PR and push to `main`: `npm run format:check`, `astro check`, `npm test`, `npm run build` (which chains `astro build` → `scripts/build/audit-build.mjs` → `scripts/build/generate-csp.mjs`), then a second job runs [lychee](https://lychee.cli.rs/) against the built `dist/` using `lychee.toml` to flag broken outbound links. Internal anchor + SEO + image invariants are the audit script's job; lychee is for external URLs only. When CI fails on the build step, read the script header comment in `scripts/build/<file>.mjs` for the exit-code contract and the local repro recipe.
+- `ci.yml` — on every PR and push to `main`. Five jobs run in parallel against a fresh `node_modules` so a red signal surfaces fast: `format` (`npm run format:check`), `lint` (`npm run lint` — ESLint flat config covering Astro + TS, catches unused imports / dead code / stray `console.log`), `typecheck` (`astro check`), `test` (`npm test`), and `build` (`npm run build`, which chains `astro build` → `scripts/build/audit-build.mjs` → `scripts/build/generate-csp.mjs`). A sixth `link-check` job needs `build` and runs [lychee](https://lychee.cli.rs/) against the built `dist/` using `lychee.toml` to flag broken outbound links. Internal anchor + SEO + image invariants are the audit script's job; lychee is for external URLs only. When CI fails on the build step, read the script header comment in `scripts/build/<file>.mjs` for the exit-code contract and the local repro recipe.
+- Dependency hygiene: `.github/dependabot.yml` opens grouped monthly PRs for npm and `github-actions`. Minor/patch bumps land as a single PR per ecosystem; majors come through individually so each gets review.
+- Pre-commit hint (opt-in, no enforced hook): run `npm run format:check && npm run lint && npm run check` before pushing — these three are the gates that catch the most "the only thing red is whitespace" surprises on PR.
 - `lighthouse.yml` — on non-draft PRs from the same repo only (fork PRs skip because they can't read the Vercel bypass secret). Resolves the Vercel preview URL from the Deployments API, runs Lighthouse CI desktop + mobile against it using `lighthouserc.{desktop,mobile}.json`, and upserts a single sticky PR comment with the scores. The gate is median-of-3 ≥ 0.95 on performance, accessibility, and best-practices. SEO is collected and surfaced in the comment but intentionally not asserted — Vercel preview deploys ship `x-robots-tag: noindex`, which caps the SEO score below the gate regardless of real SEO quality. Static SEO invariants are enforced by `scripts/build/audit-build.mjs` on every PR instead.
 
 ## SEO and social

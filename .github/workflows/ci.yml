@@ -5,36 +5,70 @@ on:
   push:
     branches: [main]
 
+# Jobs split so a red signal surfaces fast: format / lint / type-check / tests
+# all run in parallel against a fresh node_modules. Build + audit + lychee run
+# after because they need the compiled `dist/`.
 jobs:
-  build:
-    name: Lint and build
+  format:
+    name: Prettier format check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      - run: npm ci
+      - run: npm run format:check
 
-      - name: Install dependencies
-        run: npm ci
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
 
-      - name: Prettier format check
-        run: npm run format:check
+  typecheck:
+    name: Astro type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
 
-      - name: Astro type check
-        run: npm run check
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
 
-      - name: Unit tests
-        run: npm test
-
-      - name: Astro build
+  build:
+    name: Build and audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Astro build (chains audit-build + generate-csp)
         run: npm run build
-
-      - name: Static build audit
-        run: npm run audit
 
   link-check:
     name: External link health
@@ -42,19 +76,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
+      - run: npm ci
       - name: Build site
         run: npm run build
-
       - name: Check outbound links
         uses: lycheeverse/lychee-action@v2
         with:
