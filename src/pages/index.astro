@@ -495,12 +495,7 @@ acme/web/feat/analytics-v3                 $  3.12    WEB-1199`}</code></pre>
               <tr class:list={[i > 0 ? "border-line/70 border-t" : ""]}>
                 <td class="text-fg px-4 py-3 font-medium sm:px-5">{p.name}</td>
                 <td class="px-4 py-3 sm:px-5">
-                  <span
-                    class:list={[
-                      "chip",
-                      p.live ? "border-accent text-accent" : "text-fg-dim",
-                    ]}
-                  >
+                  <span class:list={["chip", p.live ? "border-accent text-accent" : "text-fg-dim"]}>
                     {p.live ? "Live" : "Coming soon"}
                   </span>
                 </td>
