@@ -34,9 +34,8 @@ src/
     CopyableCommand.astro    # one-click-copy install block (hero + compact variants)
     OsInstallTabs.astro      # macOS / Linux / Windows install tabs; SSR default macOS, upgrades to the visitor's OS via a tiny inline script. Wraps CopyableCommand
     EditorInstallCards.astro # VS Code / Cursor / JetBrains install cards (logo + name → marketplace link → command — simplified in #121)
+    GitHubIcon.astro         # shared GitHub mark inline SVG — used by Base.astro (footer) and index.astro (hero CTA)
     JsonLd.astro             # escapes and emits a single <script type="application/ld+json"> block — used by Base.astro (SoftwareApplication) and index.astro (FAQPage)
-    _unused/                 # components kept for reference but NOT imported by any page (see _unused/README.md; final fate decided in #128)
-      Diagram.astro          # inline SVG: agent → provider (direct) + daemon tailing the on-disk transcript
   lib/
     anchors.ts               # single source of truth for in-page section anchor IDs — imported by Base.astro (header nav, mobile-nav disclosure #119) and index.astro (section ids + cross-section links) so the audit-build invariant (#8 "every <a href='#X'> has a matching id") cannot drift via grep
   pages/
@@ -149,7 +148,7 @@ A few deliberate choices that come up often enough to be worth writing down (see
 
 - **`pages/index.astro` stays as one file.** It's long (~940 lines) but the data for each section (`features`, `providers`, `alternatives`, `faqs`, …) is defined immediately above its markup in the same file. Extracting each section into its own `*.astro` component would either fragment that data across multiple files or force a shared module just to pass props around — neither of which beats the "one file, one diff, one search" cost. The in-source `{/* N. NAME */}` comments are the table of contents.
 - **Section anchor IDs live in `src/lib/anchors.ts`.** The header nav (`Base.astro`), the mobile-nav `<details>` disclosure (#119), the `<section id="…">` tags in `index.astro`, and every cross-section `<a href="#…">` all import from that single constant. The audit-build script's anchor-integrity check (invariant #8) is a runtime backstop, not the primary defense — drift fails at type-check now.
-- **`src/components/_unused/`** is for components kept for reference (cost of re-authoring vs. cost of carrying) but not imported anywhere. The leading underscore marks them in directory listings; `_unused/README.md` enumerates each resident's reason. Final delete-or-restore is tracked in the legacy-cleanup ticket ([#128](https://github.com/siropkin/getbudi.dev/issues/128)).
+- **No `_unused/` graveyard.** Components that no template imports get deleted in the same PR that orphans them (resolved in [#128](https://github.com/siropkin/getbudi.dev/issues/128)). `git log` is the archive — re-deriving a hand-tuned SVG from a past revision beats carrying it as dark matter that the next sweep has to re-evaluate.
 - **`scripts/` is grouped by when it runs.** `scripts/build/` is chained by `npm run build` and gates the deploy; `scripts/generate/` is manual one-shots. Each file's header explains its exit-code contract and local-repro recipe — start there when CI is red.
 
 ## Dev notes
