@@ -5,6 +5,13 @@
   "framework": "astro",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/login",
+      "destination": "https://app.getbudi.dev",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

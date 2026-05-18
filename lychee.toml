@@ -12,6 +12,8 @@ accept = ["200..=299", "403", "429"]
 exclude_path = ["dist/404.html"]
 # ^ The 404 page intentionally links to things we want to check, but skipping
 #   it avoids scanning the same links twice.
+exclude = ['^file://.*/dist/login$']
+# ^ /login is a Vercel redirect (vercel.json), not a built page.
 # Root-relative URLs like "/", "/#privacy", "/favicon.svg" are resolved
 # against `--root-dir` (set in the workflow to $GITHUB_WORKSPACE/dist) so
 # lychee treats them as offline filesystem checks. That keeps the network
