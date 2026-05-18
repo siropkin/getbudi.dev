@@ -160,3 +160,7 @@ A few deliberate choices that come up often enough to be worth writing down (see
 - Visitor-facing copy does **not** link into `siropkin/budi`'s ADR tree or `docs/` files. Contributors still reason in ADRs, but the public site reads as plain English: restate the behavior in visitor-friendly terms and keep it aligned with the current product. Docs drift is still the enemy — just solved by rewording the one surface that shipped, not by pointing marketing visitors at a decision record.
 - Images should be optimized (WebP/AVIF where possible) and served with cache-friendly headers.
 - Keep the page JS-light. A marketing site that takes 4 seconds to render is not a good ad for a tool that brags about being fast.
+
+## Issue tracking
+
+All budi repos use **GitHub Issues** as the issue tracker. File bugs, feature requests, and tasks as GitHub issues on the relevant repo.
