@@ -8,7 +8,7 @@
   "redirects": [
     {
       "source": "/login",
-      "destination": "https://app.getbudi.dev",
+      "destination": "https://app.getbudi.dev/login",
       "permanent": false
     }
   ],
