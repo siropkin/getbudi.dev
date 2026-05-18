@@ -22,8 +22,8 @@
    * (#6b7280) measured 3.6–3.81:1 and broke the gate in R2.4.
    */
   --color-fg-dim: #8a93a1;
-  --color-accent: #22c55e;
-  --color-accent-soft: rgba(34, 197, 94, 0.12);
+  --color-accent: #2563eb;
+  --color-accent-soft: rgba(37, 99, 235, 0.12);
   --color-warn: #eab308;
 
   --font-sans:
