@@ -117,8 +117,10 @@ const jsonLd = {
           <span class="text-[1.05rem]">budi</span>
           <span class="text-fg-dim text-xs font-normal">/ getbudi.dev</span>
         </a>
-        <nav class="text-fg-muted flex items-center gap-5 text-sm">
-          <a href={siteAnchorHref(ANCHORS.install)} class="hover:text-fg">Install</a>
+        <nav class="text-fg-muted flex items-center gap-3 text-sm sm:gap-5">
+          <a href={siteAnchorHref(ANCHORS.install)} class="hover:text-fg hidden sm:inline"
+            >Install</a
+          >
           <a href={siteAnchorHref(ANCHORS.providers)} class="hover:text-fg hidden md:inline"
             >Providers</a
           >
@@ -149,6 +151,7 @@ const jsonLd = {
             <div
               class="border-line/70 bg-surface-2 absolute top-full right-0 z-20 mt-2 flex min-w-[160px] flex-col gap-2 rounded-md border p-3 shadow-lg"
             >
+              <a href={siteAnchorHref(ANCHORS.install)} class="hover:text-fg">Install</a>
               <a href={siteAnchorHref(ANCHORS.providers)} class="hover:text-fg">Providers</a>
               <a href={siteAnchorHref(ANCHORS.compare)} class="hover:text-fg">Compare</a>
               <a href={siteAnchorHref(ANCHORS.privacy)} class="hover:text-fg">Privacy</a>
@@ -170,7 +173,7 @@ const jsonLd = {
           </a>
           <a
             href="/login"
-            class="bg-accent hover:bg-accent/85 rounded-md px-3 py-1.5 text-sm font-medium text-white transition-colors"
+            class="bg-accent hover:bg-accent/85 hidden rounded-md px-3 py-1.5 text-sm font-medium text-white transition-colors sm:inline-block"
           >
             Sign in
           </a>
