@@ -6,24 +6,23 @@
  * syntax in templates; in v4 it does NOT wrap in var(), which silently breaks.
  */
 @theme {
-  --color-surface: #0b0d10;
-  --color-surface-2: #11141a;
-  --color-surface-3: #161a21;
-  --color-line: #232832;
-  --color-line-strong: #313846;
-  --color-fg: #e6e8ec;
-  --color-fg-muted: #9aa3b2;
+  --color-surface: #030E16;
+  --color-surface-2: #061520;
+  --color-surface-3: #0c2030;
+  --color-line: rgba(255, 255, 255, 0.1);
+  --color-line-strong: rgba(255, 255, 255, 0.15);
+  --color-fg: #ffffff;
+  --color-fg-muted: #a1a1aa;
   /*
-   * fg-dim must clear WCAG AA 4.5:1 on --color-surface-2 (#11141a) and
-   * --color-surface-3 (#161a21). #8a93a1 measures ~5.8:1 on surface-2 and
-   * ~5.5:1 on surface-3 (axe / Lighthouse mobile), while staying visibly
-   * dimmer than --color-fg-muted so the secondary/tertiary hierarchy holds.
-   * Do not lower this below ~#848c98 without re-measuring — the old value
-   * (#6b7280) measured 3.6–3.81:1 and broke the gate in R2.4.
+   * fg-dim must clear WCAG AA 4.5:1 on --color-surface-2 (#061520) and
+   * --color-surface-3 (#0c2030). #87878b measures ~5.2:1 on surface-2 and
+   * ~4.6:1 on surface-3, while staying visibly dimmer than --color-fg-muted
+   * so the secondary/tertiary hierarchy holds. Do not lower this below
+   * ~#838387 without re-measuring.
    */
-  --color-fg-dim: #8a93a1;
-  --color-accent: #2563eb;
-  --color-accent-soft: rgba(37, 99, 235, 0.12);
+  --color-fg-dim: #87878b;
+  --color-accent: #007FAF;
+  --color-accent-soft: rgba(0, 127, 175, 0.12);
   --color-warn: #eab308;
 
   --font-sans:
@@ -49,14 +48,14 @@
 
   body {
     background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(34, 197, 94, 0.08), transparent 60%),
-      radial-gradient(900px 500px at -10% 10%, rgba(99, 102, 241, 0.06), transparent 60%),
+      radial-gradient(1200px 600px at 80% -10%, rgba(0, 127, 175, 0.08), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(0, 127, 175, 0.05), transparent 60%),
       var(--color-surface);
     min-height: 100dvh;
   }
 
   ::selection {
-    background-color: rgba(34, 197, 94, 0.35);
+    background-color: rgba(0, 127, 175, 0.4);
     color: #fff;
   }
 
