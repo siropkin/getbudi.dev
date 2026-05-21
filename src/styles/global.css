@@ -6,7 +6,7 @@
  * syntax in templates; in v4 it does NOT wrap in var(), which silently breaks.
  */
 @theme {
-  --color-surface: #030E16;
+  --color-surface: #030e16;
   --color-surface-2: #061520;
   --color-surface-3: #0c2030;
   --color-line: rgba(255, 255, 255, 0.1);
@@ -21,7 +21,7 @@
    * ~#838387 without re-measuring.
    */
   --color-fg-dim: #87878b;
-  --color-accent: #007FAF;
+  --color-accent: #007faf;
   --color-accent-soft: rgba(0, 127, 175, 0.12);
   --color-warn: #eab308;
 
