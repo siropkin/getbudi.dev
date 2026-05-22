@@ -122,7 +122,7 @@ const policy = [
   "object-src 'none'",
   `script-src ${scriptSrc}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
+  "img-src 'self' data: https://img.shields.io https://vsmarketplacebadges.dev",
   "font-src 'self' data:",
   "connect-src 'self'",
   "manifest-src 'self'",

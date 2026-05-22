@@ -6,22 +6,34 @@ const editors = [
     id: "vscode",
     name: "VS Code",
     command: "code --install-extension siropkin.budi",
-    storeName: "VS Code Marketplace",
+    installUrl: "vscode:extension/siropkin.budi",
+    installLabel: "Install in VS Code",
     storeUrl: "https://marketplace.visualstudio.com/items?itemName=siropkin.budi",
+    storeName: "VS Code Marketplace",
+    badgeUrl: "https://vsmarketplacebadges.dev/installs-short/siropkin.budi.svg?color=007faf",
+    badgeAlt: "VS Code Marketplace install count",
   },
   {
     id: "cursor",
     name: "Cursor",
     command: "cursor --install-extension siropkin.budi",
-    storeName: "Open VSX",
+    installUrl: "https://open-vsx.org/extension/siropkin/budi",
+    installLabel: "Install from Open VSX",
     storeUrl: "https://open-vsx.org/extension/siropkin/budi",
+    storeName: "Open VSX",
+    badgeUrl: "https://img.shields.io/open-vsx/dt/siropkin/budi?label=downloads&color=007faf",
+    badgeAlt: "Open VSX download count",
   },
   {
     id: "jetbrains",
     name: "JetBrains IDEs",
-    command: "Settings → Plugins → Marketplace → search for budi",
-    storeName: "JetBrains Marketplace",
+    command: null,
+    installUrl: "https://plugins.jetbrains.com/plugin/31662-budi",
+    installLabel: "Install from Marketplace",
     storeUrl: "https://plugins.jetbrains.com/plugin/31662-budi",
+    storeName: "JetBrains Marketplace",
+    badgeUrl: "https://img.shields.io/jetbrains/plugin/d/31662-budi?label=downloads&color=007faf",
+    badgeAlt: "JetBrains Marketplace download count",
   },
 ] as const;
 ---
@@ -68,20 +80,36 @@ const editors = [
           <h3 class="text-fg min-w-0 leading-tight font-semibold tracking-tight">{ed.name}</h3>
         </header>
 
-        <a
-          href={ed.storeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-fg-muted hover:text-accent inline-flex items-center gap-1 self-start text-xs"
-        >
-          View on {ed.storeName} →
+        <a href={ed.storeUrl} target="_blank" rel="noopener noreferrer">
+          <img src={ed.badgeUrl} alt={ed.badgeAlt} height="20" loading="lazy" />
         </a>
 
-        {ed.id === "jetbrains" ? (
-          <p class="text-fg-muted text-xs leading-relaxed">{ed.command}</p>
-        ) : (
-          <CopyableCommand command={ed.command} variant="compact" />
-        )}
+        <a
+          href={ed.installUrl}
+          target={ed.id === "vscode" ? undefined : "_blank"}
+          rel={ed.id === "vscode" ? undefined : "noopener noreferrer"}
+          class="bg-accent-soft text-accent hover:bg-accent/20 inline-flex items-center gap-2 self-start rounded-lg px-3.5 py-2 text-sm font-medium transition-colors"
+        >
+          {ed.installLabel}
+          <svg
+            aria-hidden="true"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <>
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </>
+          </svg>
+        </a>
+
+        {ed.command && <CopyableCommand command={ed.command} variant="compact" />}
       </article>
     ))
   }
