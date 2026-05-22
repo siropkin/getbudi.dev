@@ -81,12 +81,7 @@ const editors = [
         </header>
 
         <a href={ed.storeUrl} target="_blank" rel="noopener noreferrer">
-          <img
-            src={ed.badgeUrl}
-            alt={ed.badgeAlt}
-            height="20"
-            loading="lazy"
-          />
+          <img src={ed.badgeUrl} alt={ed.badgeAlt} height="20" loading="lazy" />
         </a>
 
         <a
@@ -96,14 +91,25 @@ const editors = [
           class="bg-accent-soft text-accent hover:bg-accent/20 inline-flex items-center gap-2 self-start rounded-lg px-3.5 py-2 text-sm font-medium transition-colors"
         >
           {ed.installLabel}
-          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+          <svg
+            aria-hidden="true"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <>
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </>
           </svg>
         </a>
 
-        {ed.command && (
-          <CopyableCommand command={ed.command} variant="compact" />
-        )}
+        {ed.command && <CopyableCommand command={ed.command} variant="compact" />}
       </article>
     ))
   }
