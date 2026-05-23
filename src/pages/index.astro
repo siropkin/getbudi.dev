@@ -49,10 +49,8 @@ const faqJsonLd = {
 
 const installCommands = {
   macos: "brew install siropkin/budi/budi && budi init",
-  linux:
-    "curl -fsSL https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.sh | bash && budi init",
-  windows:
-    "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init",
+  linux: "curl -fsSL https://getbudi.dev/install.sh | sh",
+  windows: "irm https://getbudi.dev/install.ps1 | iex",
 };
 
 let LATEST_BUDI_VERSION = "v8.4.2";

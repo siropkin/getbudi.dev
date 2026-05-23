@@ -10,6 +10,16 @@
       "source": "/login",
       "destination": "https://app.getbudi.dev/login",
       "permanent": false
+    },
+    {
+      "source": "/install.sh",
+      "destination": "https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.sh",
+      "permanent": false
+    },
+    {
+      "source": "/install.ps1",
+      "destination": "https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1",
+      "permanent": false
     }
   ],
   "headers": [
