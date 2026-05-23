@@ -1,0 +1,687 @@
+---
+import Base from "~/layouts/Base.astro";
+import { ANCHORS, siteAnchorHref } from "~/lib/anchors";
+
+const neverUpload = [
+  { category: "Your prompts", why: "Everything you type to an AI agent stays on your machine." },
+  { category: "AI responses", why: "Generated code, reasoning, and tool call output stay local." },
+  { category: "Source code & file paths", why: "Your project structure and file system layout are never exposed." },
+  { category: "Email addresses", why: "Identity is handled by API key, not personal information." },
+  { category: "Raw request/response payloads", why: "Unstructured data dumps could contain anything sensitive." },
+  { category: "MCP tool details", why: "Server names, tool arguments, and execution results stay private." },
+  { category: "Custom tag values", why: "Tags are user-defined and could contain anything, so they stay local-only." },
+];
+
+const optionallyUploads = [
+  "Token counts (input, output, cache) — numbers, no content",
+  "Cost in cents — derived from token counts and public pricing",
+  "Model and provider names — public identifiers like claude-sonnet-4-20250514",
+  "Hashed repo identifier — a SHA-256 hash, not the actual path",
+  "Git branch name — useful for ticket attribution, contains no code",
+  "Session title — workspace or project-level label (e.g. Verkada-Web)",
+  "Message and session counts — numeric totals per time bucket",
+  "Ticket ID — extracted from branch name (e.g. PROJ-1234)",
+];
+---
+
+<Base
+  title="Cloud Data Contract and Privacy Boundary — budi"
+  description="Full technical data contract for budi's optional cloud sync: what data leaves your machine, what never does, identity model, authentication, API surface, and configuration reference."
+  canonical="https://getbudi.dev/privacy/"
+>
+  {/* HEADER */}
+  <section class="container-readable pt-16 pb-14 sm:pt-24 sm:pb-20">
+    <div class="flex max-w-3xl flex-col items-start gap-6 sm:gap-8">
+      <div class="flex flex-wrap items-center gap-2">
+        <a href="/" class="chip hover:border-accent hover:text-fg transition-colors">
+          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          Home
+        </a>
+        <span class="chip">
+          <span aria-hidden="true" class="bg-accent inline-block h-1.5 w-1.5 rounded-full"></span>
+          ADR-0083
+        </span>
+      </div>
+
+      <h1 class="text-[2.25rem] leading-[1.05] font-semibold tracking-tight text-balance sm:text-[3.25rem]">
+        Cloud Data Contract and
+        <span class="text-accent">Privacy Boundary.</span>
+      </h1>
+
+      <p class="text-fg-muted text-lg leading-relaxed text-pretty sm:text-xl">
+        Budi's cloud sync is optional. When you turn it on, only pre-aggregated numbers
+        leave your machine — never prompts, code, or AI responses. This page is the full
+        technical contract. For the short version, see the
+        <a href={siteAnchorHref(ANCHORS.privacy)} class="link-underline hover:text-fg">landing page summary</a>.
+      </p>
+
+      <p class="text-fg-dim text-sm">
+        Source: <a href="https://github.com/siropkin/budi/wiki/Cloud-Data-Contract-and-Privacy-Boundary" target="_blank" rel="noopener noreferrer" class="link-underline hover:text-fg">ADR-0083</a>
+        with amendments ADR-0091, ADR-0094, and the 2026-05-15 workspace rename.
+      </p>
+    </div>
+  </section>
+
+  {/* TL;DR */}
+  <section class="container-readable border-line/70 border-t py-10 sm:py-14">
+    <div class="card border-l-accent border-l-4 p-5 sm:p-6">
+      <h2 class="text-fg mb-3 text-lg font-semibold tracking-tight">The short version</h2>
+      <div class="grid gap-4 sm:grid-cols-3">
+        <div>
+          <p class="text-fg text-sm font-medium">Your code is yours</p>
+          <p class="text-fg-muted mt-1 text-sm leading-relaxed">
+            Prompts, AI responses, source code, and file paths never leave your machine.
+            There is no "full upload" mode — this is enforced structurally, not by a setting.
+          </p>
+        </div>
+        <div>
+          <p class="text-fg text-sm font-medium">Only numbers travel</p>
+          <p class="text-fg-muted mt-1 text-sm leading-relaxed">
+            If you opt in to cloud sync, only pre-aggregated daily totals travel: token counts,
+            cost, model name, hashed repo ID, and branch name. Nothing content-bearing.
+          </p>
+        </div>
+        <div>
+          <p class="text-fg text-sm font-medium">Off by default</p>
+          <p class="text-fg-muted mt-1 text-sm leading-relaxed">
+            Cloud sync is disabled until you explicitly run <code class="bg-surface-3 border-line/70 rounded border px-1 py-0.5 text-[0.85em]">budi cloud join</code>.
+            No telemetry, no phone-home, no automatic opt-in.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* TABLE OF CONTENTS */}
+  <section class="container-readable py-6 sm:py-8">
+    <nav class="card max-w-xl p-5 sm:p-6">
+      <p class="text-fg-dim mb-3 text-xs tracking-[0.18em] uppercase">On this page</p>
+      <ol class="text-fg-muted grid gap-1.5 text-sm sm:grid-cols-2">
+        <li><a href="#core-contract" class="hover:text-fg">1. What stays, what goes</a></li>
+        <li><a href="#sync-payload" class="hover:text-fg">2. What the sync looks like</a></li>
+        <li><a href="#identity" class="hover:text-fg">3. Identity model</a></li>
+        <li><a href="#auth" class="hover:text-fg">4. Authentication & transport</a></li>
+        <li><a href="#idempotency" class="hover:text-fg">5. Retries & deduplication</a></li>
+        <li><a href="#cloud-alpha" class="hover:text-fg">6. Cloud alpha specs</a></li>
+        <li><a href="#api-surface" class="hover:text-fg">7. API surface (v1)</a></li>
+        <li><a href="#config" class="hover:text-fg">8. Configuration reference</a></li>
+        <li><a href="#tradeoffs" class="hover:text-fg">9. Trade-offs</a></li>
+        <li><a href="#amendments" class="hover:text-fg">10. Amendments</a></li>
+      </ol>
+    </nav>
+  </section>
+
+  {/* 1. CORE PRIVACY CONTRACT */}
+  <section id="core-contract" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 1</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">What stays, what goes.</h2>
+      <p class="text-fg-muted mt-3">
+        The sync worker can only read from rollup tables — pre-aggregated counts
+        and costs. It has no access to message content, file paths, or raw payloads.
+        This is a structural guarantee, not a config toggle.
+      </p>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-2">
+      {/* Never leaves */}
+      <div>
+        <h3 class="text-fg mb-4 font-semibold tracking-tight">Never leaves your machine</h3>
+        <div class="grid gap-3">
+          {neverUpload.map((item) => (
+            <div class="card border-l-accent border-l-4 px-4 py-3">
+              <p class="text-fg text-sm font-medium">{item.category}</p>
+              <p class="text-fg-muted mt-1 text-sm leading-relaxed">{item.why}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Can optionally leave */}
+      <div>
+        <h3 class="text-fg mb-4 font-semibold tracking-tight">Can optionally leave (when cloud sync is on)</h3>
+        <div class="card border-l-warn border-l-4 p-5 sm:p-6">
+          <p class="text-fg-muted mb-4 text-sm leading-relaxed">
+            These are the only fields that cross the wire — all derived from pre-aggregated daily rollups.
+            No content, no paths, no PII.
+          </p>
+          <ul class="space-y-2.5">
+            {optionallyUploads.map((item) => (
+              <li class="text-fg-muted flex items-start gap-2.5 text-sm leading-relaxed">
+                <span aria-hidden="true" class="bg-warn mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p class="text-fg-dim mt-4 text-sm leading-relaxed">
+          <strong class="text-fg font-medium">Repo identifier note:</strong> The repo_id is a SHA-256 hash of the repo
+          root path, computed locally. The actual file system path never appears in the sync payload.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* 2. SYNC PAYLOAD STRUCTURE */}
+  <section id="sync-payload" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 2</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">What the sync looks like.</h2>
+      <p class="text-fg-muted mt-3">
+        The daemon pushes daily rollup records to the cloud — once per sync tick (every 5 minutes by default).
+        Daily granularity gives managers the views they need without revealing per-hour work patterns.
+      </p>
+    </header>
+
+    <div class="grid gap-6">
+      <div>
+        <h3 class="text-fg mb-2 font-semibold tracking-tight">Sync envelope</h3>
+        <p class="text-fg-muted mb-4 text-sm">Every push is wrapped in an envelope that identifies the device and workspace:</p>
+        <div class="card overflow-hidden">
+          <div class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs">
+            <span class="font-mono">sync envelope</span>
+          </div>
+          <pre class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[13px]"><code>{`{
+  "schema_version": 2,
+  "device_id": "d_abc123def456",
+  "workspace_id": "ws_xyz789",
+  "label": "ivan-mbp",
+  "synced_at": "2026-04-10T18:30:00Z",
+  "payload": {
+    "daily_rollups": [ ... ],
+    "session_summaries": [ ... ]
+  }
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-fg mb-2 font-semibold tracking-tight">Daily rollup record</h3>
+        <p class="text-fg-muted mb-4 text-sm">
+          One record per unique combination of day, role, provider, model, repo, and branch.
+          This is what a single row looks like:
+        </p>
+        <div class="card overflow-hidden">
+          <div class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs">
+            <span class="font-mono">daily rollup</span>
+          </div>
+          <pre class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[13px]"><code>{`{
+  "bucket_day": "2026-04-10",
+  "role": "assistant",
+  "provider": "anthropic",
+  "model": "claude-sonnet-4-20250514",
+  "repo_id": "sha256:a1b2c3d4e5f6",
+  "git_branch": "feature/PROJ-1234-add-auth",
+  "ticket": "PROJ-1234",
+  "ticket_source": "branch",
+  "message_count": 47,
+  "input_tokens": 125000,
+  "output_tokens": 89000,
+  "cache_creation_tokens": 15000,
+  "cache_read_tokens": 42000,
+  "cost_cents": 3.42
+}`}</code></pre>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-fg mb-2 font-semibold tracking-tight">Session summary record</h3>
+        <p class="text-fg-muted mb-4 text-sm">
+          A scrubbed per-session summary with computed totals only — no per-message detail, no paths, no content:
+        </p>
+        <div class="card overflow-hidden">
+          <div class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs">
+            <span class="font-mono">session summary</span>
+          </div>
+          <pre class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[13px]"><code>{`{
+  "session_id": "d99dfe22-d05c-4c78-8698-015d06e5dabb",
+  "provider": "claude_code",
+  "title": "Verkada-Web",
+  "started_at": "2026-04-10T09:15:00Z",
+  "ended_at": "2026-04-10T10:45:00Z",
+  "duration_ms": 5400000,
+  "repo_id": "sha256:a1b2c3d4e5f6",
+  "git_branch": "feature/PROJ-1234-add-auth",
+  "ticket": "PROJ-1234",
+  "message_count": 47,
+  "total_input_tokens": 125000,
+  "total_output_tokens": 89000,
+  "total_cost_cents": 3.42,
+  "primary_model": "claude-sonnet-4-20250514"
+}`}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* 3. IDENTITY MODEL */}
+  <section id="identity" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 3</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Identity model.</h2>
+      <p class="text-fg-muted mt-3">
+        Three entities form a simple hierarchy. A workspace is your team's billing and
+        visibility boundary. Users belong to one workspace. Each user can have multiple
+        devices (laptop, desktop, CI runner).
+      </p>
+    </header>
+
+    <div class="card mb-6 overflow-hidden">
+      <div class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs">
+        <span class="font-mono">hierarchy</span>
+      </div>
+      <pre class="text-fg m-0 px-4 py-4 text-center text-sm"><code>Workspace (1) ──&lt; User (many) ──&lt; Device (many)</code></pre>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-3">
+      {([
+        {
+          entity: "Workspace",
+          id: "ws_<alphanumeric>",
+          desc: "Your team boundary. Manager creates it in the cloud dashboard. All devices in a workspace contribute to the same dashboard.",
+        },
+        {
+          entity: "User",
+          id: "usr_<alphanumeric>",
+          desc: "A cloud account created via self-registration or manager invite. Can be a member (sync data, see own stats) or manager (see everyone's stats).",
+        },
+        {
+          entity: "Device",
+          id: "dev_<alphanumeric>",
+          desc: "One budi installation on one machine. Generated locally on first login. Persists across daemon restarts — regenerated only if the config file is deleted.",
+        },
+      ]).map((item) => (
+        <article class="card flex flex-col gap-3 p-5 sm:p-6">
+          <div>
+            <h3 class="text-fg font-semibold tracking-tight">{item.entity}</h3>
+            <code class="text-fg-dim text-xs">{item.id}</code>
+          </div>
+          <p class="text-fg-muted text-sm leading-relaxed">{item.desc}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {/* 4. AUTHENTICATION & TRANSPORT */}
+  <section id="auth" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 4</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Authentication & transport.</h2>
+      <p class="text-fg-muted mt-3">
+        All communication is encrypted, one-directional, and initiated by your machine.
+        The cloud never calls back to the daemon — there is no webhook, no pull endpoint,
+        no remote command channel.
+      </p>
+    </header>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="card p-5 sm:p-6">
+        <h3 class="text-fg mb-3 font-semibold tracking-tight">How the daemon talks to the cloud</h3>
+        <dl class="flex flex-col gap-3 text-sm">
+          <div>
+            <dt class="text-fg-dim text-xs tracking-wider uppercase">Transport</dt>
+            <dd class="text-fg-muted mt-0.5">HTTPS only. The daemon refuses to sync over plain HTTP (hard-coded).</dd>
+          </div>
+          <div>
+            <dt class="text-fg-dim text-xs tracking-wider uppercase">Auth</dt>
+            <dd class="text-fg-muted mt-0.5">API key in <code class="text-[0.85em]">Authorization: Bearer budi_&lt;key&gt;</code> header.</dd>
+          </div>
+          <div>
+            <dt class="text-fg-dim text-xs tracking-wider uppercase">Key storage</dt>
+            <dd class="text-fg-muted mt-0.5"><code class="text-[0.85em]">~/.config/budi/cloud.toml</code>, file permissions <code class="text-[0.85em]">0600</code>.</dd>
+          </div>
+          <div>
+            <dt class="text-fg-dim text-xs tracking-wider uppercase">Rate limiting</dt>
+            <dd class="text-fg-muted mt-0.5">Server-side. On 429s the daemon backs off exponentially (1s &rarr; 2s &rarr; 4s &rarr; ... &rarr; 5 min cap).</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="card p-5 sm:p-6">
+        <h3 class="text-fg mb-3 font-semibold tracking-tight">What the cloud can and cannot see</h3>
+        <dl class="flex flex-col gap-3 text-sm">
+          <div>
+            <dt class="text-fg-dim text-xs tracking-wider uppercase">Sees</dt>
+            <dd class="text-fg-muted mt-0.5">Aggregated cost/usage metrics, session summaries, model names, provider names, hashed repo IDs, branch names, ticket IDs.</dd>
+          </div>
+          <div>
+            <dt class="text-fg-dim text-xs tracking-wider uppercase">Never sees</dt>
+            <dd class="text-fg-muted mt-0.5">Prompts, responses, code, file paths, email addresses, raw payloads, tag values, tool arguments, MCP traffic.</dd>
+          </div>
+          <div>
+            <dt class="text-fg-dim text-xs tracking-wider uppercase">Direction</dt>
+            <dd class="text-fg-muted mt-0.5">Push-only from daemon. The cloud never initiates a connection to your machine.</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <h3 class="text-fg mb-4 font-semibold tracking-tight">Other outbound requests</h3>
+      <p class="text-fg-muted mb-4 text-sm">
+        Besides cloud sync, the daemon can make two additional HTTPS requests for pricing data.
+        Both are opt-out via <code class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.85em]">BUDI_PRICING_REFRESH=0</code>:
+      </p>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="card p-4">
+          <p class="text-fg text-sm font-medium">LiteLLM pricing manifest</p>
+          <p class="text-fg-muted mt-1 text-sm leading-relaxed">
+            Anonymous GET to fetch the latest model prices. No user content, no identifiers.
+          </p>
+          <p class="text-fg-dim mt-2 text-xs">Added by ADR-0091</p>
+        </div>
+        <div class="card p-4">
+          <p class="text-fg text-sm font-medium">Team pricing pull</p>
+          <p class="text-fg-muted mt-1 text-sm leading-relaxed">
+            Authenticated GET to fetch your workspace's negotiated price list. No user content in the request.
+          </p>
+          <p class="text-fg-dim mt-2 text-xs">Added by ADR-0094</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* 5. IDEMPOTENCY & DEDUPLICATION */}
+  <section id="idempotency" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 5</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Retries & deduplication.</h2>
+      <p class="text-fg-muted mt-3">
+        Network failures, retries, and overlapping sync windows are handled gracefully.
+        The server uses UPSERT semantics — re-sending the same data never creates duplicates.
+      </p>
+    </header>
+
+    <div class="grid gap-6 sm:grid-cols-2">
+      <div class="card p-5 sm:p-6">
+        <h3 class="text-fg mb-3 font-semibold tracking-tight">How duplicates are prevented</h3>
+        <p class="text-fg-muted mb-3 text-sm leading-relaxed">
+          Each record type has a unique key. If the same key arrives twice, the server
+          overwrites the old row — so the daemon can safely retry on any failure.
+        </p>
+        <dl class="flex flex-col gap-3 text-sm">
+          <div>
+            <dt class="text-fg text-xs font-medium">Daily rollup key</dt>
+            <dd class="text-fg-muted mt-1"><code class="bg-surface-3 border-line/70 rounded border px-1.5 py-0.5 text-[0.85em]">(device_id, bucket_day, role, provider, model, repo_id, git_branch)</code></dd>
+          </div>
+          <div>
+            <dt class="text-fg text-xs font-medium">Session summary key</dt>
+            <dd class="text-fg-muted mt-1"><code class="bg-surface-3 border-line/70 rounded border px-1.5 py-0.5 text-[0.85em]">(device_id, session_id)</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="card p-5 sm:p-6">
+        <h3 class="text-fg mb-3 font-semibold tracking-tight">Sync watermark</h3>
+        <p class="text-fg-muted mb-3 text-sm leading-relaxed">
+          The daemon remembers the last day that was fully synced. On each tick it sends:
+        </p>
+        <ol class="text-fg-muted list-inside list-decimal space-y-1.5 text-sm leading-relaxed">
+          <li>New days since the watermark</li>
+          <li>Today's rollups again (they grow throughout the day)</li>
+          <li>Session summaries for sessions that changed since the last sync</li>
+        </ol>
+        <p class="text-fg-muted mt-3 text-sm leading-relaxed">
+          The server confirms the watermark in its response. If the push fails, the watermark
+          doesn't advance — and the next tick retries.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* 6. CLOUD ALPHA SPECIFICATIONS */}
+  <section id="cloud-alpha" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 6</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Cloud alpha specs.</h2>
+      <p class="text-fg-muted mt-3">
+        The current cloud alpha is designed for small teams of 1 to 20 developers.
+      </p>
+    </header>
+
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="text-fg-dim border-line/70 border-b text-xs tracking-wider uppercase">
+          <tr>
+            <th class="px-4 py-3 text-left font-medium sm:px-5">Aspect</th>
+            <th class="px-4 py-3 text-left font-medium sm:px-5">How it works</th>
+          </tr>
+        </thead>
+        <tbody class="text-fg-muted">
+          {([
+            ["Getting started", "Manager signs up, creates a workspace, and shares an invite link."],
+            ["Joining a team", "Developer runs budi cloud join <invite-token> — one command."],
+            ["Roles", "Manager sees the whole team's dashboard. Member sees only their own data."],
+            ["Data granularity", "Daily cost breakdowns. No per-hour or real-time views yet."],
+            ["Retention", "90 days of synced data. Configurable in future versions."],
+            ["Multi-workspace", "Not yet — a user belongs to exactly one workspace in v1."],
+            ["SSO / SAML", "Not yet — API key auth only. Enterprise auth is planned for post-8.0."],
+          ]).map(([aspect, decision], i) => (
+            <tr class:list={[i > 0 ? "border-line/70 border-t" : ""]}>
+              <td class="text-fg px-4 py-3 font-medium sm:px-5">{aspect}</td>
+              <td class="px-4 py-3 sm:px-5">{decision}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {/* 7. API SURFACE */}
+  <section id="api-surface" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 7</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">API surface (v1).</h2>
+      <p class="text-fg-muted mt-3">
+        The daemon talks to exactly four cloud endpoints. The dashboard and user management
+        APIs are separate and not covered here.
+      </p>
+    </header>
+
+    <div class="card mb-6 overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="text-fg-dim border-line/70 border-b text-xs tracking-wider uppercase">
+          <tr>
+            <th class="px-4 py-3 text-left font-medium sm:px-5">Endpoint</th>
+            <th class="px-4 py-3 text-left font-medium sm:px-5">What it does</th>
+          </tr>
+        </thead>
+        <tbody class="text-fg-muted">
+          {([
+            ["POST /v1/ingest", "Receives the sync payload from the daemon"],
+            ["GET /v1/ingest/status", "Returns sync health and current watermark for the device"],
+            ["GET /v1/whoami", "Returns the identity of the authenticated device"],
+            ["GET /v1/pricing/active", "Returns the workspace's negotiated price list"],
+          ]).map(([endpoint, purpose], i) => (
+            <tr class:list={[i > 0 ? "border-line/70 border-t" : ""]}>
+              <td class="text-fg px-4 py-3 font-medium sm:px-5"><code class="text-[0.85em]">{endpoint}</code></td>
+              <td class="px-4 py-3 sm:px-5">{purpose}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="text-fg mb-4 font-semibold tracking-tight">POST /v1/ingest response codes</h3>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {([
+        ["200 OK", "Payload accepted. Watermark updated."],
+        ["401", "Auth failed. Daemon stops syncing until re-authenticated."],
+        ["422", "Schema mismatch. Daemon logs a warning and waits for update."],
+        ["429 / 5xx", "Rate limit or server error. Daemon retries with exponential backoff."],
+      ]).map(([code, desc]) => (
+        <div class="card p-4">
+          <p class="text-fg text-sm font-medium">{code}</p>
+          <p class="text-fg-muted mt-1 text-sm leading-relaxed">{desc}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* 8. CONFIGURATION REFERENCE */}
+  <section id="config" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 8</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Configuration reference.</h2>
+      <p class="text-fg-muted mt-3">
+        Everything lives in one file: <code class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]">~/.config/budi/cloud.toml</code>.
+        It's created by <code class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]">budi cloud join</code>
+        and disabled by default — no automatic opt-in, no telemetry, no phone-home.
+      </p>
+    </header>
+
+    <div class="mb-8">
+      <h3 class="text-fg mb-4 font-semibold tracking-tight">Default config file</h3>
+      <div class="card overflow-hidden">
+        <div class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs">
+          <span class="font-mono">~/.config/budi/cloud.toml</span>
+        </div>
+        <pre class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[13px]"><code>{`[cloud]
+enabled = false                       # nothing syncs until you flip this
+api_key = "budi_..."                  # your bearer token
+device_id = "dev_..."                 # stable machine identifier
+workspace_id = "ws_..."               # your team's workspace
+endpoint = "https://app.getbudi.dev"  # cloud ingest URL
+
+[cloud.sync]
+interval_seconds = 300                # push every 5 minutes
+retry_max_seconds = 300               # max backoff cap`}</code></pre>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-fg mb-4 font-semibold tracking-tight">Environment variable overrides</h3>
+      <p class="text-fg-muted mb-4 text-sm">
+        These override the config file — useful for CI or self-hosted deployments:
+      </p>
+      <div class="grid gap-3 sm:grid-cols-2">
+        {([
+          ["BUDI_CLOUD_ENABLED", "Override the enabled flag (true / false)"],
+          ["BUDI_CLOUD_API_KEY", "Override API key (useful for CI)"],
+          ["BUDI_CLOUD_ENDPOINT", "Override cloud URL (useful for self-hosted)"],
+          ["BUDI_PRICING_REFRESH", "Set to 0 to disable pricing refresh requests"],
+        ]).map(([name, desc]) => (
+          <div class="card p-4">
+            <code class="text-fg text-sm font-medium">{name}</code>
+            <p class="text-fg-muted mt-1 text-sm leading-relaxed">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* 9. TRADE-OFFS */}
+  <section id="tradeoffs" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 9</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Trade-offs.</h2>
+      <p class="text-fg-muted mt-3">
+        Privacy-first comes with real costs. Here's what the design intentionally gives up.
+      </p>
+    </header>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      {([
+        {
+          title: "Daily granularity only",
+          body: "The cloud dashboard shows daily cost breakdowns. You can't drill into hourly or per-request data in the cloud — but you can locally via the CLI.",
+        },
+        {
+          title: "No per-message visibility",
+          body: "The cloud sees \"47 messages cost $3.42 on this branch today\" — never the content of those messages. Less debuggable, more private.",
+        },
+        {
+          title: "No tag sync",
+          body: "Custom tags stay local-only because their values are user-defined and could contain anything sensitive. Managers filter by model/repo/branch/ticket instead.",
+        },
+        {
+          title: "One workspace per user",
+          body: "If you consult for multiple clients, you can't aggregate across workspaces yet. Multi-workspace is planned for post-8.0.",
+        },
+        {
+          title: "API key auth only",
+          body: "No SSO, SAML, or OAuth yet. Fine for small-team alpha; enterprise auth is on the roadmap.",
+        },
+        {
+          title: "No central configuration",
+          body: "Managers can't push budget limits or settings to developer machines. All config is local. Budget enforcement happens on your machine, not in the cloud.",
+        },
+      ]).map((item) => (
+        <article class="card flex flex-col gap-2 p-5 sm:p-6">
+          <h3 class="text-fg font-semibold tracking-tight">{item.title}</h3>
+          <p class="text-fg-muted text-sm leading-relaxed">{item.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {/* 10. AMENDMENTS */}
+  <section id="amendments" class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20">
+    <header class="mb-10 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Section 10</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Amendments.</h2>
+      <p class="text-fg-muted mt-3">
+        Changes to the original data contract since it was published. In every case,
+        the core privacy guarantee — no content, no code, no prompts leave your machine — is unchanged.
+      </p>
+    </header>
+
+    <div class="grid gap-4">
+      <article class="card p-5 sm:p-6">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="chip border-accent text-accent">ADR-0091</span>
+          <span class="text-fg-dim text-xs">2026-04-21</span>
+        </div>
+        <h3 class="text-fg mt-3 font-semibold tracking-tight">Pricing refresh</h3>
+        <p class="text-fg-muted mt-2 text-sm leading-relaxed">
+          The daemon now fetches an open-source pricing manifest (LiteLLM) to stay current with model costs.
+          This is an anonymous request with no user data attached. Disable with <code class="text-[0.85em]">BUDI_PRICING_REFRESH=0</code>.
+        </p>
+      </article>
+
+      <article class="card p-5 sm:p-6">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="chip border-accent text-accent">ADR-0094</span>
+          <span class="text-fg-dim text-xs">2026-05-11</span>
+        </div>
+        <h3 class="text-fg mt-3 font-semibold tracking-tight">Team pricing</h3>
+        <p class="text-fg-muted mt-2 text-sm leading-relaxed">
+          Workspaces can now set custom model prices. The daemon fetches these via an authenticated request
+          that carries no user content — just a small JSON of rates. Same opt-out switch.
+        </p>
+      </article>
+
+      <article class="card p-5 sm:p-6">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="chip border-accent text-accent">#836</span>
+          <span class="text-fg-dim text-xs">2026-05-15</span>
+        </div>
+        <h3 class="text-fg mt-3 font-semibold tracking-tight">Workspace rename</h3>
+        <p class="text-fg-muted mt-2 text-sm leading-relaxed">
+          "Organization" was renamed to "Workspace" across the codebase. The daemon accepts both the old
+          <code class="text-[0.85em]">org_id</code> and new <code class="text-[0.85em]">workspace_id</code>
+          keys during a transition period so existing configs keep working without edits.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  {/* FOOTER CTA */}
+  <section class="container-readable border-line/70 border-t py-10 sm:py-14">
+    <div class="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div class="max-w-2xl">
+        <p class="text-fg-muted text-sm leading-relaxed">
+          Questions about the data contract?
+          <a href="https://github.com/siropkin/budi/issues" target="_blank" rel="noopener noreferrer" class="link-underline hover:text-fg">Open an issue</a>
+          or check the
+          <a href="https://github.com/siropkin/budi/wiki/Cloud-Data-Contract-and-Privacy-Boundary" target="_blank" rel="noopener noreferrer" class="link-underline hover:text-fg">wiki source</a>.
+        </p>
+      </div>
+      <a href="/" class="text-accent hover:text-accent/85 inline-flex shrink-0 items-center gap-1.5 self-start text-sm font-semibold sm:self-auto">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        Back to home
+      </a>
+    </div>
+  </section>
+</Base>
