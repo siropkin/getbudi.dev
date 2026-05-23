@@ -55,20 +55,6 @@ const installCommands = {
     "irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/install-standalone.ps1 | iex; budi init",
 };
 
-let LATEST_BUDI_VERSION = "v8.4.2";
-try {
-  const res = await fetch("https://api.github.com/repos/siropkin/budi/releases/latest", {
-    signal: AbortSignal.timeout(5000),
-  });
-  if (res.ok) {
-    const data = await res.json();
-    if (typeof data.tag_name === "string" && /^v\d+\.\d+\.\d+/.test(data.tag_name)) {
-      LATEST_BUDI_VERSION = data.tag_name;
-    }
-  }
-} catch {
-  // keep fallback
-}
 const features = [
   {
     title: "Multi-agent, no interception",
@@ -249,8 +235,7 @@ const altInstalls = [
       <div class="order-2 lg:order-1">
         <OsInstallTabs id="install-hero" commands={installCommands} variant="hero" />
         <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-          <span>Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>.</span
-          >
+          <span>Installs latest.</span>
           <span>
             One command. macOS / Linux / Windows. No account needed.
             <a href={anchorHref(ANCHORS.install)} class="link-underline hover:text-fg"
@@ -622,8 +607,7 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
 
     <OsInstallTabs id="install-section" commands={installCommands} variant="hero" />
     <p class="text-fg-dim mt-2 text-xs">
-      Installs <code class="text-fg-muted text-[11px]">{LATEST_BUDI_VERSION}</code>. Latest release
-      on <a
+      Installs latest release from <a
         href="https://github.com/siropkin/budi/releases"
         class="link-underline hover:text-fg"
         target="_blank"
