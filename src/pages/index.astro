@@ -1,6 +1,7 @@
 ---
 import Base from "~/layouts/Base.astro";
 import CopyableCommand from "~/components/CopyableCommand.astro";
+import CodeTabs from "~/components/CodeTabs.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
 import EditorInstallCards from "~/components/EditorInstallCards.astro";
 import GitHubIcon from "~/components/GitHubIcon.astro";
@@ -163,25 +164,16 @@ const providers = [
   },
 ];
 
-const altInstalls = [
+const vsixTabs = [
   {
-    label: "Bundled extension via budi CLI",
-    note: "Same path budi init uses. Picks the right editor automatically.",
-    code: "budi integrations install --with cursor-extension",
-  },
-  {
-    label: "Manual VSIX in VS Code (offline / pinned)",
-    note: "Download cursor-budi.vsix from the budi-cursor releases page first.",
+    key: "vscode",
+    label: "VS Code",
     code: "code --install-extension cursor-budi.vsix --force",
   },
   {
-    label: "Manual VSIX in Cursor (offline / pinned)",
-    note: "Same VSIX file works in Cursor — Open VSX is just a discovery surface.",
+    key: "cursor",
+    label: "Cursor",
     code: "cursor --install-extension cursor-budi.vsix --force",
-  },
-  {
-    label: "Daemon from source (Rust toolchain)",
-    code: "git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh",
   },
 ];
 ---
@@ -677,15 +669,37 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
         Other install methods
       </summary>
       <div class="mt-4 grid gap-3">
-        {
-          altInstalls.map((alt) => (
-            <div>
-              <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">{alt.label}</div>
-              {alt.note && <p class="text-fg-muted mb-2 text-xs leading-relaxed">{alt.note}</p>}
-              <CopyableCommand command={alt.code} variant="compact" />
-            </div>
-          ))
-        }
+        <div>
+          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
+            Bundled extension via budi CLI
+          </div>
+          <p class="text-fg-muted mb-2 text-xs leading-relaxed">
+            Same path budi init uses. Picks the right editor automatically.
+          </p>
+          <CopyableCommand
+            command="budi integrations install --with cursor-extension"
+            variant="compact"
+          />
+        </div>
+        <div>
+          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
+            Manual VSIX (offline / pinned)
+          </div>
+          <p class="text-fg-muted mb-2 text-xs leading-relaxed">
+            Download cursor-budi.vsix from the budi-cursor releases page first. The same file works
+            in both editors.
+          </p>
+          <CodeTabs id="alt-vsix" variant="compact" tabs={vsixTabs} />
+        </div>
+        <div>
+          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
+            Daemon from source (Rust toolchain)
+          </div>
+          <CopyableCommand
+            command="git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh"
+            variant="compact"
+          />
+        </div>
       </div>
     </details>
   </section>
