@@ -31,8 +31,9 @@ Chosen in [#2](https://github.com/siropkin/getbudi.dev/issues/2) (Astro 5 at the
 src/
   layouts/Base.astro         # <html>, head, header (with mobile-nav <details> disclosure for the sections hidden below the sm: breakpoint), footer, skip link, OG/Twitter meta, JSON-LD seam (via <JsonLd />), icons, Vercel Web Analytics
   components/
+    CodeTabs.astro           # generic tabbed code-block switcher (accepts an array of {key, label, icon?, code, note?} tabs). Wraps CopyableCommand. Used directly for VSIX install tabs, and indirectly via OsInstallTabs for OS-switched install commands
     CopyableCommand.astro    # one-click-copy install block (hero + compact variants)
-    OsInstallTabs.astro      # macOS / Linux / Windows install tabs; SSR default macOS, upgrades to the visitor's OS via a tiny inline script. Wraps CopyableCommand
+    OsInstallTabs.astro      # macOS / Linux / Windows install tabs; thin wrapper around CodeTabs that adds client-side OS auto-detection
     EditorInstallCards.astro # VS Code / Cursor / JetBrains install cards (logo + name → marketplace link → command — simplified in #121)
     GitHubIcon.astro         # shared GitHub mark inline SVG — used by Base.astro (footer) and index.astro (hero CTA)
     JsonLd.astro             # escapes and emits a single <script type="application/ld+json"> block — used by Base.astro (SoftwareApplication) and index.astro (FAQPage)
