@@ -54,6 +54,18 @@ const installCommands = {
   windows: "irm https://getbudi.dev/install.ps1 | iex",
 };
 
+const updateCommands = {
+  macos: "brew upgrade budi",
+  linux: "curl -fsSL https://getbudi.dev/install.sh | sh",
+  windows: "irm https://getbudi.dev/install.ps1 | iex",
+};
+
+const uninstallCommands = {
+  macos: "brew uninstall budi",
+  linux: "rm -f ~/.local/bin/budi ~/.local/bin/budi-daemon",
+  windows: 'Remove-Item -Recurse -Force "$env:LOCALAPPDATA\\budi"',
+};
+
 const features = [
   {
     title: "Multi-agent, no interception",
@@ -702,6 +714,38 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
         </div>
       </div>
     </details>
+
+    <div class="mt-12">
+      <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Updating.</h3>
+      <p class="text-fg-muted mb-4 text-sm">
+        Re-run the same install command for your platform — it fetches the latest release and
+        replaces the binaries in place. Run <code class="text-xs">budi doctor</code> afterwards to verify.
+      </p>
+      <OsInstallTabs id="install-update" commands={updateCommands} variant="compact" />
+      <p class="text-fg-dim mt-2 text-xs">
+        Then verify with
+        <code>budi doctor</code>.
+      </p>
+    </div>
+
+    <div class="mt-12">
+      <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Uninstalling.</h3>
+      <p class="text-fg-muted mb-4 text-sm">Remove editor integrations first, then the binary.</p>
+      <div class="grid gap-3">
+        <div>
+          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
+            Step 1 — remove editor wiring (all platforms)
+          </div>
+          <CopyableCommand command="budi integrations uninstall" variant="compact" />
+        </div>
+        <div>
+          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
+            Step 2 — remove the binary
+          </div>
+          <OsInstallTabs id="install-uninstall" commands={uninstallCommands} variant="compact" />
+        </div>
+      </div>
+    </div>
   </section>
 
   {/* 7. FOR TEAMS — compact callout */}
