@@ -646,6 +646,45 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
       </ol>
     </div>
 
+    <div class="mt-12 grid gap-6 lg:grid-cols-2">
+      <article class="card p-5 sm:p-6">
+        <h3 class="text-fg mb-2 text-lg font-semibold tracking-tight">Updating</h3>
+        <p class="text-fg-muted text-sm leading-relaxed">
+          <code class="text-xs">budi update</code> is the quickest universal path once budi is already
+          installed. If you prefer the original installer path, these commands have the same effect:
+        </p>
+        <pre class="terminal-scroll text-fg mt-4 overflow-x-auto rounded-lg bg-[#111827] px-4 py-3 text-[12px] leading-relaxed"><code>{`brew upgrade budi
+# or
+curl -fsSL https://getbudi.dev/install.sh | sh
+# or
+irm https://getbudi.dev/install.ps1 | iex
+
+budi doctor`}</code></pre>
+        <p class="text-fg-dim mt-3 text-xs leading-relaxed">
+          The shell and PowerShell installers both fetch the latest GitHub release before replacing the
+          binaries, so re-running them is a supported update path.
+        </p>
+      </article>
+
+      <article class="card p-5 sm:p-6">
+        <h3 class="text-fg mb-2 text-lg font-semibold tracking-tight">Uninstalling</h3>
+        <p class="text-fg-muted text-sm leading-relaxed">
+          Start with <code class="text-xs">budi uninstall</code> to stop the daemon and remove the
+          autostart + editor wiring. Then remove the binaries using the path that matches how you
+          installed budi.
+        </p>
+        <pre class="terminal-scroll text-fg mt-4 overflow-x-auto rounded-lg bg-[#111827] px-4 py-3 text-[12px] leading-relaxed"><code>{`budi uninstall
+# or keep the analytics database
+budi uninstall --keep-data
+
+brew uninstall budi
+# or
+rm ~/.local/bin/budi ~/.local/bin/budi-daemon
+# or
+irm https://raw.githubusercontent.com/siropkin/budi/main/scripts/uninstall-standalone.ps1 | iex`}</code></pre>
+      </article>
+    </div>
+
     <div id={ANCHORS.editorExtension} class="mt-12 scroll-mt-24">
       <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Editor extension.</h3>
       <p class="text-fg-muted mb-6 text-sm">
