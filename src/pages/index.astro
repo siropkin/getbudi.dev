@@ -566,7 +566,9 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
                   </span>
                 </td>
                 <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">{p.source}</td>
-                <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">{p.latency ?? "—"}</td>
+                <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">
+                  {p.latency ?? "—"}
+                </td>
               </tr>
             ))
           }
