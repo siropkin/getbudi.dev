@@ -5,6 +5,7 @@ import CodeTabs from "~/components/CodeTabs.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
 import EditorInstallCards from "~/components/EditorInstallCards.astro";
 import GitHubIcon from "~/components/GitHubIcon.astro";
+import Callout from "~/components/Callout.astro";
 import JsonLd from "~/components/JsonLd.astro";
 import { ANCHORS, anchorHref } from "~/lib/anchors";
 
@@ -236,15 +237,14 @@ const vsixTabs = [
     <div class="mt-6 flex flex-col gap-6 sm:mt-8 sm:gap-8">
       <div class="order-2 lg:order-1">
         <OsInstallTabs id="install-hero" commands={installCommands} variant="hero" />
-        <p class="text-fg-dim mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-          <span>Installs latest.</span>
-          <span>
-            One command. macOS / Linux / Windows. No account needed.
+        <div class="mt-3">
+          <Callout kind="info">
+            Installs latest. One command. macOS / Linux / Windows. No account needed.
             <a href={anchorHref(ANCHORS.install)} class="link-underline hover:text-fg"
               >Editor wiring →</a
             >
-          </span>
-        </p>
+          </Callout>
+        </div>
       </div>
 
       <div class="order-3 flex max-w-3xl flex-wrap items-center gap-3 text-sm lg:order-2">
@@ -502,11 +502,14 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
         The realistic alternatives, named honestly.
       </h2>
-      <p class="text-fg-muted mt-3">
+    </header>
+
+    <div class="mb-8">
+      <Callout kind="tip">
         If one of these already fits your workflow, use it. Budi exists for the case where you run
         more than one agent, care about per-repo attribution, and are not willing to upload prompts.
-      </p>
-    </header>
+      </Callout>
+    </div>
 
     <div class="grid gap-4 sm:grid-cols-2">
       {
@@ -558,32 +561,23 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
     </header>
 
     <div class="grid gap-4 md:grid-cols-3">
-      <div class="card border-l-accent border-l-4 p-5">
-        <h3 class="text-fg mb-2 font-semibold">Never leaves</h3>
-        <p class="text-fg-muted text-sm leading-relaxed">
-          Prompts, code, AI responses, file paths, email addresses, raw payloads, and tag values.
-          There is no "full upload" mode in the code.
-        </p>
-      </div>
-      <div class="card border-l-warn border-l-4 p-5">
-        <h3 class="text-fg mb-2 font-semibold">Can optionally leave</h3>
-        <p class="text-fg-muted text-sm leading-relaxed">
-          Pre-aggregated daily numbers — tokens, cost, model name, hashed repo ID, branch name,
-          ticket ID. Push-only, HTTPS-only. Off by default.
-        </p>
-      </div>
-      <div class="card border-l-line-strong border-l-4 p-5">
-        <h3 class="text-fg mb-2 font-semibold">How to turn it on</h3>
-        <p class="text-fg-muted text-sm leading-relaxed">
-          Free for personal use — sign up at <a
-            href="https://app.getbudi.dev"
-            class="link-underline hover:text-fg"
-            target="_blank"
-            rel="noopener noreferrer">app.getbudi.dev</a
-          >, drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>, set
-          <code class="text-xs">enabled = true</code>, restart the daemon.
-        </p>
-      </div>
+      <Callout kind="info" title="Never leaves">
+        Prompts, code, AI responses, file paths, email addresses, raw payloads, and tag values.
+        There is no "full upload" mode in the code.
+      </Callout>
+      <Callout kind="warn" title="Can optionally leave">
+        Pre-aggregated daily numbers — tokens, cost, model name, hashed repo ID, branch name,
+        ticket ID. Push-only, HTTPS-only. Off by default.
+      </Callout>
+      <Callout kind="tip" title="How to turn it on">
+        Free for personal use — sign up at <a
+          href="https://app.getbudi.dev"
+          class="link-underline hover:text-fg"
+          target="_blank"
+          rel="noopener noreferrer">app.getbudi.dev</a
+        >, drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>, set
+        <code class="text-xs">enabled = true</code>, restart the daemon.
+      </Callout>
     </div>
 
     <p class="text-fg-muted mt-6 text-sm">
