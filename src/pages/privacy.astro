@@ -59,10 +59,6 @@ const optionallyUploads = [
           >
           Home
         </a>
-        <span class="chip">
-          <span aria-hidden="true" class="bg-accent inline-block h-1.5 w-1.5 rounded-full"></span>
-          ADR-0083
-        </span>
       </div>
 
       <h1
@@ -81,15 +77,7 @@ const optionallyUploads = [
         >.
       </p>
 
-      <p class="text-fg-dim text-sm">
-        Source: <a
-          href="https://github.com/siropkin/budi/wiki/Cloud-Data-Contract-and-Privacy-Boundary"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="link-underline hover:text-fg">ADR-0083</a
-        >
-        with amendments ADR-0091, ADR-0094, and the 2026-05-15 workspace rename.
-      </p>
+      <p class="text-fg-dim text-sm">Last updated: 2026-05-15</p>
     </div>
   </section>
 
@@ -461,7 +449,6 @@ const optionallyUploads = [
           <p class="text-fg-muted mt-1 text-sm leading-relaxed">
             Anonymous GET to fetch the latest model prices. No user content, no identifiers.
           </p>
-          <p class="text-fg-dim mt-2 text-xs">Added by ADR-0091</p>
         </div>
         <div class="card p-4">
           <p class="text-fg text-sm font-medium">Team pricing pull</p>
@@ -469,7 +456,6 @@ const optionallyUploads = [
             Authenticated GET to fetch your workspace's negotiated price list. No user content in
             the request.
           </p>
-          <p class="text-fg-dim mt-2 text-xs">Added by ADR-0094</p>
         </div>
       </div>
     </div>
@@ -777,11 +763,8 @@ retry_max_seconds = 300               # max backoff cap`}</code></pre>
 
     <div class="grid gap-4">
       <article class="card p-5 sm:p-6">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="chip border-accent text-accent">ADR-0091</span>
-          <span class="text-fg-dim text-xs">2026-04-21</span>
-        </div>
-        <h3 class="text-fg mt-3 font-semibold tracking-tight">Pricing refresh</h3>
+        <span class="text-fg-dim text-xs">2026-04-21</span>
+        <h3 class="text-fg mt-2 font-semibold tracking-tight">Pricing refresh</h3>
         <p class="text-fg-muted mt-2 text-sm leading-relaxed">
           The daemon now fetches an open-source pricing manifest (LiteLLM) to stay current with
           model costs. This is an anonymous request with no user data attached. Disable with <code
@@ -791,11 +774,8 @@ retry_max_seconds = 300               # max backoff cap`}</code></pre>
       </article>
 
       <article class="card p-5 sm:p-6">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="chip border-accent text-accent">ADR-0094</span>
-          <span class="text-fg-dim text-xs">2026-05-11</span>
-        </div>
-        <h3 class="text-fg mt-3 font-semibold tracking-tight">Team pricing</h3>
+        <span class="text-fg-dim text-xs">2026-05-11</span>
+        <h3 class="text-fg mt-2 font-semibold tracking-tight">Team pricing</h3>
         <p class="text-fg-muted mt-2 text-sm leading-relaxed">
           Workspaces can now set custom model prices. The daemon fetches these via an authenticated
           request that carries no user content — just a small JSON of rates. Same opt-out switch.
