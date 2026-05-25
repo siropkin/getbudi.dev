@@ -8,7 +8,7 @@ This repo is the public face, not the product. Keep it small, fast, and static-f
 
 | Domain                     | Repo                                                                    | What lives there                                                                                                                          |
 | -------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `getbudi.dev`              | **this repo** (`siropkin/getbudi.dev`)                                  | Marketing site: hero, features, local-first story, install flow, opt-in cloud CTA                                                         |
+| `getbudi.dev`              | **this repo** (`siropkin/getbudi.dev`)                                  | Marketing site: hero, features, local-first story, install flow, dashboard CTA                                                            |
 | `app.getbudi.dev`          | [`siropkin/budi-cloud`](https://github.com/siropkin/budi-cloud)         | Authenticated cloud dashboard (Next.js + Supabase)                                                                                        |
 | Open-source CLI / daemon   | [`siropkin/budi`](https://github.com/siropkin/budi)                     | Rust workspace: transcript-tailing daemon, CLI, core business logic                                                                       |
 | Cursor / VS Code extension | [`siropkin/budi-cursor`](https://github.com/siropkin/budi-cursor)       | TypeScript extension targeting VS Code and Cursor (one VSIX, host-aware scope)                                                            |
@@ -40,7 +40,7 @@ src/
   lib/
     anchors.ts               # single source of truth for in-page section anchor IDs — imported by Base.astro (header nav, mobile-nav disclosure #119) and index.astro (section ids + cross-section links) so the audit-build invariant (#8 "every <a href='#X'> has a matching id") cannot drift via grep
   pages/
-    index.astro              # landing page: hero → features → providers → compare → privacy → install → teams → FAQ (see "Pages" below for what each section ships)
+    index.astro              # landing page: hero → features → providers → compare → privacy → install → dashboard → FAQ (see "Pages" below for what each section ships)
     404.astro                # static "not found" page, noindex, linked back to /
   styles/global.css          # Tailwind v4 import + @theme tokens + base layer
 public/
@@ -108,15 +108,15 @@ The site should read the way the Reddit posts read — first-person, specific, h
 Intentionally a single marketing page plus a 404 — deep docs, changelog, and pricing stay out of this repo.
 
 - `/` — section order (matches the in-source `{/* N. NAME */}` comments and the header nav anchors):
-  1. **Hero** — tagline, `OsInstallTabs` install command (macOS / Linux / Windows), GitHub / For teams / Compare nav row, and a `budi stats project` terminal shot. Mobile/tablet (`< lg`) reorders to terminal-first, then install + nav (#100).
+  1. **Hero** — tagline, `OsInstallTabs` install command (macOS / Linux / Windows), GitHub / Dashboard / Compare nav row, and a `budi stats project` terminal shot. Mobile/tablet (`< lg`) reorders to terminal-first, then install + nav (#100).
   2. **Features** (`#features`) — 4 feature cards, a paired Cursor / VS Code status-bar mock figure, and a `budi sessions <id>` terminal shot.
   3. **Providers** (`#providers`) — provider coverage matrix inside a `<details open>` (opened by default since #118) with a Copilot Chat cost-accuracy sub-state breakdown card.
   4. **Compare** (`#compare`) — honest "why not just X?" alternative table; the Budi row is highlighted.
   5. **Privacy** (`#privacy`) — three-column "never leaves / can optionally leave / how to enable" contract, plus the `#analytics` disclosure anchor linked from the footer.
   6. **Install** (`#install`) — second `OsInstallTabs`, 4-step after-install verifier (`budi init` / `budi integrations install` / `budi doctor` / `budi status`), and the `#editor-extension` picker rendered by `EditorInstallCards` (logo + name → marketplace link → command — simplified in #121). A `<details>` block exposes `Other install methods` (bundled VSIX, manual VSIX in VS Code / Cursor, daemon-from-source).
-  7. **For teams** (`#teams`) — compact callout linking to `app.getbudi.dev`.
+  7. **Dashboard** (`#dashboard`) — dashboard preview mockup with CTA linking to `app.getbudi.dev`.
   8. **FAQ** (`#faq`) — five expandable Q&A items (first one open by default); the FAQ JSON-LD is emitted from `index.astro` via `<JsonLd />` for `FAQPage` rich results.
-- Header nav (in `Base.astro`) keeps Install always visible; Compare / Privacy collapse below `sm:`, Providers / For teams / FAQ collapse below `md:`. A `<details>` "Sections" disclosure surfaces the hidden anchors on mobile (#119).
+- Header nav (in `Base.astro`) keeps Install always visible; Compare / Privacy collapse below `sm:`, Providers / Dashboard / FAQ collapse below `md:`. A `<details>` "Sections" disclosure surfaces the hidden anchors on mobile (#119).
 - `/404` — static "not found", `noindex`, linked back to `/`. Excluded from `sitemap-index.xml` by `astro.config.mjs`.
 
 Deep reference links out to `siropkin/budi` (README, releases) or `app.getbudi.dev`. No `/docs`, `/pricing`, or `/changelog` page is planned — adding one re-opens the docs-drift problem we deliberately avoid by keeping a single surface.

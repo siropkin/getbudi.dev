@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "Is it free?",
-    a: "Yes for solo use. The budi daemon and CLI are open source (MIT) and free forever — self-hosted, no signup. The optional cloud dashboard at app.getbudi.dev is free for personal use: sign up, get a workspace, push aggregates from your machine. Paid plans cover teams that share a workspace and need multi-seat dashboards.",
+    a: "Yes for solo use. The budi daemon and CLI are open source (MIT) and free forever — self-hosted, no signup. The optional online dashboard at app.getbudi.dev is free for personal use: sign up, get a workspace, push aggregates from your machine. Paid plans cover teams that share a workspace and need multi-seat dashboards.",
   },
   {
     q: "Does budi work in VS Code, Cursor, and JetBrains?",
@@ -114,7 +114,7 @@ const alternatives = [
   },
   {
     name: "Budi",
-    examples: "Local daemon · transcript tailing · multi-agent · opt-in cloud",
+    examples: "Local daemon · transcript tailing · multi-agent · opt-in dashboard",
     good: "Multi-agent via local transcript tailing — nothing in your network path. Repo/branch/ticket attribution. Live session health vitals. Optional team dashboard with aggregates only.",
     gap: "You run a small daemon. Live rows lag by seconds; Cursor cost can additionally lag ~10 min via the Cursor Usage API. Not every agent supported yet (Gemini deferred).",
     kind: "budi" as const,
@@ -258,10 +258,26 @@ const vsixTabs = [
           View on GitHub
         </a>
         <a
-          href={anchorHref(ANCHORS.teams)}
-          class="text-fg-muted hover:text-fg inline-flex items-center gap-1 px-3 py-2"
+          href="https://app.getbudi.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="border-accent text-accent hover:bg-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors hover:text-white"
         >
-          Cloud dashboard →
+          See your stats online
+          <svg
+            aria-hidden="true"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
         </a>
         <a
           href={anchorHref(ANCHORS.compare)}
@@ -575,8 +591,9 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
           class="link-underline hover:text-fg"
           target="_blank"
           rel="noopener noreferrer">app.getbudi.dev</a
-        >, drop your API key into <code class="text-xs">~/.config/budi/cloud.toml</code>, set
-        <code class="text-xs">enabled = true</code>, restart the daemon.
+        >, then run
+        <code class="text-xs">budi cloud init --api-key &lt;key&gt; --force --yes</code>. One
+        command, no editor required.
       </Callout>
     </div>
 
@@ -742,37 +759,119 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
     </div>
   </section>
 
-  {/* 7. FOR TEAMS — compact callout */}
+  {/* 7. DASHBOARD — online view of your local stats */}
   <section
-    id={ANCHORS.teams}
-    class="container-readable border-line/70 scroll-mt-24 border-t py-10 sm:py-14"
+    id={ANCHORS.dashboard}
+    class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20"
   >
-    <div class="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-      <div class="max-w-2xl">
-        <p class="text-fg-dim mb-1 text-xs tracking-[0.18em] uppercase">Cloud dashboard (opt-in)</p>
-        <h2 class="text-fg text-lg font-semibold tracking-tight sm:text-xl">
-          One workspace for your stats — aggregates only, no prompts or code.
-        </h2>
-        <p class="text-fg-muted mt-2 text-sm leading-relaxed">
-          Free for personal use. Daily cost per user, repo, model, branch, and ticket at <a
-            href="https://app.getbudi.dev"
-            class="link-underline hover:text-fg"
-            target="_blank"
-            rel="noopener noreferrer">app.getbudi.dev</a
-          > — your first workspace is created automatically on signup. Paid plans cover teams that share
-          a workspace. <a href={anchorHref(ANCHORS.privacy)} class="link-underline hover:text-fg"
-            >Privacy contract</a
-          >
-          spells out exactly what does and doesn't leave your machine.
-        </p>
+    <header class="mb-8 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Online dashboard</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
+        Your local stats, visible from anywhere.
+      </h2>
+      <p class="text-fg-muted mt-3">
+        The daemon pushes pre-aggregated daily numbers — tokens, cost, model, repo, branch, ticket —
+        to <a
+          href="https://app.getbudi.dev"
+          class="link-underline hover:text-fg"
+          target="_blank"
+          rel="noopener noreferrer">app.getbudi.dev</a
+        >. Never prompts, code, or file paths. Free for personal use; paid plans cover teams that
+        share a workspace.
+      </p>
+    </header>
+
+    <figure class="card overflow-hidden">
+      <div
+        class="border-line bg-surface-3 text-fg-dim flex items-center justify-between border-b px-4 py-2.5 text-xs"
+      >
+        <div class="flex items-center gap-2">
+          <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+          <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+          <span class="inline-block h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+          <span class="ml-3 font-mono">app.getbudi.dev — Overview</span>
+        </div>
       </div>
+      <div class="bg-[#0a0f14] px-5 py-6 sm:px-8 sm:py-8">
+        <div class="mb-6 grid gap-3 sm:grid-cols-4">
+          {
+            [
+              { label: "Today", value: "$4.92", sub: "healthy" },
+              { label: "7 days", value: "$38.10", sub: "+12%" },
+              { label: "30 days", value: "$162.44", sub: "3 agents" },
+              { label: "Messages", value: "21,402", sub: "7d total" },
+            ].map((stat) => (
+              <div class="rounded-lg border border-[#1e2a36] bg-[#0f1820] px-4 py-3">
+                <p class="text-[11px] tracking-wider text-[#5a6a7a] uppercase">{stat.label}</p>
+                <p class="text-fg mt-1 text-lg font-semibold">{stat.value}</p>
+                <p class="text-accent mt-0.5 text-xs">{stat.sub}</p>
+              </div>
+            ))
+          }
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <p class="text-fg-dim mb-2 text-xs tracking-wider uppercase">Cost by repo (7d)</p>
+            <div class="space-y-2">
+              {
+                [
+                  { repo: "siropkin/budi", cost: "$18.40", pct: 48 },
+                  { repo: "acme/web", cost: "$11.05", pct: 29 },
+                  { repo: "acme/infra", cost: "$6.32", pct: 17 },
+                  { repo: "personal/notes", cost: "$2.33", pct: 6 },
+                ].map((row) => (
+                  <div>
+                    <div class="flex justify-between text-xs">
+                      <span class="text-fg-muted">{row.repo}</span>
+                      <span class="text-fg">{row.cost}</span>
+                    </div>
+                    <div class="bg-surface-3 mt-1 h-1.5 rounded-full">
+                      <div class="bg-accent h-1.5 rounded-full" style={`width: ${row.pct}%`} />
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+          <div>
+            <p class="text-fg-dim mb-2 text-xs tracking-wider uppercase">Cost by model (7d)</p>
+            <div class="space-y-2">
+              {
+                [
+                  { model: "claude-opus-4-7", cost: "$22.18", pct: 58 },
+                  { model: "claude-sonnet-4-6", cost: "$9.41", pct: 25 },
+                  { model: "claude-haiku-4-5", cost: "$4.02", pct: 11 },
+                  { model: "gpt-5-codex", cost: "$2.49", pct: 6 },
+                ].map((row) => (
+                  <div>
+                    <div class="flex justify-between text-xs">
+                      <span class="text-fg-muted">{row.model}</span>
+                      <span class="text-fg">{row.cost}</span>
+                    </div>
+                    <div class="bg-surface-3 mt-1 h-1.5 rounded-full">
+                      <div class="bg-accent h-1.5 rounded-full" style={`width: ${row.pct}%`} />
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption class="text-fg-muted border-line/70 border-t px-4 py-3 text-xs leading-relaxed">
+        Dashboard overview — same numbers as <code>budi stats project</code>, visible from any
+        browser. Aggregates only, never prompts or code.
+      </figcaption>
+    </figure>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
       <a
         href="https://app.getbudi.dev"
         target="_blank"
         rel="noopener noreferrer"
-        class="bg-accent inline-flex shrink-0 items-center gap-2 self-start rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:self-auto"
+        class="bg-accent inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
       >
-        Try the free cloud dashboard
+        See your stats online
         <svg
           aria-hidden="true"
           width="14"
@@ -788,6 +887,12 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
           <polyline points="7 7 17 7 17 17"></polyline>
         </svg>
       </a>
+      <span class="text-fg-dim text-sm">
+        Free for personal use · <a
+          href={anchorHref(ANCHORS.privacy)}
+          class="link-underline hover:text-fg">Privacy contract</a
+        >
+      </span>
     </div>
   </section>
 
