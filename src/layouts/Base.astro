@@ -3,6 +3,7 @@ import "~/styles/global.css";
 import Analytics from "@vercel/analytics/astro";
 import GitHubIcon from "~/components/GitHubIcon.astro";
 import JsonLd from "~/components/JsonLd.astro";
+import SearchModal from "~/components/SearchModal.astro";
 import { ANCHORS, anchorHref, siteAnchorHref } from "~/lib/anchors";
 
 interface Props {
@@ -123,6 +124,7 @@ const jsonLd = {
             >Install</a
           >
           <a href="/privacy" class="hover:text-fg hidden sm:inline">Privacy</a>
+          <SearchModal />
           <details class="relative sm:hidden">
             <summary
               class="hover:text-fg flex cursor-pointer list-none items-center gap-1"
@@ -169,7 +171,7 @@ const jsonLd = {
       </div>
     </header>
 
-    <main id={ANCHORS.main} tabindex="-1">
+    <main id={ANCHORS.main} tabindex="-1" data-pagefind-body>
       <slot />
     </main>
 
