@@ -149,31 +149,37 @@ const providers = [
     name: "Cursor",
     live: true,
     source: "Local SQLite + Cursor Usage API",
+    href: "/docs/providers/cursor/",
   },
   {
     name: "Claude Code",
     live: true,
     source: "Local JSONL transcripts",
+    href: "/docs/providers/claude-code/",
   },
   {
     name: "Codex CLI",
     live: true,
     source: "Local JSONL transcripts",
+    href: "/docs/providers/codex-cli/",
   },
   {
     name: "Copilot CLI",
     live: true,
     source: "Local JSONL session-state",
+    href: "/docs/providers/copilot-cli/",
   },
   {
     name: "Copilot Chat (VS Code)",
     live: true,
     source: "Local JSON/JSONL + GitHub Billing API",
+    href: "/docs/providers/copilot-chat/",
   },
   {
     name: "Continue, Cline, Roo Code, Aider, Gemini CLI",
     live: false,
     source: "Local logs",
+    href: null,
   },
 ];
 
@@ -496,7 +502,15 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
           {
             providers.map((p, i) => (
               <tr class:list={[i > 0 ? "border-line/70 border-t" : ""]}>
-                <td class="text-fg px-4 py-3 font-medium sm:px-5">{p.name}</td>
+                <td class="text-fg px-4 py-3 font-medium sm:px-5">
+                  {p.href ? (
+                    <a href={p.href} class="link-underline hover:text-accent">
+                      {p.name}
+                    </a>
+                  ) : (
+                    p.name
+                  )}
+                </td>
                 <td class="px-4 py-3 sm:px-5">
                   <span class:list={["chip", p.live ? "border-accent text-accent" : "text-fg-dim"]}>
                     {p.live ? "Live" : "Coming soon"}

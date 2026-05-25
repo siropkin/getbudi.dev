@@ -54,7 +54,8 @@ const currentPath = Astro.url.pathname;
                     <a
                       href={item.href}
                       class:list={[
-                        "block rounded-md px-2.5 py-1.5 text-sm transition-colors",
+                        "block rounded-md py-1.5 text-sm transition-colors",
+                        item.indent ? "pr-2.5 pl-5" : "px-2.5",
                         currentPath === item.href
                           ? "bg-accent-soft text-accent font-medium"
                           : "text-fg-muted hover:text-fg",
@@ -84,7 +85,8 @@ const currentPath = Astro.url.pathname;
                     <a
                       href={item.href}
                       class:list={[
-                        "block rounded-md px-2.5 py-1.5 text-sm transition-colors",
+                        "block rounded-md py-1.5 text-sm transition-colors",
+                        item.indent ? "pr-2.5 pl-5" : "px-2.5",
                         currentPath === item.href
                           ? "bg-accent-soft text-accent font-medium"
                           : "text-fg-muted hover:text-fg",

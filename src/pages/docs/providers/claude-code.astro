@@ -1,0 +1,137 @@
+---
+import DocsLayout from "~/layouts/DocsLayout.astro";
+import CopyableCommand from "~/components/CopyableCommand.astro";
+import Callout from "~/components/Callout.astro";
+---
+
+<DocsLayout
+  title="Claude Code"
+  description="How budi tracks Claude Code usage — data sources, what's parsed, and how to verify."
+>
+  <div class="flex max-w-2xl flex-col gap-10">
+    <header>
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Provider</p>
+      <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Claude Code</h1>
+      <p class="text-fg-muted mt-3 leading-relaxed">
+        Claude Code writes JSONL transcripts to disk. Budi tails these files in real-time for
+        session, token, and cost data. No configuration needed — just install budi and it finds the
+        transcripts automatically.
+      </p>
+      <div class="mt-4 flex items-center gap-2">
+        <span class="chip border-accent text-accent">Live</span>
+        <span class="text-fg-dim text-xs">since v8.0.0</span>
+      </div>
+    </header>
+
+    <section>
+      <h2 id="data-sources" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Data sources
+      </h2>
+      <div class="card p-5">
+        <h3 id="jsonl-transcripts" class="text-fg mb-1.5 text-sm font-medium">
+          Local JSONL transcripts (primary)
+        </h3>
+        <p class="text-fg-muted text-sm leading-relaxed">
+          Claude Code writes structured JSONL transcript files that include every message in a
+          conversation — user prompts (content not read by budi), assistant responses, tool calls,
+          and token usage metadata. Budi tails these files as they're written.
+        </p>
+        <div class="text-fg-dim mt-3 text-xs">
+          <span class="font-medium">Path:</span>
+          <code
+            class="bg-surface-3 border-line/70 text-fg ml-1 rounded border px-1.5 py-0.5 text-[0.9em]"
+            >~/.claude/projects/*/</code
+          >
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 id="what-is-parsed" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        What's parsed
+      </h2>
+      <ul class="text-fg-muted space-y-2 text-sm leading-relaxed">
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Input and output token counts per message
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Cache creation and cache read token counts
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Model name and version (e.g. claude-sonnet-4-6, claude-opus-4-6)
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Dollar cost (computed from token counts via budi's pricing manifest)
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Session boundaries and conversation timestamps
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Repo, branch, and working directory from project path
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 id="caveats" class="text-fg mb-3 text-xl font-semibold tracking-tight">Caveats</h2>
+      <Callout kind="tip" title="Zero-config provider">
+        Claude Code is the simplest provider to set up — budi auto-discovers the transcript
+        directory and starts tailing immediately. No API keys, no PATs, no configuration.
+      </Callout>
+      <ul class="text-fg-muted mt-4 space-y-2 text-sm leading-relaxed">
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Cost is computed from token counts using budi's pricing manifest, not from a billing API. This
+          means cost tracks Anthropic's published pricing — if your org has custom pricing, the numbers
+          may differ.
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Budi reads only the structured metadata (tokens, model, timestamps) — it does not read your
+          prompts or the AI's responses.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 id="verify" class="text-fg mb-3 text-xl font-semibold tracking-tight">How to verify</h2>
+      <p class="text-fg-muted mb-4 leading-relaxed">
+        After installing budi, start a Claude Code session and send a few messages. Then run:
+      </p>
+      <CopyableCommand command="budi doctor" variant="compact" />
+      <p class="text-fg-muted mt-4 leading-relaxed">
+        Look for the Claude Code tailer in the output:
+      </p>
+      <pre
+        class="card mt-3 overflow-x-auto p-5 font-mono text-sm leading-relaxed"><code class="text-fg">✓ Daemon running (pid 12345, port 7878)
+✓ Claude Code tailer: active
+  Path: ~/.claude/projects/
+  Last event: 2s ago
+✓ All checks passed.</code></pre>
+      <p class="text-fg-muted mt-4 leading-relaxed">To confirm session data is flowing:</p>
+      <CopyableCommand command="budi stats projects" variant="compact" />
+    </section>
+  </div>
+</DocsLayout>

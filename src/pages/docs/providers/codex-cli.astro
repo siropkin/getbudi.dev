@@ -1,0 +1,127 @@
+---
+import DocsLayout from "~/layouts/DocsLayout.astro";
+import CopyableCommand from "~/components/CopyableCommand.astro";
+import Callout from "~/components/Callout.astro";
+---
+
+<DocsLayout
+  title="Codex CLI"
+  description="How budi tracks OpenAI Codex CLI usage — data sources, what's parsed, and how to verify."
+>
+  <div class="flex max-w-2xl flex-col gap-10">
+    <header>
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Provider</p>
+      <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Codex CLI</h1>
+      <p class="text-fg-muted mt-3 leading-relaxed">
+        OpenAI's Codex CLI writes JSONL session logs. Budi tails these the same way it handles
+        Claude Code transcripts — automatic discovery, real-time attribution.
+      </p>
+      <div class="mt-4 flex items-center gap-2">
+        <span class="chip border-accent text-accent">Live</span>
+        <span class="text-fg-dim text-xs">since v8.3.0</span>
+      </div>
+    </header>
+
+    <section>
+      <h2 id="data-sources" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Data sources
+      </h2>
+      <div class="card p-5">
+        <h3 id="jsonl-transcripts" class="text-fg mb-1.5 text-sm font-medium">
+          Local JSONL session logs (primary)
+        </h3>
+        <p class="text-fg-muted text-sm leading-relaxed">
+          Codex CLI writes JSONL session logs that contain structured conversation data including
+          token usage, model information, and tool invocations. Budi auto-discovers and tails these
+          files.
+        </p>
+        <div class="text-fg-dim mt-3 text-xs">
+          <span class="font-medium">Path:</span>
+          <code
+            class="bg-surface-3 border-line/70 text-fg ml-1 rounded border px-1.5 py-0.5 text-[0.9em]"
+            >~/.codex/sessions/</code
+          >
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 id="what-is-parsed" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        What's parsed
+      </h2>
+      <ul class="text-fg-muted space-y-2 text-sm leading-relaxed">
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Input and output token counts per message
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Model name and version (e.g. codex-mini, o4-mini)
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Dollar cost (computed from token counts via budi's pricing manifest)
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Session boundaries and timestamps
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Repo and branch context from the working directory
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 id="caveats" class="text-fg mb-3 text-xl font-semibold tracking-tight">Caveats</h2>
+      <Callout kind="tip" title="Zero-config provider">
+        Like Claude Code, Codex CLI is zero-config — budi auto-discovers the session log directory
+        and starts tailing immediately.
+      </Callout>
+      <ul class="text-fg-muted mt-4 space-y-2 text-sm leading-relaxed">
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Cost is computed from token counts using budi's pricing manifest, not from OpenAI's billing
+          API. If your org has custom pricing, the numbers may differ.
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          Codex CLI's session log format has changed across versions — budi supports the current format
+          and the previous major version.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 id="verify" class="text-fg mb-3 text-xl font-semibold tracking-tight">How to verify</h2>
+      <p class="text-fg-muted mb-4 leading-relaxed">
+        After installing budi, run a Codex CLI session. Then:
+      </p>
+      <CopyableCommand command="budi doctor" variant="compact" />
+      <p class="text-fg-muted mt-4 leading-relaxed">Look for the Codex CLI tailer in the output:</p>
+      <pre
+        class="card mt-3 overflow-x-auto p-5 font-mono text-sm leading-relaxed"><code class="text-fg">✓ Daemon running (pid 12345, port 7878)
+✓ Codex CLI tailer: active
+  Path: ~/.codex/sessions/
+  Last event: 5s ago
+✓ All checks passed.</code></pre>
+      <p class="text-fg-muted mt-4 leading-relaxed">To see Codex CLI spend:</p>
+      <CopyableCommand command="budi stats projects --filter codex" variant="compact" />
+    </section>
+  </div>
+</DocsLayout>
