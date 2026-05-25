@@ -31,6 +31,9 @@ const {
   noindex = false,
 } = Astro.props;
 
+const isHomepage = Astro.url.pathname === "/";
+const installHref = isHomepage ? anchorHref(ANCHORS.install) : "/docs/getting-started/";
+
 // JSON-LD lives in `head` so rich-result crawlers pick it up without JS.
 // SoftwareApplication is the closest schema.org fit: budi is a CLI tool
 // with a GitHub download target, MIT-licensed, and cross-platform.
@@ -131,9 +134,7 @@ const jsonLd = {
         </a>
         <nav class="text-fg-muted flex items-center gap-3 text-sm sm:gap-5">
           <a href="/docs/" class="hover:text-fg hidden sm:inline">Docs</a>
-          <a href={siteAnchorHref(ANCHORS.install)} class="hover:text-fg hidden sm:inline"
-            >Install</a
-          >
+          <a href={installHref} class="hover:text-fg hidden sm:inline">Install</a>
           <a href="/privacy" class="hover:text-fg hidden sm:inline">Privacy</a>
           <SearchModal />
           <details class="relative sm:hidden">
@@ -156,7 +157,7 @@ const jsonLd = {
               class="border-line/70 bg-surface-2 absolute top-full right-0 z-20 mt-2 flex min-w-[160px] flex-col gap-2 rounded-md border p-3 shadow-lg"
             >
               <a href="/docs/" class="hover:text-fg">Docs</a>
-              <a href={siteAnchorHref(ANCHORS.install)} class="hover:text-fg">Install</a>
+              <a href={installHref} class="hover:text-fg">Install</a>
               <a href="/privacy" class="hover:text-fg">Privacy</a>
               <hr class="border-line/70" />
               <a href="/login" class="text-accent hover:text-accent/85 font-medium">Sign in</a>
