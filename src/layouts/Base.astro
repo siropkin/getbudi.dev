@@ -4,6 +4,7 @@ import Analytics from "@vercel/analytics/astro";
 import GitHubIcon from "~/components/GitHubIcon.astro";
 import JsonLd from "~/components/JsonLd.astro";
 import SearchModal from "~/components/SearchModal.astro";
+import ThemeToggle from "~/components/ThemeToggle.astro";
 import { ANCHORS, anchorHref, siteAnchorHref } from "~/lib/anchors";
 
 interface Props {
@@ -99,6 +100,16 @@ const jsonLd = {
     <meta name="theme-color" content="#030e16" />
 
     <JsonLd data={jsonLd} />
+
+    <script is:inline>
+      (function () {
+        const s = localStorage.getItem("theme");
+        const t = s || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.dataset.theme = t;
+        const m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.content = t === "light" ? "#ffffff" : "#030e16";
+      })();
+    </script>
   </head>
   <body class="antialiased">
     <a
@@ -161,6 +172,7 @@ const jsonLd = {
             <GitHubIcon />
             <span class="hidden sm:inline">GitHub</span>
           </a>
+          <ThemeToggle />
           <a
             href="/login"
             class="bg-accent hover:bg-accent/85 hidden rounded-md px-3 py-1.5 text-sm font-medium text-white transition-colors sm:inline-block"
