@@ -6,20 +6,23 @@ const providers = [
     name: "Cursor",
     live: true,
     source: "Local SQLite + Cursor Usage API",
+    href: "/docs/providers/cursor/",
     details:
-      "Budi reads Cursor's local SQLite database for per-message token counts and model info. The Cursor Usage API supplements this with dollar-level reconciliation. Cost can lag ~10 minutes because the Usage API updates on a delay.",
+      "Budi reads Cursor's local SQLite database for per-message token counts and model info. The Cursor Usage API supplements this with dollar-level reconciliation.",
   },
   {
     name: "Claude Code",
     live: true,
     source: "Local JSONL transcripts",
+    href: "/docs/providers/claude-code/",
     details:
-      "Claude Code writes JSONL transcripts to ~/.claude/projects/. Budi tails these files in real-time for session, token, and cost data. No configuration needed — just install budi and it finds the transcripts automatically.",
+      "Claude Code writes JSONL transcripts to ~/.claude/projects/. Budi tails these files in real-time for session, token, and cost data.",
   },
   {
     name: "Codex CLI",
     live: true,
     source: "Local JSONL transcripts",
+    href: "/docs/providers/codex-cli/",
     details:
       "OpenAI's Codex CLI writes JSONL session logs. Budi tails these the same way it handles Claude Code transcripts — automatic discovery, real-time attribution.",
   },
@@ -27,6 +30,7 @@ const providers = [
     name: "Copilot CLI",
     live: true,
     source: "Local JSONL session-state",
+    href: "/docs/providers/copilot-cli/",
     details:
       "GitHub Copilot's CLI mode writes local session state files. Budi reads these for token counts and model info.",
   },
@@ -34,13 +38,15 @@ const providers = [
     name: "Copilot Chat (VS Code)",
     live: true,
     source: "Local JSON/JSONL + GitHub Billing API",
+    href: "/docs/providers/copilot-chat/",
     details:
-      "VS Code's Copilot Chat stores local session data that budi tails for output-only token counts. For dollar-accurate reconciliation, add a GitHub PAT scoped to billing — budi matches local sessions against GitHub's per-(date, model) billing buckets. Org-managed licences see output-only tokens (the user-level Billing API endpoint is empty for them).",
+      "VS Code's Copilot Chat stores local session data that budi tails for output-only token counts. For dollar-accurate reconciliation, add a GitHub PAT scoped to billing.",
   },
   {
     name: "Continue, Cline, Roo Code, Aider, Gemini CLI",
     live: false,
     source: "Local logs (planned)",
+    href: null,
     details:
       "Planned for 8.5.0. Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
   },
@@ -78,7 +84,15 @@ const providers = [
             {
               providers.map((p, i) => (
                 <tr class:list={[i > 0 ? "border-line/70 border-t" : ""]}>
-                  <td class="text-fg px-4 py-3 font-medium sm:px-5">{p.name}</td>
+                  <td class="text-fg px-4 py-3 font-medium sm:px-5">
+                    {p.href ? (
+                      <a href={p.href} class="link-underline hover:text-accent">
+                        {p.name}
+                      </a>
+                    ) : (
+                      p.name
+                    )}
+                  </td>
                   <td class="px-4 py-3 sm:px-5">
                     <span
                       class:list={["chip", p.live ? "border-accent text-accent" : "text-fg-dim"]}
@@ -105,7 +119,13 @@ const providers = [
               .replace(/-+$/, "")}
             class="text-fg mb-2 text-xl font-semibold tracking-tight"
           >
-            {p.name}
+            {p.href ? (
+              <a href={p.href} class="hover:text-accent transition-colors">
+                {p.name}
+              </a>
+            ) : (
+              p.name
+            )}
           </h2>
           <div class="flex flex-wrap items-center gap-2">
             <span class:list={["chip", p.live ? "border-accent text-accent" : "text-fg-dim"]}>
@@ -114,6 +134,28 @@ const providers = [
             <span class="text-fg-dim text-xs">{p.source}</span>
           </div>
           <p class="text-fg-muted mt-3 leading-relaxed">{p.details}</p>
+          {p.href && (
+            <a
+              href={p.href}
+              class="text-accent hover:text-accent/80 mt-2 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+            >
+              Full guide
+              <svg
+                aria-hidden="true"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          )}
         </section>
       ))
     }
@@ -166,6 +208,9 @@ const providers = [
         Without a PAT, on May-2026+ VS Code builds you get output-only token dollars — useful as a
         relative trend, but typically a fraction of the actual bill. With a PAT scoped to billing,
         budi reconciles to GitHub's exact dollar number per (date, model) bucket.
+        <a href="/docs/providers/copilot-chat/#pat-setup" class="link-underline hover:text-fg">
+          Full PAT setup guide →
+        </a>
       </p>
       <p class="text-fg-muted mt-3 leading-relaxed">
         Org-managed licences see output-only forever — the user-level Billing API endpoint is empty
