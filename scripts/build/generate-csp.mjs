@@ -113,7 +113,7 @@ for (const page of pages) {
 // inline styles can't really do XSS, and Astro inlines small Tailwind
 // blocks via `inlineStylesheets: "auto"` which would otherwise need
 // per-build hashing for marginal benefit.
-const scriptSrc = ["'self'", ...[...hashes].sort()].join(" ");
+const scriptSrc = ["'self'", "'wasm-unsafe-eval'", ...[...hashes].sort()].join(" ");
 const policy = [
   "default-src 'self'",
   "base-uri 'self'",
