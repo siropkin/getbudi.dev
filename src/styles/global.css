@@ -123,6 +123,7 @@
   background-color: var(--color-surface-2);
   border: 1px solid var(--color-line);
   color: var(--color-fg-muted);
+  white-space: nowrap;
 }
 
 /*

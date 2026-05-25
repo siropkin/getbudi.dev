@@ -12,7 +12,7 @@ accept = ["200..=299", "403", "429"]
 exclude_path = ["dist/404.html"]
 # ^ The 404 page intentionally links to things we want to check, but skipping
 #   it avoids scanning the same links twice.
-exclude = ['^file://.*/dist/login$', '^https://getbudi\.dev/']
+exclude = ['^file://.*/dist/login$', '^https://getbudi\.dev/', '^https://vsmarketplacebadges\.dev/']
 # ^ /login is a Vercel redirect (vercel.json), not a built page.
 # ^ getbudi.dev links are self-referential (canonical URLs, nav links); their
 #   correctness is verified by the build audit, not the external link checker.
