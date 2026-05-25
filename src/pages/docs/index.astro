@@ -1,0 +1,148 @@
+---
+import DocsLayout from "~/layouts/DocsLayout.astro";
+---
+
+<DocsLayout
+  title="Introduction"
+  description="Documentation for budi — the open-source, local-first cost tracker for AI coding agents like Cursor, Claude Code, Codex, and Copilot Chat."
+>
+  <div class="flex max-w-2xl flex-col gap-8">
+    <header>
+      <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Documentation</h1>
+      <p class="text-fg-muted mt-3 text-lg leading-relaxed">
+        Budi is an open-source, local-first cost tracker for AI coding agents. It tails the
+        transcript files your tools already write to disk — nothing in your network path.
+      </p>
+    </header>
+
+    <section>
+      <h2 id="what-budi-does" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        What budi does
+      </h2>
+      <p class="text-fg-muted leading-relaxed">
+        After a single install command, three things run on your machine: a small Rust daemon that
+        tails transcripts, a status bar in your editor, and a CLI for repo / branch / ticket
+        attribution. Budi tracks Claude Code, Codex CLI, Copilot CLI, Cursor, and Copilot Chat (VS
+        Code) today — with more agents coming.
+      </p>
+      <ul class="text-fg-muted mt-4 space-y-2 text-sm leading-relaxed">
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          <span
+            ><strong class="text-fg font-medium">Multi-agent</strong> — one daemon tracks all your AI
+            coding tools at once.</span
+          >
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          <span
+            ><strong class="text-fg font-medium">Real attribution</strong> — cost is attributed per repo,
+            branch, and ticket.</span
+          >
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          <span
+            ><strong class="text-fg font-medium">Privacy-first</strong> — prompts, code, and responses
+            never leave your machine.</span
+          >
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span
+            aria-hidden="true"
+            class="bg-accent mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"></span>
+          <span
+            ><strong class="text-fg font-medium">Optional cloud</strong> — opt-in team dashboard syncs
+            aggregates only.</span
+          >
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 id="quick-start" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Quick start
+      </h2>
+      <p class="text-fg-muted leading-relaxed">
+        Install budi with one command, then verify with <code
+          class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi doctor</code
+        >. The <a href="/docs/getting-started/" class="link-underline hover:text-fg"
+          >Getting started</a
+        > guide walks through every step.
+      </p>
+      <div class="card mt-4 overflow-hidden">
+        <pre
+          class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[13px]"><code>{`brew install siropkin/budi/budi && budi init
+budi integrations install
+budi doctor`}</code></pre>
+      </div>
+    </section>
+
+    <section>
+      <h2 id="docs-overview" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        What's in the docs
+      </h2>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <a
+          href="/docs/getting-started/"
+          class="card hover:border-accent group flex flex-col gap-2 p-5 transition-colors"
+        >
+          <h3
+            class="text-fg group-hover:text-accent font-semibold tracking-tight transition-colors"
+          >
+            Getting started
+          </h3>
+          <p class="text-fg-muted text-sm leading-relaxed">
+            Install, initialize, wire up your editor, and verify everything works.
+          </p>
+        </a>
+        <a
+          href="/docs/providers/"
+          class="card hover:border-accent group flex flex-col gap-2 p-5 transition-colors"
+        >
+          <h3
+            class="text-fg group-hover:text-accent font-semibold tracking-tight transition-colors"
+          >
+            Providers
+          </h3>
+          <p class="text-fg-muted text-sm leading-relaxed">
+            Which AI coding agents budi tracks, how data is sourced, and what's coming next.
+          </p>
+        </a>
+        <a
+          href="/docs/commands/"
+          class="card hover:border-accent group flex flex-col gap-2 p-5 transition-colors"
+        >
+          <h3
+            class="text-fg group-hover:text-accent font-semibold tracking-tight transition-colors"
+          >
+            Commands
+          </h3>
+          <p class="text-fg-muted text-sm leading-relaxed">
+            CLI reference for stats, sessions, doctor, status, and more.
+          </p>
+        </a>
+        <a
+          href="/privacy"
+          class="card hover:border-accent group flex flex-col gap-2 p-5 transition-colors"
+        >
+          <h3
+            class="text-fg group-hover:text-accent font-semibold tracking-tight transition-colors"
+          >
+            Privacy & Data Contract
+          </h3>
+          <p class="text-fg-muted text-sm leading-relaxed">
+            Full technical contract for what data leaves your machine and what never does.
+          </p>
+        </a>
+      </div>
+    </section>
+  </div>
+</DocsLayout>

@@ -1,0 +1,199 @@
+---
+import DocsLayout from "~/layouts/DocsLayout.astro";
+
+const commands = [
+  {
+    name: "budi init",
+    description:
+      "Starts the daemon on port 7878 and installs the platform-native autostart service (launchd on macOS, systemd on Linux, Startup folder on Windows). Run once after install.",
+    usage: "budi init",
+  },
+  {
+    name: "budi status",
+    description:
+      "Today-cost snapshot: daemon state, active tailers, and today's spend across all providers.",
+    usage: "budi status",
+  },
+  {
+    name: "budi stats",
+    description:
+      "Cost breakdown with multiple sub-commands for different attribution levels. Default window is 7 days.",
+    usage: "budi stats [projects | branches | tickets]",
+    subcommands: [
+      {
+        name: "budi stats projects",
+        desc: "Cost grouped by repository. Shows today, 7d, and 30d totals.",
+      },
+      {
+        name: "budi stats branches",
+        desc: "Cost grouped by branch. Useful for comparing feature work.",
+      },
+      {
+        name: "budi stats tickets",
+        desc: "Cost grouped by ticket ID extracted from branch names (e.g. PROJ-1234).",
+      },
+    ],
+  },
+  {
+    name: "budi sessions",
+    description:
+      "Lists recent sessions or shows detail for a specific session. Session detail includes context growth, cache reuse, cost acceleration, retry loops, and vitals.",
+    usage: "budi sessions [<id>]",
+  },
+  {
+    name: "budi doctor",
+    description:
+      'End-to-end verifier: checks daemon connectivity, tailer health, schema version, transcript visibility, and attribution pipeline. When "All checks passed." you are done.',
+    usage: "budi doctor",
+  },
+  {
+    name: "budi integrations install",
+    description:
+      "Wires the Claude Code statusline and offers the VS Code / Cursor extension if either editor is detected. Restart Claude Code afterwards so it picks up the new statusLine command.",
+    usage: "budi integrations install [--with cursor-extension]",
+  },
+  {
+    name: "budi integrations uninstall",
+    description: "Removes all editor integrations (statusline config, VS Code/Cursor extension).",
+    usage: "budi integrations uninstall",
+  },
+  {
+    name: "budi cloud join",
+    description:
+      "Joins a cloud workspace using an invite token. Creates the cloud config file and enables sync. Off by default — nothing syncs until you run this.",
+    usage: "budi cloud join <invite-token>",
+  },
+];
+---
+
+<DocsLayout
+  title="Commands"
+  description="CLI reference for budi — stats, sessions, doctor, status, init, and integrations commands."
+>
+  <div class="flex max-w-2xl flex-col gap-10">
+    <header>
+      <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Commands</h1>
+      <p class="text-fg-muted mt-3 leading-relaxed">
+        CLI reference for the budi daemon and its sub-commands. Run <code
+          class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi --help</code
+        > for the full flag list.
+      </p>
+    </header>
+
+    {
+      commands.map((cmd) => (
+        <section>
+          <h2
+            id={cmd.name
+              .replace(/^budi /, "")
+              .replace(/ /g, "-")
+              .toLowerCase()}
+            class="text-fg mb-2 text-xl font-semibold tracking-tight"
+          >
+            {cmd.name}
+          </h2>
+          <div class="card mb-3 overflow-hidden">
+            <pre class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-3 text-[12.5px] leading-[1.55]">
+              <code>{cmd.usage}</code>
+            </pre>
+          </div>
+          <p class="text-fg-muted leading-relaxed">{cmd.description}</p>
+          {cmd.subcommands && (
+            <div class="mt-4 grid gap-3">
+              {cmd.subcommands.map((sub) => (
+                <div class="card px-4 py-3">
+                  <code class="text-fg text-sm font-medium">{sub.name}</code>
+                  <p class="text-fg-muted mt-1 text-sm leading-relaxed">{sub.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      ))
+    }
+
+    <section>
+      <h2 id="session-detail" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Session detail example
+      </h2>
+      <p class="text-fg-muted mb-4 leading-relaxed">
+        Running <code
+          class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi sessions &lt;id&gt;</code
+        > shows session health in plain English:
+      </p>
+      <div class="card overflow-hidden">
+        <div
+          class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs"
+        >
+          <span class="font-mono">~ budi sessions &lt;id&gt;</span>
+        </div>
+        <pre
+          class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[12.5px]"><code>{`  Session 2968337c-1e4
+  ──────────────────────────────────────────────────
+  Agent      claude_code
+  Models     claude-opus-4-7
+  Started    2026-05-06T02:22:27.194+00:00
+  Duration   2m22s
+  Repos      github.com/siropkin/budi-cloud
+  Branches   151-repos-companion-tables, main
+  Outcome    no_commit
+             …explanation…
+
+  Messages   22
+  Input      32
+  Output     10.8K
+  Est. cost  $1.70
+
+  Tags
+    file_path: src/lib/dal.ts
+    …
+
+  🟢 Vitals: GREEN`}</code></pre>
+      </div>
+    </section>
+
+    <section>
+      <h2 id="project-stats" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Project stats example
+      </h2>
+      <p class="text-fg-muted mb-4 leading-relaxed">
+        <code class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi stats project</code
+        > gives you the big picture:
+      </p>
+      <div class="card overflow-hidden">
+        <div
+          class="border-line bg-surface-3 text-fg-dim flex items-center gap-2 border-b px-4 py-2.5 text-xs"
+        >
+          <span class="font-mono">~ budi stats project</span>
+        </div>
+        <pre
+          class="terminal-scroll text-fg m-0 overflow-x-auto px-4 py-4 text-[12px] leading-[1.55] sm:text-[12.5px]"><code>{`Today                          7d        30d
+──────────────────────────────────────────────────
+$ 4.92 session  🟢 healthy  $ 38.10  $ 162.44
+
+Top repos (last 7d)            cost      msgs
+──────────────────────────────────────────────────
+siropkin/budi               $ 18.40    21,402
+acme/web                    $ 11.05     9,118
+acme/infra                  $  6.32     2,845
+personal/notes              $  2.33       661
+
+Top models (last 7d)           cost     share
+──────────────────────────────────────────────────
+claude-opus-4-7             $ 22.18    58.2 %
+claude-sonnet-4-6           $  9.41    24.7 %
+claude-haiku-4-5            $  4.02    10.6 %
+gpt-5-codex                 $  2.49     6.5 %
+
+Branch hot list                cost    ticket
+──────────────────────────────────────────────────
+budi/feat/cloud-ingest      $  6.91   BUD-214
+acme/web/fix/checkout-retry $  4.38   WEB-1180
+acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
+      </div>
+    </section>
+  </div>
+</DocsLayout>

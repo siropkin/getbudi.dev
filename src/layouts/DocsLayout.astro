@@ -1,0 +1,166 @@
+---
+import Base from "./Base.astro";
+import { DOCS_NAV } from "~/lib/docs-nav";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<Base
+  title={`${title} — budi docs`}
+  description={description}
+  canonical={`https://getbudi.dev${currentPath}`}
+>
+  <div class="container-readable flex gap-10 pt-10 pb-20 sm:pt-14">
+    {/* Mobile sidebar toggle */}
+    <details class="fixed top-[65px] left-0 z-30 w-full lg:hidden" id="docs-mobile-nav">
+      <summary
+        class="border-line/70 bg-surface/90 flex cursor-pointer list-none items-center gap-2 border-b px-5 py-3 text-sm font-medium backdrop-blur-sm"
+      >
+        <svg
+          aria-hidden="true"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-fg-dim"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        Docs menu
+      </summary>
+      <nav
+        class="border-line/70 bg-surface max-h-[60vh] overflow-y-auto border-b px-5 py-4"
+        aria-label="Docs navigation (mobile)"
+      >
+        {
+          DOCS_NAV.map((group) => (
+            <div class="mb-4 last:mb-0">
+              <p class="text-fg-dim mb-1.5 text-xs tracking-[0.18em] uppercase">{group.title}</p>
+              <ul class="space-y-1">
+                {group.items.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      class:list={[
+                        "block rounded-md px-2.5 py-1.5 text-sm transition-colors",
+                        currentPath === item.href
+                          ? "bg-accent-soft text-accent font-medium"
+                          : "text-fg-muted hover:text-fg",
+                      ]}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </details>
+
+    {/* Desktop sidebar */}
+    <aside class="hidden w-52 shrink-0 lg:block" aria-label="Docs navigation">
+      <nav class="sticky top-24">
+        {
+          DOCS_NAV.map((group) => (
+            <div class="mb-5 last:mb-0">
+              <p class="text-fg-dim mb-1.5 text-xs tracking-[0.18em] uppercase">{group.title}</p>
+              <ul class="space-y-0.5">
+                {group.items.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      class:list={[
+                        "block rounded-md px-2.5 py-1.5 text-sm transition-colors",
+                        currentPath === item.href
+                          ? "bg-accent-soft text-accent font-medium"
+                          : "text-fg-muted hover:text-fg",
+                      ]}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </aside>
+
+    {/* Main content */}
+    <article class="min-w-0 flex-1" id="docs-content">
+      <slot />
+    </article>
+
+    {/* Right-rail TOC — populated by client script from h2/h3 in #docs-content */}
+    <aside class="hidden w-44 shrink-0 xl:block" aria-label="On this page">
+      <nav class="sticky top-24" id="docs-toc">
+        <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">On this page</p>
+        <ul class="space-y-1 text-sm" id="docs-toc-list"></ul>
+      </nav>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  function buildToc() {
+    const content = document.getElementById("docs-content");
+    const list = document.getElementById("docs-toc-list");
+    if (!content || !list) return;
+
+    const headings = content.querySelectorAll<HTMLHeadingElement>("h2[id], h3[id]");
+    if (headings.length === 0) {
+      const tocNav = document.getElementById("docs-toc");
+      if (tocNav) tocNav.hidden = true;
+      return;
+    }
+
+    for (const h of headings) {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `#${h.id}`;
+      a.textContent = h.textContent;
+      a.className =
+        h.tagName === "H3"
+          ? "text-fg-dim hover:text-fg block pl-3 transition-colors"
+          : "text-fg-muted hover:text-fg block transition-colors";
+      a.dataset.tocTarget = h.id;
+      li.appendChild(a);
+      list.appendChild(li);
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            for (const link of list.querySelectorAll("a")) {
+              link.classList.remove("text-accent");
+              link.classList.add(
+                link.dataset.tocTarget === entry.target.id ? "text-accent" : "text-fg-muted",
+              );
+            }
+          }
+        }
+      },
+      { rootMargin: "0px 0px -70% 0px", threshold: 0 },
+    );
+
+    for (const h of headings) observer.observe(h);
+  }
+
+  buildToc();
+</script>
