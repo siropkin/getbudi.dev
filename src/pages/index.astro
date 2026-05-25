@@ -34,6 +34,10 @@ const faqs = [
     q: "What about Continue / Cline / Roo Code / Aider / Gemini CLI?",
     a: "Planned for 8.5.0 (the breadth round). Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
   },
+  {
+    q: "How quickly does budi see a new session?",
+    a: "Most providers surface within seconds — the daemon tails local transcripts as they're written. Cursor can lag ~10 minutes when cost comes via the Cursor Usage API; Copilot Chat billing reconciliation takes about an hour. See the Latency column in the provider table above for per-provider details.",
+  },
 ];
 
 const faqJsonLd = {
@@ -187,36 +191,42 @@ const providers = [
     name: "Cursor",
     live: true,
     source: "Local SQLite + Cursor Usage API",
+    latency: "~10 min (API) / seconds (local)",
     href: "/docs/providers/cursor/",
   },
   {
     name: "Claude Code",
     live: true,
     source: "Local JSONL transcripts",
+    latency: "seconds",
     href: "/docs/providers/claude-code/",
   },
   {
     name: "Codex CLI",
     live: true,
     source: "Local JSONL transcripts",
+    latency: "seconds",
     href: "/docs/providers/codex-cli/",
   },
   {
     name: "Copilot CLI",
     live: true,
     source: "Local JSONL session-state",
+    latency: "seconds",
     href: "/docs/providers/copilot-cli/",
   },
   {
     name: "Copilot Chat (VS Code)",
     live: true,
     source: "Local JSON/JSONL + GitHub Billing API",
+    latency: "seconds (local) / ~hour (billing)",
     href: "/docs/providers/copilot-chat/",
   },
   {
     name: "Continue, Cline, Roo Code, Aider, Gemini CLI",
     live: false,
     source: "Local logs",
+    latency: null,
     href: null,
   },
 ];
@@ -534,6 +544,7 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
             <th class="px-4 py-3 text-left font-medium sm:px-5">Provider</th>
             <th class="px-4 py-3 text-left font-medium sm:px-5">Status</th>
             <th class="hidden px-4 py-3 text-left font-medium sm:table-cell sm:px-5">Source</th>
+            <th class="hidden px-4 py-3 text-left font-medium sm:table-cell sm:px-5">Latency</th>
           </tr>
         </thead>
         <tbody>
@@ -555,6 +566,9 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
                   </span>
                 </td>
                 <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">{p.source}</td>
+                <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">
+                  {p.latency ?? "—"}
+                </td>
               </tr>
             ))
           }
