@@ -231,6 +231,24 @@ const providers = [
   },
 ];
 
+let starCount: number | null = null;
+try {
+  const res = await fetch("https://api.github.com/repos/siropkin/budi", {
+    headers: { Accept: "application/vnd.github.v3+json" },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    starCount = data.stargazers_count ?? null;
+  }
+} catch {
+  // Build continues without live count — falls back to shields.io badge.
+}
+
+const testimonials: { quote: string; author: string; source: string; href: string }[] = [
+  // TODO: Add real user quotes from X/HN/Discord as they appear.
+  // { quote: "...", author: "Name", source: "X", href: "https://..." },
+];
+
 const vsixTabs = [
   {
     key: "vscode",
@@ -1019,7 +1037,77 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
     </div>
   </section>
 
-  {/* 8. FAQ */}
+  {/* 8. COMMUNITY / SOCIAL PROOF */}
+  <section
+    id={ANCHORS.community}
+    class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20"
+  >
+    <header class="mb-8 max-w-2xl">
+      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Community</p>
+      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Open source, growing fast.</h2>
+      <p class="text-fg-muted mt-3">
+        Budi is MIT-licensed and built in the open. Star the repo, sponsor the work, or just say hi
+        in an issue.
+      </p>
+    </header>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <a
+        href="https://github.com/siropkin/budi"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="border-line-strong hover:border-accent hover:text-accent inline-flex items-center gap-2.5 rounded-lg border px-4 py-2.5 text-sm transition-colors"
+      >
+        <GitHubIcon />
+        <span>Star on GitHub</span>
+        {
+          starCount !== null && (
+            <span class="bg-surface-3 border-line/70 ml-0.5 rounded-full border px-2 py-0.5 text-xs font-semibold tabular-nums">
+              {starCount.toLocaleString("en-US")}
+            </span>
+          )
+        }
+      </a>
+      <a
+        href="https://github.com/sponsors/siropkin"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="border-accent text-accent hover:bg-accent inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm transition-colors hover:text-white"
+      >
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          ></path>
+        </svg>
+        Sponsor
+      </a>
+    </div>
+
+    {
+      testimonials.length > 0 && (
+        <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {testimonials.map((t) => (
+            <blockquote class="card flex flex-col gap-3 p-5 sm:p-6">
+              <p class="text-fg-muted text-sm leading-relaxed italic">"{t.quote}"</p>
+              <footer class="text-fg-dim mt-auto text-xs">
+                — {t.author}
+                <a
+                  href={t.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="link-underline hover:text-fg ml-1"
+                >
+                  {t.source}
+                </a>
+              </footer>
+            </blockquote>
+          ))}
+        </div>
+      )
+    }
+  </section>
+
+  {/* 9. FAQ */}
   <section
     id={ANCHORS.faq}
     class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20"
@@ -1069,7 +1157,7 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
     </div>
   </section>
 
-  {/* 9. ACKNOWLEDGMENTS */}
+  {/* 10. ACKNOWLEDGMENTS */}
   <section class="container-readable border-line/70 border-t py-10 sm:py-14">
     <p class="text-fg-muted text-sm leading-relaxed">
       <strong class="text-fg font-medium">Prior art.</strong>

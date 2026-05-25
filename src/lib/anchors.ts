@@ -22,6 +22,7 @@ export const ANCHORS = {
   privacy: "privacy",
   install: "install",
   dashboard: "dashboard",
+  community: "community",
   faq: "faq",
   /** Sub-section anchors inside the landing page. */
   analytics: "analytics",
