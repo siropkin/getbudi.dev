@@ -5,7 +5,7 @@ import GitHubIcon from "~/components/GitHubIcon.astro";
 import JsonLd from "~/components/JsonLd.astro";
 import SearchModal from "~/components/SearchModal.astro";
 import ThemeToggle from "~/components/ThemeToggle.astro";
-import { ANCHORS, anchorHref, siteAnchorHref } from "~/lib/anchors";
+import { ANCHORS, anchorHref } from "~/lib/anchors";
 
 interface Props {
   title?: string;
@@ -281,14 +281,13 @@ const jsonLd = {
           </div>
         </div>
         <div
+          id={ANCHORS.analytics}
           class="border-line/70 text-fg-dim mt-10 flex flex-col justify-between gap-3 border-t pt-6 text-xs sm:flex-row"
         >
           <span>© {new Date().getFullYear()} budi contributors. Public alpha.</span>
           <span>
-            Built static.{" "}
-            <a href={siteAnchorHref(ANCHORS.analytics)} class="link-underline hover:text-fg"
-              >Privacy-friendly analytics via Vercel</a
-            >. Source on{" "}
+            Built static. Cookieless, IP-hashed-daily page views via Vercel Web Analytics — no
+            session replay, no cross-site tracking. Source on{" "}
             <a
               href="https://github.com/siropkin/getbudi.dev"
               target="_blank"
