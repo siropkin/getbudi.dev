@@ -1,0 +1,190 @@
+---
+import DocsLayout from "~/layouts/DocsLayout.astro";
+import OsInstallTabs from "~/components/OsInstallTabs.astro";
+import EditorInstallCards from "~/components/EditorInstallCards.astro";
+import CopyableCommand from "~/components/CopyableCommand.astro";
+
+const installCommands = {
+  macos: "brew install siropkin/budi/budi && budi init",
+  linux: "curl -fsSL https://getbudi.dev/install.sh | sh",
+  windows: "irm https://getbudi.dev/install.ps1 | iex",
+};
+
+const updateCommands = {
+  macos: "brew upgrade budi",
+  linux: "curl -fsSL https://getbudi.dev/install.sh | sh",
+  windows: "irm https://getbudi.dev/install.ps1 | iex",
+};
+
+const uninstallCommands = {
+  macos: "brew uninstall budi",
+  linux: "rm -f ~/.local/bin/budi ~/.local/bin/budi-daemon",
+  windows: 'Remove-Item -Recurse -Force "$env:LOCALAPPDATA\\budi"',
+};
+
+const firstRunSteps = [
+  {
+    n: "1",
+    cmd: "budi init",
+    body: "Starts the daemon on port 7878 and installs the platform-native autostart service. The hero install runs this for you — listed here so you know what just happened.",
+  },
+  {
+    n: "2",
+    cmd: "budi integrations install",
+    body: "Wires the Claude Code statusline and offers the VS Code / Cursor extension if either editor is detected. Restart Claude Code afterwards so it picks up the new statusLine command.",
+  },
+  {
+    n: "3",
+    cmd: "budi doctor",
+    body: 'End-to-end verifier: daemon, tailers, schema, transcript visibility, and attribution health. When "All checks passed." you are done.',
+  },
+  {
+    n: "4",
+    cmd: "budi status",
+    body: "Today-cost snapshot: daemon state and today's spend. For the full breakdown, use budi stats projects / branches / tickets.",
+  },
+];
+---
+
+<DocsLayout
+  title="Getting started"
+  description="Install budi, wire up your editor, and verify everything works — one paste, four steps."
+>
+  <div class="flex max-w-2xl flex-col gap-10">
+    <header>
+      <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Getting started</h1>
+      <p class="text-fg-muted mt-3 leading-relaxed">
+        One paste installs budi and starts the daemon. Then four steps to verify everything works.
+      </p>
+    </header>
+
+    <section>
+      <h2 id="install" class="text-fg mb-3 text-xl font-semibold tracking-tight">Install</h2>
+      <p class="text-fg-muted mb-4 leading-relaxed">
+        The command below installs budi and runs <code
+          class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi init</code
+        > — the daemon is up and the autostart service is wired.
+      </p>
+      <OsInstallTabs id="docs-install" commands={installCommands} variant="hero" />
+      <p class="text-fg-dim mt-2 text-xs">
+        Installs latest release from <a
+          href="https://github.com/siropkin/budi/releases"
+          class="link-underline hover:text-fg"
+          target="_blank"
+          rel="noopener noreferrer">GitHub Releases</a
+        >. One command. macOS / Linux / Windows. No account needed.
+      </p>
+    </section>
+
+    <section>
+      <h2 id="verify" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Four steps to verify
+      </h2>
+      <p class="text-fg-muted mb-6 leading-relaxed">
+        If anything looks wrong, <code
+          class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi doctor</code
+        > is the source of truth. For a live session health read, run <code
+          class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi sessions &lt;id&gt;</code
+        >.
+      </p>
+      <ol class="grid gap-4" role="list">
+        {
+          firstRunSteps.map((step) => (
+            <li class="card flex flex-col gap-3 p-5">
+              <div class="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
+                >
+                  {step.n}
+                </span>
+                <code class="text-fg font-mono text-sm">{step.cmd}</code>
+              </div>
+              <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section>
+      <h2 id="editor-extension" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Editor extension
+      </h2>
+      <p class="text-fg-muted mb-6 leading-relaxed">
+        Adds the budi status bar to VS Code, Cursor, or a JetBrains IDE. <code
+          class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi init</code
+        > offers VS Code / Cursor automatically. Pick your editor:
+      </p>
+      <EditorInstallCards />
+    </section>
+
+    <section>
+      <h2 id="other-install-methods" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Other install methods
+      </h2>
+      <div class="grid gap-4">
+        <div>
+          <h3 id="bundled-extension" class="text-fg mb-1.5 text-sm font-medium">
+            Bundled extension via budi CLI
+          </h3>
+          <p class="text-fg-muted mb-2 text-sm leading-relaxed">
+            Same path budi init uses. Picks the right editor automatically.
+          </p>
+          <CopyableCommand
+            command="budi integrations install --with cursor-extension"
+            variant="compact"
+          />
+        </div>
+        <div>
+          <h3 id="daemon-from-source" class="text-fg mb-1.5 text-sm font-medium">
+            Daemon from source (Rust toolchain)
+          </h3>
+          <CopyableCommand
+            command="git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh"
+            variant="compact"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 id="updating" class="text-fg mb-3 text-xl font-semibold tracking-tight">Updating</h2>
+      <p class="text-fg-muted mb-4 leading-relaxed">
+        Re-run the same install command for your platform — it fetches the latest release and
+        replaces the binaries in place. Run <code
+          class="bg-surface-3 border-line/70 text-fg rounded border px-1.5 py-0.5 text-[0.9em]"
+          >budi doctor</code
+        > afterwards to verify.
+      </p>
+      <OsInstallTabs id="docs-update" commands={updateCommands} variant="compact" />
+    </section>
+
+    <section>
+      <h2 id="uninstalling" class="text-fg mb-3 text-xl font-semibold tracking-tight">
+        Uninstalling
+      </h2>
+      <p class="text-fg-muted mb-4 leading-relaxed">
+        Remove editor integrations first, then the binary.
+      </p>
+      <div class="grid gap-3">
+        <div>
+          <p class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
+            Step 1 — remove editor wiring (all platforms)
+          </p>
+          <CopyableCommand command="budi integrations uninstall" variant="compact" />
+        </div>
+        <div>
+          <p class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
+            Step 2 — remove the binary
+          </p>
+          <OsInstallTabs id="docs-uninstall" commands={uninstallCommands} variant="compact" />
+        </div>
+      </div>
+    </section>
+  </div>
+</DocsLayout>
