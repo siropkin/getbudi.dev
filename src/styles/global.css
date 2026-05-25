@@ -38,6 +38,33 @@
   --container-readable: 64rem;
 }
 
+/*
+ * Light-theme overrides. The @theme block above registers dark-mode values as
+ * the default (utilities like bg-surface-2, text-fg-muted are generated from
+ * those). Overriding the same custom properties on html[data-theme="light"]
+ * flips every utility that references them — no dark:/light: prefixes needed.
+ *
+ * fg-dim must clear WCAG AA 4.5:1 on surface-2 (#f4f5f7) and surface-3
+ * (#e8eaed). #636366 measures ~4.9:1 on surface-2 and ~4.5:1 on surface-3.
+ * accent #006694 clears ~5.3:1 on surface-2, ~4.8:1 on surface-3.
+ */
+html[data-theme="light"] {
+  --color-surface: #ffffff;
+  --color-surface-2: #f4f5f7;
+  --color-surface-3: #e8eaed;
+  --color-line: rgba(0, 0, 0, 0.1);
+  --color-line-strong: rgba(0, 0, 0, 0.16);
+  --color-fg: #1a1a2e;
+  --color-fg-muted: #52525b;
+  --color-fg-dim: #636366;
+  --color-accent: #006694;
+  --color-accent-soft: rgba(0, 102, 148, 0.1);
+  --color-warn: #b45309;
+  --color-warn-soft: rgba(180, 83, 9, 0.1);
+  --color-tip: #15803d;
+  --color-tip-soft: rgba(21, 128, 61, 0.1);
+}
+
 @layer base {
   html {
     color-scheme: dark;
@@ -49,12 +76,20 @@
     text-rendering: optimizeLegibility;
   }
 
+  html[data-theme="light"] {
+    color-scheme: light;
+  }
+
   body {
     background:
       radial-gradient(1200px 600px at 80% -10%, rgba(0, 127, 175, 0.08), transparent 60%),
       radial-gradient(900px 500px at -10% 10%, rgba(0, 127, 175, 0.05), transparent 60%),
       var(--color-surface);
     min-height: 100dvh;
+  }
+
+  html[data-theme="light"] body {
+    background: var(--color-surface);
   }
 
   ::selection {
