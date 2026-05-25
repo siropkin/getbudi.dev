@@ -6,6 +6,7 @@ const providers = [
     name: "Cursor",
     live: true,
     source: "Local SQLite + Cursor Usage API",
+    latency: "~10 min (API) / seconds (local)",
     href: "/docs/providers/cursor/",
     details:
       "Budi reads Cursor's local SQLite database for per-message token counts and model info. The Cursor Usage API supplements this with dollar-level reconciliation.",
@@ -14,6 +15,7 @@ const providers = [
     name: "Claude Code",
     live: true,
     source: "Local JSONL transcripts",
+    latency: "seconds",
     href: "/docs/providers/claude-code/",
     details:
       "Claude Code writes JSONL transcripts to ~/.claude/projects/. Budi tails these files in real-time for session, token, and cost data.",
@@ -22,6 +24,7 @@ const providers = [
     name: "Codex CLI",
     live: true,
     source: "Local JSONL transcripts",
+    latency: "seconds",
     href: "/docs/providers/codex-cli/",
     details:
       "OpenAI's Codex CLI writes JSONL session logs. Budi tails these the same way it handles Claude Code transcripts — automatic discovery, real-time attribution.",
@@ -30,6 +33,7 @@ const providers = [
     name: "Copilot CLI",
     live: true,
     source: "Local JSONL session-state",
+    latency: "seconds",
     href: "/docs/providers/copilot-cli/",
     details:
       "GitHub Copilot's CLI mode writes local session state files. Budi reads these for token counts and model info.",
@@ -38,6 +42,7 @@ const providers = [
     name: "Copilot Chat (VS Code)",
     live: true,
     source: "Local JSON/JSONL + GitHub Billing API",
+    latency: "seconds (local) / ~hour (billing)",
     href: "/docs/providers/copilot-chat/",
     details:
       "VS Code's Copilot Chat stores local session data that budi tails for output-only token counts. For dollar-accurate reconciliation, add a GitHub PAT scoped to billing.",
@@ -46,6 +51,7 @@ const providers = [
     name: "Continue, Cline, Roo Code, Aider, Gemini CLI",
     live: false,
     source: "Local logs (planned)",
+    latency: null,
     href: null,
     details:
       "Planned for 8.5.0. Same provider-plugin pattern as Cursor and Copilot Chat — local logs primary, no proxy.",
@@ -78,6 +84,7 @@ const providers = [
               <th class="px-4 py-3 text-left font-medium sm:px-5">Provider</th>
               <th class="px-4 py-3 text-left font-medium sm:px-5">Status</th>
               <th class="hidden px-4 py-3 text-left font-medium sm:table-cell sm:px-5">Source</th>
+              <th class="hidden px-4 py-3 text-left font-medium sm:table-cell sm:px-5">Latency</th>
             </tr>
           </thead>
           <tbody>
@@ -101,6 +108,9 @@ const providers = [
                     </span>
                   </td>
                   <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">{p.source}</td>
+                  <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">
+                    {p.latency ?? "—"}
+                  </td>
                 </tr>
               ))
             }
