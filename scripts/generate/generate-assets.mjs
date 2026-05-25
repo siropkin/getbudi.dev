@@ -102,11 +102,11 @@ export function buildOGSvg() {
 <svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
     <radialGradient id="g1" cx="85%" cy="-5%" r="55%">
-      <stop offset="0%" stop-color="#007faf" stop-opacity="0.22"/>
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.26"/>
       <stop offset="100%" stop-color="#0b0d10" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="g2" cx="-5%" cy="25%" r="55%">
-      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.18"/>
+      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.22"/>
       <stop offset="100%" stop-color="#0b0d10" stop-opacity="0"/>
     </radialGradient>
   </defs>
@@ -115,19 +115,15 @@ export function buildOGSvg() {
   <rect width="${W}" height="${H}" fill="url(#g1)"/>
   <rect width="${W}" height="${H}" fill="url(#g2)"/>
 
-  <!-- Brand symbol: dollar-prompt on rounded square -->
-  <rect x="72" y="72" width="44" height="44" rx="10" fill="#0f1318" stroke="#007faf" stroke-opacity="0.4" stroke-width="1.5"/>
-  <g fill="none" stroke="#007faf" stroke-width="2.5" stroke-linecap="round" transform="translate(72,72) scale(0.6875)">
-    <path d="M37 18.5c-1.8-1.8-4.2-2.5-6.5-2.5-5 0-8.5 3-8.5 7s3.5 6 8.5 7.5c5 1.5 8.5 3.5 8.5 7.5s-3.5 7-8.5 7c-2.8 0-5.4-1-7.2-3"/>
-    <line x1="31" y1="11" x2="31" y2="53"/>
-  </g>
-  <rect x="104" y="87" width="3" height="14" rx="1" fill="#007faf" opacity="0.45"/>
-  <text x="126" y="104" font-family="Inter" font-weight="600" font-size="30" fill="#e6e8ec" letter-spacing="-0.3">budi</text>
-  <text x="196" y="104" font-family="Inter" font-weight="400" font-size="22" fill="#9aa3b2">/ getbudi.dev</text>
+  <!-- Brand row -->
+  <circle cx="92" cy="92" r="10" fill="#22c55e"/>
+  <circle cx="92" cy="92" r="18" fill="none" stroke="#22c55e" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="116" y="100" font-family="Inter" font-weight="600" font-size="30" fill="#e6e8ec" letter-spacing="-0.3">budi</text>
+  <text x="186" y="100" font-family="Inter" font-weight="400" font-size="22" fill="#9aa3b2">/ getbudi.dev</text>
 
   <!-- Headline -->
   <text x="80" y="312" font-family="Inter" font-weight="600" font-size="78" fill="#e6e8ec" letter-spacing="-1.8">${esc(headline1)}</text>
-  <text x="80" y="400" font-family="Inter" font-weight="600" font-size="78" fill="#007faf" letter-spacing="-1.8">${esc(headline2)}</text>
+  <text x="80" y="400" font-family="Inter" font-weight="600" font-size="78" fill="#22c55e" letter-spacing="-1.8">${esc(headline2)}</text>
 
   <!-- Subhead -->
   <text x="80" y="460" font-family="Inter" font-weight="400" font-size="24" fill="#9aa3b2">${esc(sub)}</text>
@@ -135,7 +131,7 @@ export function buildOGSvg() {
 
   <!-- Install command chip -->
   <rect x="80" y="528" width="1040" height="72" rx="14" fill="#11141a" stroke="#232832"/>
-  <text x="108" y="576" font-family="JetBrains Mono" font-weight="500" font-size="26" fill="#007faf">$</text>
+  <text x="108" y="576" font-family="JetBrains Mono" font-weight="500" font-size="26" fill="#22c55e">$</text>
   <text x="136" y="576" font-family="JetBrains Mono" font-weight="500" font-size="26" fill="#e6e8ec">${esc(install)}</text>
 </svg>`;
 }
