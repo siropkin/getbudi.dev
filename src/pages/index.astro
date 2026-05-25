@@ -90,6 +90,44 @@ const features = [
   },
 ];
 
+type Support = "yes" | "no" | "partial" | "na";
+
+const matrixColumns = [
+  { key: "dashboards", label: "Provider dashboards" },
+  { key: "cli", label: "ccusage / claude-usage" },
+  { key: "saas", label: "SaaS cost trackers" },
+  { key: "budi", label: "Budi" },
+] as const;
+
+const matrixRows: {
+  capability: string;
+  dashboards: Support;
+  cli: Support;
+  saas: Support;
+  budi: Support;
+}[] = [
+  { capability: "Multi-agent", dashboards: "no", cli: "no", saas: "yes", budi: "yes" },
+  {
+    capability: "Repo / branch / ticket attribution",
+    dashboards: "no",
+    cli: "no",
+    saas: "partial",
+    budi: "yes",
+  },
+  { capability: "Local-only by default", dashboards: "yes", cli: "yes", saas: "no", budi: "yes" },
+  { capability: "No prompts uploaded", dashboards: "yes", cli: "yes", saas: "no", budi: "yes" },
+  { capability: "Live statusline", dashboards: "na", cli: "na", saas: "na", budi: "yes" },
+  { capability: "Team aggregates", dashboards: "na", cli: "na", saas: "yes", budi: "yes" },
+  { capability: "Cross-agent rollups", dashboards: "na", cli: "na", saas: "yes", budi: "yes" },
+];
+
+const supportLabel: Record<Support, string> = {
+  yes: "✓",
+  no: "✗",
+  partial: "Partial",
+  na: "–",
+};
+
 const alternatives = [
   {
     name: "Provider dashboards",
@@ -541,7 +579,64 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
       </Callout>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="card terminal-scroll overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="text-fg-dim border-line/70 border-b text-xs tracking-wider uppercase">
+          <tr>
+            <th class="bg-surface-2 sticky left-0 px-4 py-3 text-left font-medium sm:px-5">
+              Capability
+            </th>
+            {
+              matrixColumns.map((col) => (
+                <th
+                  class:list={[
+                    "px-4 py-3 text-center font-medium whitespace-nowrap sm:px-5",
+                    col.key === "budi" ? "text-accent" : "",
+                  ]}
+                >
+                  {col.label}
+                </th>
+              ))
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            matrixRows.map((row, i) => (
+              <tr class:list={[i > 0 ? "border-line/70 border-t" : ""]}>
+                <td class="text-fg bg-surface-2 sticky left-0 px-4 py-3 font-medium whitespace-nowrap sm:px-5">
+                  {row.capability}
+                </td>
+                {matrixColumns.map((col) => {
+                  const val = row[col.key];
+                  const isBudi = col.key === "budi";
+                  return (
+                    <td
+                      class:list={[
+                        "px-4 py-3 text-center sm:px-5",
+                        val === "yes" && isBudi
+                          ? "text-accent font-semibold"
+                          : val === "yes"
+                            ? "text-tip"
+                            : val === "no"
+                              ? "text-fg-dim"
+                              : val === "partial"
+                                ? "text-warn"
+                                : "text-fg-dim",
+                      ]}
+                    >
+                      {supportLabel[val]}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
       {
         alternatives.map((alt) => (
           <article
