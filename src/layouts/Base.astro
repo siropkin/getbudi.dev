@@ -32,9 +32,7 @@ const {
 } = Astro.props;
 
 const isHomepage = Astro.url.pathname === "/";
-const installHref = isHomepage
-  ? anchorHref(ANCHORS.install)
-  : "/docs/getting-started/";
+const installHref = isHomepage ? anchorHref(ANCHORS.install) : "/docs/getting-started/";
 
 // JSON-LD lives in `head` so rich-result crawlers pick it up without JS.
 // SoftwareApplication is the closest schema.org fit: budi is a CLI tool
@@ -136,9 +134,7 @@ const jsonLd = {
         </a>
         <nav class="text-fg-muted flex items-center gap-3 text-sm sm:gap-5">
           <a href="/docs/" class="hover:text-fg hidden sm:inline">Docs</a>
-          <a href={installHref} class="hover:text-fg hidden sm:inline"
-            >Install</a
-          >
+          <a href={installHref} class="hover:text-fg hidden sm:inline">Install</a>
           <a href="/privacy" class="hover:text-fg hidden sm:inline">Privacy</a>
           <SearchModal />
           <details class="relative sm:hidden">
