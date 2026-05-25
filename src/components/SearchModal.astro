@@ -1,4 +1,5 @@
 ---
+
 ---
 
 <button
@@ -53,9 +54,7 @@
         autocomplete="off"
         class="text-fg placeholder:text-fg-dim min-w-0 flex-1 bg-transparent text-sm outline-none"
       />
-      <kbd
-        class="text-fg-dim border-line/70 shrink-0 rounded border px-1.5 py-0.5 text-xs"
-        >Esc</kbd
+      <kbd class="text-fg-dim border-line/70 shrink-0 rounded border px-1.5 py-0.5 text-xs">Esc</kbd
       >
     </div>
     <div id="search-results" class="max-h-[min(60vh,24rem)] overflow-y-auto p-2">
@@ -79,8 +78,8 @@
 
   async function loadPagefind() {
     if (pagefind) return pagefind;
-    // @ts-expect-error — pagefind index only exists after build
-    pagefind = await import(/* @vite-ignore */ "/pagefind/pagefind.js");
+    const path = "/pagefind/pagefind.js";
+    pagefind = await import(/* @vite-ignore */ path);
     await pagefind.init();
     return pagefind;
   }
@@ -134,9 +133,7 @@
       return;
     }
 
-    const items = await Promise.all(
-      searchResults.results.slice(0, 12).map((r: any) => r.data()),
-    );
+    const items = await Promise.all(searchResults.results.slice(0, 12).map((r: any) => r.data()));
 
     results.innerHTML = "";
     for (const item of items) {
