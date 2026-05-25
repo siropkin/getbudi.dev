@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && npm run audit && npm run csp",
+    "build": "astro build && npx pagefind --site dist && npm run audit && npm run csp",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
@@ -35,6 +35,7 @@
     "eslint-plugin-astro": "^1.7.0",
     "globals": "^17.6.0",
     "node-html-parser": "^7.1.0",
+    "pagefind": "^1.3.0",
     "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.0",

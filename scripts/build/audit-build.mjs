@@ -112,8 +112,7 @@ function walkHtml(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
-      // Skip Astro's hashed asset dir — it doesn't contain pages.
-      if (entry.name === "_astro") continue;
+      if (entry.name === "_astro" || entry.name === "pagefind") continue;
       out.push(...walkHtml(full));
     } else if (entry.isFile() && entry.name.endsWith(".html")) {
       out.push(full);

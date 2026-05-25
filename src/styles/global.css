@@ -91,6 +91,21 @@
     outline-offset: 2px;
     border-radius: 2px;
   }
+
+  dialog {
+    color: inherit;
+  }
+
+  dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  mark {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
+    border-radius: 2px;
+    padding-inline: 1px;
+  }
 }
 
 @utility container-readable {
