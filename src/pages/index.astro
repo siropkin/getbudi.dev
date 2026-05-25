@@ -1,13 +1,11 @@
 ---
 import Base from "~/layouts/Base.astro";
-import CopyableCommand from "~/components/CopyableCommand.astro";
-import CodeTabs from "~/components/CodeTabs.astro";
 import OsInstallTabs from "~/components/OsInstallTabs.astro";
-import EditorInstallCards from "~/components/EditorInstallCards.astro";
 import GitHubIcon from "~/components/GitHubIcon.astro";
 import Callout from "~/components/Callout.astro";
 import JsonLd from "~/components/JsonLd.astro";
 import { ANCHORS, anchorHref } from "~/lib/anchors";
+import { installCommands } from "~/lib/install-data";
 
 const faqs = [
   {
@@ -53,23 +51,6 @@ const faqJsonLd = {
   })),
 };
 
-const installCommands = {
-  macos: "brew install siropkin/budi/budi && budi init",
-  linux: "curl -fsSL https://getbudi.dev/install.sh | sh",
-  windows: "irm https://getbudi.dev/install.ps1 | iex",
-};
-
-const updateCommands = {
-  macos: "brew upgrade budi",
-  linux: "curl -fsSL https://getbudi.dev/install.sh | sh",
-  windows: "irm https://getbudi.dev/install.ps1 | iex",
-};
-
-const uninstallCommands = {
-  macos: "brew uninstall budi",
-  linux: "rm -f ~/.local/bin/budi ~/.local/bin/budi-daemon",
-  windows: 'Remove-Item -Recurse -Force "$env:LOCALAPPDATA\\budi"',
-};
 
 const features = [
   {
@@ -163,72 +144,13 @@ const alternatives = [
   },
 ];
 
-const firstRunSteps = [
-  {
-    n: "1",
-    cmd: "budi init",
-    body: "Starts the daemon on port 7878 and installs the platform-native autostart service. The hero install runs this for you — listed here so you know what just happened.",
-  },
-  {
-    n: "2",
-    cmd: "budi integrations install",
-    body: "Wires the Claude Code statusline and offers the VS Code / Cursor extension if either editor is detected. Restart Claude Code afterwards so it picks up the new statusLine command.",
-  },
-  {
-    n: "3",
-    cmd: "budi doctor",
-    body: 'End-to-end verifier: daemon, tailers, schema, transcript visibility, and attribution health. When "All checks passed." you are done.',
-  },
-  {
-    n: "4",
-    cmd: "budi status",
-    body: "Today-cost snapshot: daemon state and today's spend. For the full breakdown, use budi stats projects / branches / tickets.",
-  },
-];
-
 const providers = [
-  {
-    name: "Cursor",
-    live: true,
-    source: "Local SQLite + Cursor Usage API",
-    latency: "~10 min (API) / seconds (local)",
-    href: "/docs/providers/cursor/",
-  },
-  {
-    name: "Claude Code",
-    live: true,
-    source: "Local JSONL transcripts",
-    latency: "seconds",
-    href: "/docs/providers/claude-code/",
-  },
-  {
-    name: "Codex CLI",
-    live: true,
-    source: "Local JSONL transcripts",
-    latency: "seconds",
-    href: "/docs/providers/codex-cli/",
-  },
-  {
-    name: "Copilot CLI",
-    live: true,
-    source: "Local JSONL session-state",
-    latency: "seconds",
-    href: "/docs/providers/copilot-cli/",
-  },
-  {
-    name: "Copilot Chat (VS Code)",
-    live: true,
-    source: "Local JSON/JSONL + GitHub Billing API",
-    latency: "seconds (local) / ~hour (billing)",
-    href: "/docs/providers/copilot-chat/",
-  },
-  {
-    name: "Continue, Cline, Roo Code, Aider, Gemini CLI",
-    live: false,
-    source: "Local logs",
-    latency: null,
-    href: null,
-  },
+  { name: "Cursor", live: true, href: "/docs/providers/cursor/" },
+  { name: "Claude Code", live: true, href: "/docs/providers/claude-code/" },
+  { name: "Codex CLI", live: true, href: "/docs/providers/codex-cli/" },
+  { name: "Copilot CLI", live: true, href: "/docs/providers/copilot-cli/" },
+  { name: "Copilot Chat", live: true, href: "/docs/providers/copilot-chat/" },
+  { name: "Continue, Cline, Roo Code, Aider, Gemini CLI", live: false, href: null },
 ];
 
 let starCount: number | null = null;
@@ -249,18 +171,6 @@ const testimonials: { quote: string; author: string; source: string; href: strin
   // { quote: "...", author: "Name", source: "X", href: "https://..." },
 ];
 
-const vsixTabs = [
-  {
-    key: "vscode",
-    label: "VS Code",
-    code: "code --install-extension cursor-budi.vsix --force",
-  },
-  {
-    key: "cursor",
-    label: "Cursor",
-    code: "cursor --install-extension cursor-budi.vsix --force",
-  },
-];
 ---
 
 <Base>
@@ -312,8 +222,8 @@ const vsixTabs = [
         <div class="mt-3">
           <Callout kind="info">
             Installs latest. One command. macOS / Linux / Windows. No account needed.
-            <a href={anchorHref(ANCHORS.install)} class="link-underline hover:text-fg"
-              >Editor wiring →</a
+            <a href="/docs/getting-started/" class="link-underline hover:text-fg"
+              >Full setup guide →</a
             >
           </Callout>
         </div>
@@ -540,7 +450,7 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
     </figure>
   </section>
 
-  {/* 3b. PROVIDER MATRIX */}
+  {/* 3b. PROVIDER COVERAGE */}
   <section
     id={ANCHORS.providers}
     class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20"
@@ -549,50 +459,50 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
       <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">What budi tracks</p>
       <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">Provider coverage.</h2>
       <p class="text-fg-muted mt-3">
-        Local logs are the primary source for every provider. Vendor APIs (Cursor Usage, GitHub
-        Billing) are used only as supplementary truth-up — so attribution keeps working offline and
-        when an upstream API breaks.
+        Local logs are the primary source for every provider — no proxy, no gateway, nothing in
+        your network path.
       </p>
     </header>
 
-    <div class="card overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="text-fg-dim border-line/70 border-b text-xs tracking-wider uppercase">
-          <tr>
-            <th class="px-4 py-3 text-left font-medium sm:px-5">Provider</th>
-            <th class="px-4 py-3 text-left font-medium sm:px-5">Status</th>
-            <th class="hidden px-4 py-3 text-left font-medium sm:table-cell sm:px-5">Source</th>
-            <th class="hidden px-4 py-3 text-left font-medium sm:table-cell sm:px-5">Latency</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            providers.map((p, i) => (
-              <tr class:list={[i > 0 ? "border-line/70 border-t" : ""]}>
-                <td class="text-fg px-4 py-3 font-medium sm:px-5">
-                  {p.href ? (
-                    <a href={p.href} class="link-underline hover:text-accent">
-                      {p.name}
-                    </a>
-                  ) : (
-                    p.name
-                  )}
-                </td>
-                <td class="px-4 py-3 sm:px-5">
-                  <span class:list={["chip", p.live ? "border-accent text-accent" : "text-fg-dim"]}>
-                    {p.live ? "Live" : "Coming soon"}
-                  </span>
-                </td>
-                <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">{p.source}</td>
-                <td class="text-fg-muted hidden px-4 py-3 sm:table-cell sm:px-5">
-                  {p.latency ?? "—"}
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
+    <div class="flex flex-wrap items-center gap-2">
+      {
+        providers.map((p) =>
+          p.live && p.href ? (
+            <a
+              href={p.href}
+              class="chip border-accent text-accent hover:bg-accent transition-colors hover:text-white"
+            >
+              {p.name}
+            </a>
+          ) : !p.live ? (
+            <span class="chip text-fg-dim">{p.name} (coming soon)</span>
+          ) : null,
+        )
+      }
     </div>
+
+    <p class="mt-6">
+      <a
+        href="/docs/providers/"
+        class="text-accent hover:text-accent/80 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+      >
+        See all providers — sources, latency, and setup guides
+        <svg
+          aria-hidden="true"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </p>
   </section>
 
   {/* 4. COMPARE */}
@@ -750,157 +660,7 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
     </p>
   </section>
 
-  {/* 6. INSTALL */}
-  <section id={ANCHORS.install} class="container-readable border-line/70 border-t py-14 sm:py-20">
-    <header class="mb-8 max-w-2xl">
-      <p class="text-fg-dim mb-2 text-xs tracking-[0.18em] uppercase">Install</p>
-      <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-        One paste, then four steps to verify.
-      </h2>
-      <p class="text-fg-muted mt-3">
-        The command below installs budi and runs <code>budi init</code> — the daemon is up and the autostart
-        service is wired. Editor statusline + extension wiring is the second step in the checklist below.
-      </p>
-    </header>
-
-    <OsInstallTabs id="install-section" commands={installCommands} variant="hero" />
-    <p class="text-fg-dim mt-2 text-xs">
-      Installs latest release from <a
-        href="https://github.com/siropkin/budi/releases"
-        class="link-underline hover:text-fg"
-        target="_blank"
-        rel="noopener noreferrer">GitHub</a
-      >. Prefer to install the editor extension on its own?
-      <a href={anchorHref(ANCHORS.editorExtension)} class="link-underline hover:text-fg"
-        >Pick VS Code or Cursor below</a
-      >.
-    </p>
-
-    <div class="mt-10">
-      <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Four steps to verify.</h3>
-      <p class="text-fg-muted mb-6 text-sm">
-        If anything looks wrong, <code class="text-xs">budi doctor</code> is the source of truth. For
-        a live session health read, run <code class="text-xs">budi sessions &lt;id&gt;</code>.
-      </p>
-      <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="list">
-        {
-          firstRunSteps.map((step) => (
-            <li class="card flex flex-col gap-3 p-5">
-              <div class="flex items-center gap-3">
-                <span
-                  aria-hidden="true"
-                  class="bg-accent-soft text-accent inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-sm font-semibold"
-                >
-                  {step.n}
-                </span>
-                <code class="text-fg font-mono text-sm">{step.cmd}</code>
-              </div>
-              <p class="text-fg-muted text-sm leading-relaxed">{step.body}</p>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
-
-    <div id={ANCHORS.editorExtension} class="mt-12 scroll-mt-24">
-      <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Editor extension.</h3>
-      <p class="text-fg-muted mb-6 text-sm">
-        Adds the budi status bar to VS Code, Cursor, or a JetBrains IDE. <code class="text-xs"
-          >budi init</code
-        > offers VS Code / Cursor automatically. Pick your editor:
-      </p>
-      <EditorInstallCards />
-    </div>
-
-    <details class="group mt-10">
-      <summary
-        class="text-fg-muted hover:text-fg inline-flex cursor-pointer list-none items-center gap-2 text-sm transition-colors"
-      >
-        <svg
-          aria-hidden="true"
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="transition-transform group-open:rotate-90"
-        >
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-        Other install methods
-      </summary>
-      <div class="mt-4 grid gap-3">
-        <div>
-          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
-            Bundled extension via budi CLI
-          </div>
-          <p class="text-fg-muted mb-2 text-xs leading-relaxed">
-            Same path budi init uses. Picks the right editor automatically.
-          </p>
-          <CopyableCommand
-            command="budi integrations install --with cursor-extension"
-            variant="compact"
-          />
-        </div>
-        <div>
-          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
-            Manual VSIX (offline / pinned)
-          </div>
-          <p class="text-fg-muted mb-2 text-xs leading-relaxed">
-            Download cursor-budi.vsix from the budi-cursor releases page first. The same file works
-            in both editors.
-          </p>
-          <CodeTabs id="alt-vsix" variant="compact" tabs={vsixTabs} />
-        </div>
-        <div>
-          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
-            Daemon from source (Rust toolchain)
-          </div>
-          <CopyableCommand
-            command="git clone https://github.com/siropkin/budi.git && cd budi && ./scripts/install.sh"
-            variant="compact"
-          />
-        </div>
-      </div>
-    </details>
-
-    <div class="mt-12">
-      <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Updating.</h3>
-      <p class="text-fg-muted mb-4 text-sm">
-        Re-run the same install command for your platform — it fetches the latest release and
-        replaces the binaries in place. Run <code class="text-xs">budi doctor</code> afterwards to verify.
-      </p>
-      <OsInstallTabs id="install-update" commands={updateCommands} variant="compact" />
-      <p class="text-fg-dim mt-2 text-xs">
-        Then verify with
-        <code>budi doctor</code>.
-      </p>
-    </div>
-
-    <div class="mt-12">
-      <h3 class="text-fg mb-1 text-lg font-semibold tracking-tight">Uninstalling.</h3>
-      <p class="text-fg-muted mb-4 text-sm">Remove editor integrations first, then the binary.</p>
-      <div class="grid gap-3">
-        <div>
-          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
-            Step 1 — remove editor wiring (all platforms)
-          </div>
-          <CopyableCommand command="budi integrations uninstall" variant="compact" />
-        </div>
-        <div>
-          <div class="text-fg-dim mb-1.5 text-xs tracking-wider uppercase">
-            Step 2 — remove the binary
-          </div>
-          <OsInstallTabs id="install-uninstall" commands={uninstallCommands} variant="compact" />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* 7. DASHBOARD — online view of your local stats */}
+  {/* 6. DASHBOARD — online view of your local stats */}
   <section
     id={ANCHORS.dashboard}
     class="container-readable border-line/70 scroll-mt-24 border-t py-14 sm:py-20"

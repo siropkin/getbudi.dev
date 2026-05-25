@@ -20,13 +20,11 @@ export const ANCHORS = {
   providers: "providers",
   compare: "compare",
   privacy: "privacy",
-  install: "install",
   dashboard: "dashboard",
   community: "community",
   faq: "faq",
   /** Sub-section anchors inside the landing page. */
   analytics: "analytics",
-  editorExtension: "editor-extension",
 } as const;
 
 export type AnchorId = (typeof ANCHORS)[keyof typeof ANCHORS];
