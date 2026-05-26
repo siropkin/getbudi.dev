@@ -332,7 +332,8 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
         {
           [
             { key: "cursor", label: "Cursor status bar" },
-            { key: "vscode", label: "VS Code status bar" },
+            { key: "vscode", label: "VS Code / Cursor status bar" },
+            { key: "jetbrains", label: "JetBrains status bar" },
             { key: "session", label: "Session detail" },
           ].map((tab, i) => (
             <button
@@ -366,7 +367,7 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
           },
           {
             key: "vscode",
-            host: "VS Code",
+            host: "VS Code / Cursor",
             file: "payments.ts",
             scope: "copilot_chat",
             statusBg: "bg-[#007ACC]",
@@ -374,6 +375,17 @@ acme/web/feat/analytics-v3  $  3.12   WEB-1199`}</code></pre>
             d1: "$0.31",
             d7: "$2.04",
             d30: "$9.87",
+          },
+          {
+            key: "jetbrains",
+            host: "JetBrains",
+            file: "payments.ts",
+            scope: "copilot_chat",
+            statusBg: "bg-[#3c3f41]",
+            statusBorder: "border-[#515151]",
+            d1: "$0.28",
+            d7: "$1.86",
+            d30: "$8.54",
           },
         ].map((s, i) => (
           <figure
