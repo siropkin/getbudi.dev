@@ -59,7 +59,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'wasm-unsafe-eval' 'sha256-5nOOCkXAxSQx9B7gsfeFfh7ULaxT3M3mihdatTuYn74=' 'sha256-7lmlSWOZpwY0hPhoNO8H7R4nCsEPG2rb3wn7muxIaBU=' 'sha256-K9X851Pd2mfVq5aF93bYwU2GYiJC9ogMjZC53BvoT70=' 'sha256-MbnEiF8MoKChoZ7math6Mgh1JyJpASeQS6+IMKiETUk=' 'sha256-OnqbK1872Y1fGmCDLdiQnRv3UjDqmjtp5SquEnvG6gw=' 'sha256-U6eaTpgQwpXTKMOOXQcFmXtmKwnwirvAeC00XMIcDH4=' 'sha256-UTFFs1mxbxsMdvIKmEhqk4OIQuFyHIIb0Y093EPtC78=' 'sha256-UlWKedVxf4OJF0wyr5ePTDtUp6SsoM+o6qWbhl6GBe0=' 'sha256-Wj9okDdVaQlAcLhO01+EtIOgDzZjjw3ur3jgL7Pw3so=' 'sha256-eJpg+KehfEG2iKV+l6anxeCZA89mA+YxjFJp0I+nZBM=' 'sha256-hDM6CfQQgPBebPns0OeuMJOno8DfLVCNYl5GGwWa7JM=' 'sha256-ku9H2Z9Nj0VGq2Mi6ftQyz8wq1l1rcNqPaaR5sF8AlE=' 'sha256-mhrNEW6wZHL04EW/DjSxESfiCvTI/cyMpZfvZDDL7WE=' 'sha256-ou3RqRtKUAaqTYTwy7CzEdXJwpyYTnDlhAEiP6++cJk=' 'sha256-rfZiY05yvrjZMXYNf9WYqV6MoRYZrVFZw5C61DrMWJI=' 'sha256-v5+X/9zjf2/gTCUrbpPeyha206HM1JBrPCgrI0TdNzQ=' 'sha256-w0ayGBf+1ulLbH5QMwdPFxHIH6kJHUeeajEDjuMamdw=' 'sha256-xBLRIEPyEi4wjnXKU0OdZPHuoVrkUo4zJHMQ/u4unzA=' 'sha256-yZ8wvF1mZqRQ8ZPYqTUfFIsI1vefR5+T0gPOT63eXfo=' 'sha256-z2IuMDe+YeW0DnOOGUXg55zpGTzZFGUy8se1dxONCpM=' 'sha256-z9BR8R+8tR4I5pTwriX+G0UlQqqPfP5jF+p/ueXsLhg='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://img.shields.io https://vsmarketplacebadges.dev; font-src 'self' data:; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'wasm-unsafe-eval' 'sha256-5nOOCkXAxSQx9B7gsfeFfh7ULaxT3M3mihdatTuYn74=' 'sha256-7lmlSWOZpwY0hPhoNO8H7R4nCsEPG2rb3wn7muxIaBU=' 'sha256-K9X851Pd2mfVq5aF93bYwU2GYiJC9ogMjZC53BvoT70=' 'sha256-MbnEiF8MoKChoZ7math6Mgh1JyJpASeQS6+IMKiETUk=' 'sha256-OnqbK1872Y1fGmCDLdiQnRv3UjDqmjtp5SquEnvG6gw=' 'sha256-U6eaTpgQwpXTKMOOXQcFmXtmKwnwirvAeC00XMIcDH4=' 'sha256-UTFFs1mxbxsMdvIKmEhqk4OIQuFyHIIb0Y093EPtC78=' 'sha256-UlWKedVxf4OJF0wyr5ePTDtUp6SsoM+o6qWbhl6GBe0=' 'sha256-Wj9okDdVaQlAcLhO01+EtIOgDzZjjw3ur3jgL7Pw3so=' 'sha256-eJpg+KehfEG2iKV+l6anxeCZA89mA+YxjFJp0I+nZBM=' 'sha256-hDM6CfQQgPBebPns0OeuMJOno8DfLVCNYl5GGwWa7JM=' 'sha256-ku9H2Z9Nj0VGq2Mi6ftQyz8wq1l1rcNqPaaR5sF8AlE=' 'sha256-mhrNEW6wZHL04EW/DjSxESfiCvTI/cyMpZfvZDDL7WE=' 'sha256-ou3RqRtKUAaqTYTwy7CzEdXJwpyYTnDlhAEiP6++cJk=' 'sha256-rfZiY05yvrjZMXYNf9WYqV6MoRYZrVFZw5C61DrMWJI=' 'sha256-riZhPnrTJlhzduV1ovUT0HgdValPcH9tDojONCD6xCk=' 'sha256-v5+X/9zjf2/gTCUrbpPeyha206HM1JBrPCgrI0TdNzQ=' 'sha256-w0ayGBf+1ulLbH5QMwdPFxHIH6kJHUeeajEDjuMamdw=' 'sha256-xBLRIEPyEi4wjnXKU0OdZPHuoVrkUo4zJHMQ/u4unzA=' 'sha256-yZ8wvF1mZqRQ8ZPYqTUfFIsI1vefR5+T0gPOT63eXfo=' 'sha256-z2IuMDe+YeW0DnOOGUXg55zpGTzZFGUy8se1dxONCpM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://img.shields.io https://vsmarketplacebadges.dev; font-src 'self' data:; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests"
         }
       ]
     },
@@ -104,7 +104,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, s-maxage=300, must-revalidate"
+          "value": "public, no-cache, max-age=0, s-maxage=300, must-revalidate"
         }
       ]
     },
@@ -113,7 +113,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, s-maxage=300, must-revalidate"
+          "value": "public, no-cache, max-age=0, s-maxage=300, must-revalidate"
         }
       ]
     }

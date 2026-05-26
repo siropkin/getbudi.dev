@@ -76,12 +76,27 @@
   let activeIndex = -1;
   let debounceTimer: ReturnType<typeof setTimeout>;
 
+  let loadFailed = false;
+
   async function loadPagefind() {
     if (pagefind) return pagefind;
-    const path = "/pagefind/pagefind.js";
-    pagefind = await import(/* @vite-ignore */ path);
-    await pagefind.init();
-    return pagefind;
+    if (loadFailed) return null;
+    try {
+      const path = "/pagefind/pagefind.js";
+      pagefind = await import(/* @vite-ignore */ path);
+      await pagefind.init();
+      return pagefind;
+    } catch {
+      loadFailed = true;
+      return null;
+    }
+  }
+
+  function showError() {
+    results.innerHTML = "";
+    results.appendChild(empty);
+    empty.textContent = "Search unavailable — please hard-refresh (⌘⇧R)";
+    activeIndex = -1;
   }
 
   function open() {
@@ -89,7 +104,9 @@
     input.value = "";
     results.innerHTML = "";
     results.appendChild(empty);
-    empty.textContent = "Type to search…";
+    empty.textContent = loadFailed
+      ? "Search unavailable — please hard-refresh (⌘⇧R)"
+      : "Type to search…";
     activeIndex = -1;
     input.focus();
   }
@@ -117,12 +134,18 @@
     if (!query.trim()) {
       results.innerHTML = "";
       results.appendChild(empty);
-      empty.textContent = "Type to search…";
+      empty.textContent = loadFailed
+        ? "Search unavailable — please hard-refresh (⌘⇧R)"
+        : "Type to search…";
       activeIndex = -1;
       return;
     }
 
     const pf = await loadPagefind();
+    if (!pf) {
+      showError();
+      return;
+    }
     const searchResults = await pf.search(query);
 
     if (searchResults.results.length === 0) {
